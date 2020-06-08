@@ -11,6 +11,8 @@ local function onInit()
 
 	-----------------------------------------USERS-----------------------------------------
 	--used to set up users and their permission level based on a choser identifier
+	--the default permission level is 0, negative permission levels can be created and used.
+
 	--ID-TYPE-MAP: 1: discordID | 2: HWID | 3: NAME
 	--CE.registerUser(identifier,IDtype,permissionLevel,specialPerms)
 
@@ -19,8 +21,9 @@ local function onInit()
 
 	-----------------------------------------PERMISSIONS-----------------------------------------
 	--Used to set up specific permissions unrelated to a command like the ability to do something.
+	--CE.setPermission(permission, requiredPermissionLevel)
 
-	CE.setPermission()
+	CE.setPermission("spawnVehicles", 0)
 
 
 

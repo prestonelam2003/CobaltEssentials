@@ -19,6 +19,9 @@ local M = {}
 local options = {}
 local commands = {}
 
+--TODO: try to come up with a way to combine banlist, whitelist and registeredUsers in a way that keeps everything efficent (even if it's not nessesary) & makes things a little cleaner but not confusing.
+
+--ID-TYPE-MAP: 1: discordID | 2: HWID | 3: NAME
 local banlist = {}
       banlist[1] = {}
 	  banlist[2] = {}
@@ -114,20 +117,30 @@ local function registerCommand(command, func, reqPerm)
 	commands[command].reqPerm = reqPerm
 end
 
-local function addWhitelist(identifier,IDtype)
+--POST: adds a player to the whitelist for this session
+local function addWhitelist(identifier, IDtype)
 	whitelist.players[IDtype][identifier] = identifier
 end
 
+--POST: set the whitelist as enabled or disabled (true/false) if nil or invalid, the value will toggle.
 local function setWhitelistEnabled(enabled)
+	if not enabled  then
+		whitelist.enabled = not whitelist.enabled
+	end
+
+	enabled = enabled == true or false
+
 	whitelist.enabled = enabled
 end
 
+--POST: bans a player from this session
 local function ban(identifier IDtype)
-	banlist[IDtype][identifier]
+	banlist[IDtype][identifier] = identifier
 end
 
+--POST: unbans a player from this session
 local function unban(identifier IDtype)
-	
+	banlist[IDtype][identifier] = nil
 end
 
 ---------------------------------------------------------ACCESSORS---------------------------------------------------------
@@ -189,11 +202,17 @@ M.onVehicleSpawn = M.onVehicleSpawn
 
 ----MUTATORS----
 M.addPlayer = addPlayer
-M.registerCommand = registerCommand
 M.registerUser = registerUser
+M.setPermission = setPermission
+M.registerCommand = registerCommand
+M.addWhitelist = addWhitelist
+M.setWhitelistEnabled = setWhitelistEnabled
+M.ban = ban
+M.unban = unban
 
 ----ACCESSORS----
-m.getServerID = getServerID
+M.getServerID = getServerID
+M.hasPermission = hasPermission
 
 ----FUNCTIONS----
 
