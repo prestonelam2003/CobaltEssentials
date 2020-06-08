@@ -21,7 +21,7 @@ local function onInit()
 
 	-----------------------------------------PERMISSIONS-----------------------------------------
 	--Used to set up specific permissions unrelated to a command like the ability to do something.
-	--CE.setPermission(permission, requiredPermissionLevel)
+	--CE.setPermission(permission, requiredPermissionLevel, specialValue)
 
 	CE.setPermission("spawnVehicles", 0)
 

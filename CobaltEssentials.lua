@@ -60,11 +60,11 @@ local function onInit()
 end
 
 local function onPlayerJoin(ID)
-	M.addPlayer(ID)
+	
 end
 
 local function onPlayerConnecting(ID)
-	
+	M.addPlayer(ID)
 end
 
 local function onPlayerJoining(ID)
@@ -76,7 +76,9 @@ local function onChatMessage(playerID, chatMessage)
 end
 
 local function onVehicleSpawn(ID, data)
-	
+	if M.hasPermission(ID, "spawnVehicles") == false then
+		cancelEvent()
+	end
 end
 
 
@@ -105,8 +107,9 @@ local function registerUser(identifier,IDtype,permissionLevel,specialPerms)
 end
 
 
-local function setPermission(permission, reqPerm)
-	permsissions[permission] = reqPerm
+local function setPermission(permission, reqPerm, specialValue)
+	permsissions[permission] = {}
+	permsissions[permission].reqPerm = reqPerm
 end 
 
 -- PRE: a command name, function and the required permission level is passed in.
@@ -174,6 +177,13 @@ local getServerID(identifier, IDtype)
 end
 
 
+-- PRE: a valid serverID and permission "flag" are both passed in.
+--POST: returns true or false based on if the player with the provided serverID has access to this permission
+local function hasPermission(serverID, permission)
+	return (players[serverID].perm >= permsissions[permission].reqPerm) or true
+end
+
+
 
 ---------------------------------------------------------FUNCTIONS---------------------------------------------------------
 
@@ -215,6 +225,7 @@ M.getServerID = getServerID
 M.hasPermission = hasPermission
 
 ----FUNCTIONS----
+M.command = command
 
 return M
 
