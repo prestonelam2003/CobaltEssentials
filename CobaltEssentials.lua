@@ -64,11 +64,22 @@ local function onPlayerJoin(ID)
 end
 
 local function onPlayerConnecting(ID)
-	M.addPlayer(ID)
+	local player = M.getPlayer(ID)
+	
+	if player.banned then
+		DropPlayer(ID , "You are banned from this server!")
+	else
+		if not player.whitelisted then
+			DropPlayer(ID, "You are not whitelisted on this server!")
+		else
+			players[ID] = player
+		end
+	end
+
 end
 
 local function onPlayerJoining(ID)
-
+	
 end
 
 local function onChatMessage(playerID, chatMessage)
@@ -77,27 +88,17 @@ end
 
 local function onVehicleSpawn(ID, data)
 	if M.hasPermission(ID, "spawnVehicles") == false then
-		cancelEvent()
+		cancelEvent() --TODO: UPDATE, CANCEL EVENT WILL NOT EXIST IN THE FINAL VERSION
 	end
 end
 
 
 
+--  TODO: figure out a way to smoothly implement a dynamic vehicle cap per player.
+--MAYBE?: via an optional value for "permission flags"?
 
 
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
-
--- PRE: Takes in the serverID of a player
---POST: adds that player entirely to the server player list.
-local function addPlayer(serverID)
-	local player = {}
-	player.serverID = ID
-	player.discordID = GetPlayerDiscordID(ID)
-	player.HWID = GetPlayerHWID(ID)
-	player.name = GetPlayerName(ID)
-	player.perm = 0 --TODO: CREATE A WAY TO EVLAUATE PERMISSION LEVEL/ID
-	players[serverID] = player
-end
 
 
 local function registerUser(identifier,IDtype,permissionLevel,specialPerms)
@@ -107,7 +108,9 @@ local function registerUser(identifier,IDtype,permissionLevel,specialPerms)
 end
 
 
-local function setPermission(permission, reqPerm, specialValue)
+
+--POST: set the permisson requirement for the "flag" optional value for things like car count
+local function setPermission(permission, reqPerm, value)
 	permsissions[permission] = {}
 	permsissions[permission].reqPerm = reqPerm
 end 
@@ -122,7 +125,12 @@ end
 
 --POST: adds a player to the whitelist for this session
 local function addWhitelist(identifier, IDtype)
-	whitelist.players[IDtype][identifier] = identifier
+	whitelist.players[IDtype][identifier] = true
+end
+
+--POST: removes a player from the whitelist for this session
+local function removeWhitelist(identifier, IDtype)
+	whitelist.players[IDtype][identifier] = nil
 end
 
 --POST: set the whitelist as enabled or disabled (true/false) if nil or invalid, the value will toggle.
@@ -138,7 +146,7 @@ end
 
 --POST: bans a player from this session
 local function ban(identifier IDtype)
-	banlist[IDtype][identifier] = identifier
+	banlist[IDtype][identifier] = true
 end
 
 --POST: unbans a player from this session
@@ -146,7 +154,35 @@ local function unban(identifier IDtype)
 	banlist[IDtype][identifier] = nil
 end
 
+
+
 ---------------------------------------------------------ACCESSORS---------------------------------------------------------
+
+-- PRE: Takes in the serverID of a player
+--POST: returns a complete table on the player.
+local function getPlayer(serverID)
+	local player = {}
+	player.serverID = ID
+	player.discordID = GetPlayerDiscordID(ID)
+	player.HWID = GetPlayerHWID(ID)
+	player.name = GetPlayerName(ID)
+	player[1] = player.discordID
+	player[2] = player.HWID
+	player[3] = player.name
+
+
+	player.whitelisted = not whitelist.enabled --stuff related to banlist and whitelist is a little complicated might decide to rewrite for clarity/readability just wanted to keep it compact.
+	player.banned = false
+	player.perms = 0
+	for k,v in ipairs(player) do
+		player.whitelisted = player.whitelisted or (whitelist[k][v] or false)
+		player.banned = player.banned or (banlist[k][v] or false)
+		player.perms = ((registeredUsers[k][v] or 0) > player.perms) and registeredUsers[k][v]) or player.perms --takes the highest level perms availible
+	end
+
+	return player
+end
+
 
 --     PRE: the identifier is passed in along with type, type dictates the type of identifier that is being passed in.
 --TYPE-MAP: 1: discordID | 2: HWID | 3: NAME
@@ -221,6 +257,7 @@ M.ban = ban
 M.unban = unban
 
 ----ACCESSORS----
+M.getPlayer = getPlayer
 M.getServerID = getServerID
 M.hasPermission = hasPermission
 
