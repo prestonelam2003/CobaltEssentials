@@ -19,6 +19,11 @@ local M = {}
 local options = {}
 local commands = {}
 
+local banlist = {}
+      banlist[1] = {}
+	  banlist[2] = {}
+	  banlist[3] = {}
+
 local whitelist = {}
       whitelist[1] = {}
 	  whitelist[2] = {}
@@ -91,9 +96,9 @@ end
 
 
 local function registerUser(identifier,IDtype,permissionLevel,specialPerms)
-	registeredUsers[IDtype][identifer] = {}
-	registeredUsers[IDtype][identifer].perm = permissionLevel
-	registeredUsers[IDtype][identifer].special = specialPerms
+	registeredUsers[IDtype][identifier] = {}
+	registeredUsers[IDtype][identifier].perm = permissionLevel
+	registeredUsers[IDtype][identifier].special = specialPerms
 end
 
 
@@ -110,36 +115,43 @@ local function registerCommand(command, func, reqPerm)
 end
 
 local function addWhitelist(identifier,IDtype)
-	whitelist.players[IDtype][identifer] = identifer
+	whitelist.players[IDtype][identifier] = identifier
 end
 
 local function setWhitelistEnabled(enabled)
 	whitelist.enabled = enabled
 end
 
+local function ban(identifier IDtype)
+	banlist[IDtype][identifier]
+end
+
+local function unban(identifier IDtype)
+	
+end
 
 ---------------------------------------------------------ACCESSORS---------------------------------------------------------
 
---     PRE: the identifer is passed in along with type, type dictates the type of identifer that is being passed in.
+--     PRE: the identifier is passed in along with type, type dictates the type of identifier that is being passed in.
 --TYPE-MAP: 1: discordID | 2: HWID | 3: NAME
 -- RETURNS: the serverID of said player, will return -1 if no one is found
-local getServerID(identifer, IDtype)
+local getServerID(identifier, IDtype)
 	local serverID = -1
 
 	for ID,Name in pairs(GetPlayers()) do
 		
 		--TYPE = 1
-		if type == 1 and GetPlayerDiscordID(ID) == identifer then
+		if type == 1 and GetPlayerDiscordID(ID) == identifier then
 			serverID = ID
 		end
 		
 		--TYPE = 2
-		if type == 2 and GetPlayerHWID(ID) == identifer then
+		if type == 2 and GetPlayerHWID(ID) == identifier then
 			serverID = ID
 		end
 		
 		--TYPE = 3
-		if type == 3 and name == identifer then
+		if type == 3 and name == identifier then
 			serverID = ID
 		end
 
