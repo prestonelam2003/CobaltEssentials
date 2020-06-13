@@ -53,6 +53,7 @@ local function onInit()
 	RegisterEvent("onPlayerJoining","onPlayerJoining")
 	RegisterEvent("onChatMessage","onChatMessage")
 	RegisterEvent("onVehicleSpawn","onVehicleSpawn")
+	RegisterEvent("onPlayerDisconnect","onPlayerDisconnect")
 	print("Test1")
 	print("Test2:" .. arg[0])
 	print("Test3:" .. executionPath)
@@ -86,9 +87,15 @@ local function onChatMessage(playerID, chatMessage)
 	
 end
 
+local function onPlayerDisconnect()
+	
+end
+
+
 local function onVehicleSpawn(ID, data)
 	if M.hasPermission(ID, "spawnVehicles") == false then
-		cancelEvent() --TODO: UPDATE, CANCEL EVENT WILL NOT EXIST IN THE FINAL VERSION
+		--cancelEvent() --TODO: UPDATE, CANCEL EVENT WILL NOT EXIST IN THE FINAL VERSION
+		return 1
 	end
 end
 
@@ -226,10 +233,18 @@ end
 -- PRE: a valid command is passed in along with args
 --POST: the command is ran, any return info is passed back from the original function
 local function command(ID, command, args)
-	if players[ID].perms >= commands[command].reqPerm then
-		command.func(args)
+	if commands[command] then
+
+		if players[ID].perms >= commands[command].reqPerm then
+			return command.func(args)
+		else
+			return 0
+		end
+
 	else
-		return(-1)
+
+		return -1
+
 	end
 
 end

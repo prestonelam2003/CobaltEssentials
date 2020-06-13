@@ -24,6 +24,9 @@ end
 
 ---------------------------------------------------------FUNCTIONS---------------------------------------------------------
 
+local function kick(args)
+	DropPlayer(args)
+end
 
 
 
@@ -38,6 +41,7 @@ M.onInit = onInit
 ----ACCESSORS----
 
 ----FUNCTIONS----
+M.kick = kick
 
 
 return M

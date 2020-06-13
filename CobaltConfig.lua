@@ -6,6 +6,7 @@
 
 local M = {}
 local CE = CobaltEssentials
+local CC = CobaltCommands
 
 local function onInit()
 
@@ -24,7 +25,6 @@ local function onInit()
 	--CE.setPermission(permission, requiredPermissionLevel, value)
 
 	CE.setPermission("spawnVehicles", 0)
-	CE.setPermission
 
 
 
@@ -32,7 +32,7 @@ local function onInit()
 	--used to set up chat commands and their required permission level, takes a standard pointer to a function.
 	--CE.registerCommand(command, function, requiredPermissionLevel)
 
-	CE.registerCommand("kick", kick(), 10)
+	CE.registerCommand("kick", CC.kick(), 10)
 
 
 
