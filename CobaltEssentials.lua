@@ -8,6 +8,7 @@
 
 ----DEPENDENCIES----
 --local json = require( "json" )
+local config = require("CobaltConfig")
 
 ----VARIABLES----
 local executionPath = arg[0]
@@ -15,8 +16,6 @@ local executionPath = arg[0]
 
 local M = {}
 
-----TABLES----
-local options = {}
 local commands = {}
 
 --TODO: try to come up with a way to combine banlist, whitelist and registeredUsers in a way that keeps everything efficent (even if it's not nessesary) & makes things a little cleaner but not confusing.
@@ -41,7 +40,7 @@ local players = {}
 local permsissions = {}
 
 --OPTIONS--
-whitelist.enabled = true --The default state of the whitelist.
+--whitelist.enabled = true --The default state of the whitelist.
 
 
 
@@ -85,6 +84,22 @@ end
 
 local function onChatMessage(playerID, chatMessage)
 	
+	--check to see if it is a command
+	if chatMessage:sub(1,1) == config.options.commandPrefix then
+		
+		--reformat the chat message.
+		chatMessage = chatMessage:sub(2):split(" ")
+
+		--get the command and args from the chat message.
+		local command = chatMessage[1]
+		local args = chatMessage:remove(1)
+
+		--run the command and react accordingly
+		M.command(playerID, command, args) --TODO: react accordingly
+
+		--make the chat message not appear in chat.
+		return 1
+	else
 end
 
 local function onPlayerDisconnect()
@@ -143,12 +158,12 @@ end
 --POST: set the whitelist as enabled or disabled (true/false) if nil or invalid, the value will toggle.
 local function setWhitelistEnabled(enabled)
 	if not enabled  then
-		whitelist.enabled = not whitelist.enabled
+		config.options.enableWhitelist = not config.options.enableWhitelist
+	else
+		enabled = enabled == true or false
+
+		config.options.enableWhitelist = enabled
 	end
-
-	enabled = enabled == true or false
-
-	whitelist.enabled = enabled
 end
 
 --POST: bans a player from this session

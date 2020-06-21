@@ -9,6 +9,11 @@ local CE = CobaltEssentials
 local CC = CobaltCommands
 
 local function onInit()
+	-----------------------------------------OPTIONS-----------------------------------------
+	local options = {
+		enableWhitelist = true , --weather or not the whitelist is enabled
+		commandPrefix   = "/"  , -- the prefix used before a command
+
 
 	-----------------------------------------USERS-----------------------------------------
 	--used to set up users and their permission level based on a choser identifier
@@ -56,6 +61,8 @@ local function onInit()
 	CE.ban("example person", 3)
 
 end
+
+M.options = options
 
 M.onInit = onInit
 
