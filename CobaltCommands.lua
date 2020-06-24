@@ -25,7 +25,8 @@ end
 ---------------------------------------------------------FUNCTIONS---------------------------------------------------------
 
 local function kick(args)
-	DropPlayer(args[1], "You've been kicked from the server")
+	print("attempting to kick " .. args[1])
+	DropPlayer(toNumber(args[1]), "You've been kicked from the server")
 end
 
 

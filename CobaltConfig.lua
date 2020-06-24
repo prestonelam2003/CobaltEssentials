@@ -47,7 +47,7 @@ function onInit()
 	--used to set up chat commands and their required permission level, takes a standard pointer to a function.
 	--CE.registerCommand(command, function, requiredPermissionLevel)
 
-	CE.registerCommand("kick", CC.kick, 10)
+	CE.registerCommand("kick", CC.kick, 9)
 
 
 

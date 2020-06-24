@@ -62,10 +62,11 @@ function onInit()
 end
 
 local function onPlayerJoin(ID)
-	
+	print("On Player Join")
 end
 
 local function onPlayerConnecting(ID)
+	print("On Player Connecting")
 	local player = M.getPlayer(ID)
 	
 	if player.banned then
@@ -81,11 +82,12 @@ local function onPlayerConnecting(ID)
 end
 
 local function onPlayerJoining(ID)
-	
+	print("On Player Joining")
 end
 
 local function onChatMessage(playerID, chatMessage)
-	
+	print("On Chat Message")
+		
 	--check to see if it is a command
 	if chatMessage:sub(1,1) == config.options.commandPrefix then
 		
@@ -97,6 +99,7 @@ local function onChatMessage(playerID, chatMessage)
 		local args = chatMessage:remove(1)
 
 		--run the command and react accordingly
+		print("trying to execute command")
 		M.command(playerID, command, args) --TODO: react accordingly
 
 		--make the chat message not appear in chat.
@@ -107,11 +110,12 @@ local function onChatMessage(playerID, chatMessage)
 end
 
 local function onPlayerDisconnect()
-	
+	print("On Player Disconnect")
 end
 
 
 local function onVehicleSpawn(ID, data)
+	print("On Vehicle Spawn")
 	if M.hasPermission(ID, "spawnVehicles") == false then
 		--cancelEvent() --TODO: UPDATE, CANCEL EVENT WILL NOT EXIST IN THE FINAL VERSION
 		return 1
@@ -255,6 +259,8 @@ end
 --POST: the command is ran, any return info is passed back from the original function
 local function command(ID, command, args)
 	if commands[command] then
+		
+		print("Executing command")
 
 		if players[ID].perms >= commands[command].reqPerm then
 			return command.func(args)
@@ -263,7 +269,7 @@ local function command(ID, command, args)
 		end
 
 	else
-
+		print("Insufficent Perms")
 		return -1
 
 	end
