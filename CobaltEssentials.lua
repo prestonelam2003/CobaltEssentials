@@ -61,11 +61,11 @@ function onInit()
 	print("CobaltEssentials Initiated")
 end
 
-local function onPlayerJoin(ID)
+function onPlayerJoin(ID)
 	print("On Player Join")
 end
 
-local function onPlayerConnecting(ID)
+function onPlayerConnecting(ID)
 	print("On Player Connecting")
 	local player = M.getPlayer(ID)
 	
@@ -81,11 +81,11 @@ local function onPlayerConnecting(ID)
 
 end
 
-local function onPlayerJoining(ID)
+function onPlayerJoining(ID)
 	print("On Player Joining")
 end
 
-local function onChatMessage(playerID, chatMessage)
+function onChatMessage(playerID, chatMessage)
 	print("On Chat Message")
 		
 	--check to see if it is a command
@@ -114,7 +114,7 @@ local function onPlayerDisconnect()
 end
 
 
-local function onVehicleSpawn(ID, data)
+function onVehicleSpawn(ID, data)
 	print("On Vehicle Spawn")
 	if M.hasPermission(ID, "spawnVehicles") == false then
 		--cancelEvent() --TODO: UPDATE, CANCEL EVENT WILL NOT EXIST IN THE FINAL VERSION
@@ -281,11 +281,11 @@ end
 ------------------------------------------------------PUBLICINTERFACE------------------------------------------------------
 
 ----EVENTS----
-M.onPlayerJoin = onPlayerJoin
-M.onPlayerConnecting = onPlayerConnecting
-M.onPlayerJoining = onPlayerJoining
-M.onChatMessage = onChatMessage
-M.onVehicleSpawn = M.onVehicleSpawn
+--M.onPlayerJoin = onPlayerJoin
+--M.onPlayerConnecting = onPlayerConnecting
+--M.onPlayerJoining = onPlayerJoining
+--M.onChatMessage = onChatMessage
+--M.onVehicleSpawn = M.onVehicleSpawn
 
 ----MUTATORS----
 M.addPlayer = addPlayer
