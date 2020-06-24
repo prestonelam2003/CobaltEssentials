@@ -78,11 +78,11 @@ function onPlayerConnecting(ID)
 			players[ID] = player
 		end
 	end
-
 end
 
 function onPlayerJoining(ID)
 	print("On Player Joining")
+
 end
 
 function onChatMessage(playerID, chatMessage)
@@ -194,10 +194,10 @@ end
 --POST: returns a complete table on the player.
 local function getPlayer(serverID)
 	local player = {}
-	player.serverID = ID
-	player.discordID = GetPlayerDiscordID(ID)
-	player.HWID = GetPlayerHWID(ID)
-	player.name = GetPlayerName(ID)
+	player.serverID = serverID
+	player.discordID = GetPlayerDiscordID(serverID)
+	player.HWID = GetPlayerHWID(serverID)
+	player.name = GetPlayerName(serverID)
 	player[1] = player.discordID
 	player[2] = player.HWID
 	player[3] = player.name
