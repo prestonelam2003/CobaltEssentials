@@ -8,7 +8,7 @@ local M = {}
 ----------------------------------------------------------EVENTS-----------------------------------------------------------
 
 --runs when the script is called.
-local function onInit()
+function onInit()
     
 end
 
@@ -25,7 +25,7 @@ end
 ---------------------------------------------------------FUNCTIONS---------------------------------------------------------
 
 local function kick(args)
-	DropPlayer(args)
+	DropPlayer(args[1], "You've been kicked from the server")
 end
 
 
@@ -42,6 +42,5 @@ M.onInit = onInit
 
 ----FUNCTIONS----
 M.kick = kick
-
 
 return M

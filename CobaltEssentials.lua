@@ -8,10 +8,11 @@
 
 ----DEPENDENCIES----
 --local json = require( "json" )
-local config = require("CobaltConfig")
+--local config = require("CobaltEssentials\\CobaltConfig")
+--local config = require("Resources/server/CobaltEssentials/CobaltConfig")
+local config = require("Resources/server/CobaltEssentials/CobaltConfig")
 
 ----VARIABLES----
-local executionPath = arg[0]
 
 
 local M = {}
@@ -45,7 +46,9 @@ local permsissions = {}
 
 ----------------------------------------------------------EVENTS-----------------------------------------------------------
 
-local function onInit()
+function onInit()
+	config = require("Resources/server/CobaltEssentials/CobaltConfig")
+
 	print("CobaltEssentials Initiating...")
 
 	RegisterEvent("onPlayerJoin","onPlayerJoin")
@@ -54,9 +57,6 @@ local function onInit()
 	RegisterEvent("onChatMessage","onChatMessage")
 	RegisterEvent("onVehicleSpawn","onVehicleSpawn")
 	RegisterEvent("onPlayerDisconnect","onPlayerDisconnect")
-	print("Test1")
-	print("Test2:" .. arg[0])
-	print("Test3:" .. executionPath)
 
 	print("CobaltEssentials Initiated")
 end
@@ -102,6 +102,8 @@ local function onChatMessage(playerID, chatMessage)
 		--make the chat message not appear in chat.
 		return 1
 	else
+
+	end
 end
 
 local function onPlayerDisconnect()
@@ -149,32 +151,34 @@ end
 
 --POST: adds a player to the whitelist for this session
 local function addWhitelist(identifier, IDtype)
-	whitelist.players[IDtype][identifier] = true
+	whitelist[IDtype][identifier] = true
 end
 
 --POST: removes a player from the whitelist for this session
 local function removeWhitelist(identifier, IDtype)
-	whitelist.players[IDtype][identifier] = nil
+	whitelist[IDtype][identifier] = nil
 end
 
 --POST: set the whitelist as enabled or disabled (true/false) if nil or invalid, the value will toggle.
 local function setWhitelistEnabled(enabled)
-	if not enabled  then
-		config.options.enableWhitelist = not config.options.enableWhitelist
-	else
-		enabled = enabled == true or false
-
-		config.options.enableWhitelist = enabled
+	if config.options then
+		if not enabled  then
+			config.options.enableWhitelist = not config.options.enableWhitelist
+		else
+			enabled = enabled == true or false
+	
+			config.options.enableWhitelist = enabled
+		end
 	end
 end
 
 --POST: bans a player from this session
-local function ban(identifier IDtype)
+local function ban(identifier, IDtype)
 	banlist[IDtype][identifier] = true
 end
 
 --POST: unbans a player from this session
-local function unban(identifier IDtype)
+local function unban(identifier, IDtype)
 	banlist[IDtype][identifier] = nil
 end
 
@@ -199,9 +203,9 @@ local function getPlayer(serverID)
 	player.banned = false
 	player.perms = 0
 	for k,v in ipairs(player) do
-		player.whitelisted = player.whitelisted or (whitelist[k][v] or false)
-		player.banned = player.banned or (banlist[k][v] or false)
-		player.perms = ((registeredUsers[k][v] or 0) > player.perms) and registeredUsers[k][v]) or player.perms --takes the highest level perms availible
+		player.whitelisted = player.whitelisted == true or (whitelist[k][ tonumber(v) ]  or false)
+		player.banned = player.banned == true or (banlist[k][ tonumber(v) ] or false)
+		player.perms = ((registeredUsers[k][ tonumber(v) ] or 0) > player.perms) and registeredUsers[k][ tonumber(v) ] or player.perms --takes the highest level perms availible
 	end
 
 	return player
@@ -211,7 +215,7 @@ end
 --     PRE: the identifier is passed in along with type, type dictates the type of identifier that is being passed in.
 --TYPE-MAP: 1: discordID | 2: HWID | 3: NAME
 -- RETURNS: the serverID of said player, will return -1 if no one is found
-local getServerID(identifier, IDtype)
+local function getServerID(identifier, IDtype)
 	local serverID = -1
 
 	for ID,Name in pairs(GetPlayers()) do
@@ -271,7 +275,6 @@ end
 ------------------------------------------------------PUBLICINTERFACE------------------------------------------------------
 
 ----EVENTS----
-M.onInit = onInit
 M.onPlayerJoin = onPlayerJoin
 M.onPlayerConnecting = onPlayerConnecting
 M.onPlayerJoining = onPlayerJoining

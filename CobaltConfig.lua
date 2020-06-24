@@ -5,12 +5,22 @@
 --ID-TYPE-MAP: 1: discordID | 2: HWID | 3: NAME
 
 local M = {}
-local CE = CobaltEssentials
-local CC = CobaltCommands
 
-local function onInit()
+--local CE = CobaltEssentials
+--local CC = CobaltCommands
+
+local CE
+local CC
+
+local options
+
+
+function onInit()
+	CE = require("Resources/server/CobaltEssentials/CobaltEssentials")
+	CC = require("Resources/server/CobaltEssentials/CobaltCommands")
+
 	-----------------------------------------OPTIONS-----------------------------------------
-	local options = {
+	options = {
 		enableWhitelist = true , --weather or not the whitelist is enabled
 		commandPrefix   = "/"  , -- the prefix used before a command
 	}
@@ -37,7 +47,7 @@ local function onInit()
 	--used to set up chat commands and their required permission level, takes a standard pointer to a function.
 	--CE.registerCommand(command, function, requiredPermissionLevel)
 
-	CE.registerCommand("kick", CC.kick(), 10)
+	CE.registerCommand("kick", CC.kick, 10)
 
 
 
@@ -63,7 +73,5 @@ local function onInit()
 end
 
 M.options = options
-
-M.onInit = onInit
 
 return M
