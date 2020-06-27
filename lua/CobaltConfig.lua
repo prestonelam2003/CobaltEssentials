@@ -14,7 +14,7 @@ local function onInit()
 
 	-----------------------------------------OPTIONS-----------------------------------------
 	options = {
-		enableWhitelist = true , --weather or not the whitelist is enabled
+		enableWhitelist = false , --weather or not the whitelist is enabled
 		commandPrefix   = "/"  , -- the prefix used before a command
 	}
 
@@ -42,7 +42,7 @@ local function onInit()
 	--used to set up chat commands and their required permission level, takes a standard pointer to a function.
 	--CE.registerCommand(command, function, requiredPermissionLevel)
 
-	CE.registerCommand("kick", CC.kick, 0)
+	CE.registerCommand("kick", CC.kick, 5)
 
 
 
@@ -61,7 +61,7 @@ local function onInit()
 	--ID-TYPE-MAP: 1: discordID | 2: HWID | 3: NAME
 	--CE.ban(identifier,IDtype)
 
-	CE.ban("Preston", 3)
+	CE.ban("some loser", 3)
 
 end
 
