@@ -8,9 +8,6 @@
 
 ----DEPENDENCIES----
 --local json = require( "json" )
---local config = require("CobaltEssentials\\CobaltConfig")
---local config = require("Resources/server/CobaltEssentials/CobaltConfig")
-local config = require("Resources/server/CobaltEssentials/CobaltConfig")
 
 ----VARIABLES----
 
@@ -18,6 +15,8 @@ local config = require("Resources/server/CobaltEssentials/CobaltConfig")
 local M = {}
 
 local commands = {}
+
+local options = {}
 
 --TODO: try to come up with a way to combine banlist, whitelist and registeredUsers in a way that keeps everything efficent (even if it's not nessesary) & makes things a little cleaner but not confusing.
 
@@ -47,7 +46,6 @@ local permsissions = {}
 ----------------------------------------------------------EVENTS-----------------------------------------------------------
 
 function onInit()
-	config = require("Resources/server/CobaltEssentials/CobaltConfig")
 
 	print("CobaltEssentials Initiating...")
 
@@ -85,18 +83,18 @@ function onPlayerJoining(ID)
 
 end
 
-function onChatMessage(playerID, chatMessage)
-	print("On Chat Message")
-		
-	--check to see if it is a command
-	if chatMessage:sub(1,1) == config.options.commandPrefix then
+function onChatMessage(playerID, name ,chatMessage)
+	chatMessage = chatMessage:sub(2)
+
+	if chatMessage:sub(1,1) == config.getOptions().commandPrefix then
+		print("Command")
 		
 		--reformat the chat message.
-		chatMessage = chatMessage:sub(2):split(" ")
+		chatMessage = M.split(chatMessage:sub(2)," ")
 
 		--get the command and args from the chat message.
 		local command = chatMessage[1]
-		local args = chatMessage:remove(1)
+		local args = chatMessage
 
 		--run the command and react accordingly
 		print("trying to execute command")
@@ -105,7 +103,7 @@ function onChatMessage(playerID, chatMessage)
 		--make the chat message not appear in chat.
 		return 1
 	else
-
+		
 	end
 end
 
@@ -131,16 +129,20 @@ end
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 
 
-local function registerUser(identifier,IDtype,permissionLevel,specialPerms)
+local function registerUser(identifier, IDtype, permissionLevel, specialPerms)
+	print("Registered " .. identifier .. " as ID Type " .. IDtype .. " @" .. permissionLevel)
+
 	registeredUsers[IDtype][identifier] = {}
-	registeredUsers[IDtype][identifier].perm = permissionLevel
-	registeredUsers[IDtype][identifier].special = specialPerms
+	registeredUsers[IDtype][identifier].perms = permissionLevel
+	--registeredUsers[IDtype][identifier].special = specialPerms
 end
 
 
 
 --POST: set the permisson requirement for the "flag" optional value for things like car count
 local function setPermission(permission, reqPerm, value)
+	print("Set " .. permission .. " permission @" .. reqPerm)
+
 	permsissions[permission] = {}
 	permsissions[permission].reqPerm = reqPerm
 end 
@@ -148,6 +150,8 @@ end
 -- PRE: a command name, function and the required permission level is passed in.
 --POST: the command is added to the commands table.
 local function registerCommand(command, func, reqPerm)
+	print("Registered " .. command .. " Command @" .. reqPerm)
+
 	commands[command] = {}
 	commands[command].func = func
 	commands[command].reqPerm = reqPerm
@@ -155,35 +159,52 @@ end
 
 --POST: adds a player to the whitelist for this session
 local function addWhitelist(identifier, IDtype)
+	print("Added " .. identifier .. " as ID Type " .. IDtype .. " to the whitelist" )
 	whitelist[IDtype][identifier] = true
 end
 
 --POST: removes a player from the whitelist for this session
 local function removeWhitelist(identifier, IDtype)
+	print("Removed " .. identifier .. " as ID Type " .. IDtype .. " from the whitelist" )
+
 	whitelist[IDtype][identifier] = nil
 end
 
 --POST: set the whitelist as enabled or disabled (true/false) if nil or invalid, the value will toggle.
 local function setWhitelistEnabled(enabled)
-	if config.options then
+--	if options then
 		if not enabled  then
-			config.options.enableWhitelist = not config.options.enableWhitelist
+			config.getOptions().enableWhitelist = not config.getOptions().enableWhitelist
+
 		else
 			enabled = enabled == true or false
 	
-			config.options.enableWhitelist = enabled
+			config.getOptions().enableWhitelist = enabled
 		end
-	end
+
+		if config.getOptions().enableWhitelist == enabled then
+			print("Disabled Whitelist")
+		else
+			print("Enabled Whitelist")
+		end
+
+--	end
 end
 
 --POST: bans a player from this session
 local function ban(identifier, IDtype)
+	print("Banned " .. identifier .. " as ID Type " .. IDtype .. " from the server" )
 	banlist[IDtype][identifier] = true
 end
 
 --POST: unbans a player from this session
 local function unban(identifier, IDtype)
+	print("Unbanned " .. identifier .. " as ID Type " .. IDtype .. " from the server" )
 	banlist[IDtype][identifier] = nil
+end
+
+local function setOptions(options)
+	options = options
 end
 
 
@@ -203,15 +224,34 @@ local function getPlayer(serverID)
 	player[3] = player.name
 
 
-	player.whitelisted = not whitelist.enabled --stuff related to banlist and whitelist is a little complicated might decide to rewrite for clarity/readability just wanted to keep it compact.
+	player.whitelisted = not config.getOptions().enableWhitelist --stuff related to banlist and whitelist is a little complicated might decide to rewrite for clarity/readability just wanted to keep it compact.
 	player.banned = false
 	player.perms = 0
+	
 	for k,v in ipairs(player) do
-		player.whitelisted = player.whitelisted == true or (whitelist[k][ tonumber(v) ]  or false)
-		player.banned = player.banned == true or (banlist[k][ tonumber(v) ] or false)
-		player.perms = ((registeredUsers[k][ tonumber(v) ] or 0) > player.perms) and registeredUsers[k][ tonumber(v) ] or player.perms --takes the highest level perms availible
+		if player.whitelisted == false and whitelist[k][v] == true then
+			print("Player is whitelisted")
+			player.whitelisted = true
+		end
+
+		if player.banned == false and banlist[k][v] == true then
+			print("Player is banned")
+			player.banned = true
+		end
+
+		if registeredUsers[k][v] then
+			if player.perms < tonumber(registeredUsers[k][v].perms) then
+				print(registeredUsers[k][v].perms)
+				player.perms = tonumber(registeredUsers[k][v].perms)
+			end
+		end
+
+		--player.whitelisted = player.whitelisted == true or (whitelist[k][ tonumber(v) ]  or false)
+		--player.banned = player.banned == true or (banlist[k][ tonumber(v) ] or false)
+		--player.perms = ((registeredUsers[k][ tonumber(v) ] or 0) > player.perms) and registeredUsers[k][ tonumber(v) ] or player.perms --takes the highest level perms availible
 	end
 
+	print("return player")
 	return player
 end
 
@@ -259,21 +299,34 @@ end
 --POST: the command is ran, any return info is passed back from the original function
 local function command(ID, command, args)
 	if commands[command] then
-		
-		print("Executing command")
+		print(players[ID].perms)
+		print(commands[command].reqPerm)
+
 
 		if players[ID].perms >= commands[command].reqPerm then
-			return command.func(args)
+			print("Executing command")
+			return commands[command].func(args)
 		else
+			print("Insufficent Perms")
 			return 0
 		end
 
 	else
-		print("Insufficent Perms")
+		print("Command does not exist")
 		return -1
 
 	end
 
+end
+
+local function split(s, sep)
+    local fields = {}
+
+    local sep = sep or " "
+    local pattern = string.format("([^%s]+)", sep)
+    string.gsub(s, pattern, function(c) fields[#fields + 1] = c end)
+
+    return fields
 end
 
 
@@ -304,6 +357,9 @@ M.hasPermission = hasPermission
 
 ----FUNCTIONS----
 M.command = command
+M.split = split
+
+onInit()
 
 return M
 

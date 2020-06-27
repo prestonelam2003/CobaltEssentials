@@ -6,24 +6,19 @@
 
 local M = {}
 
---local CE = CobaltEssentials
---local CC = CobaltCommands
+local options = {}
 
-local CE
-local CC
+local function onInit()
 
-local options
-
-
-function onInit()
-	CE = require("Resources/server/CobaltEssentials/CobaltEssentials")
-	CC = require("Resources/server/CobaltEssentials/CobaltCommands")
+	print("CobaltConfig Initiated")
 
 	-----------------------------------------OPTIONS-----------------------------------------
 	options = {
 		enableWhitelist = true , --weather or not the whitelist is enabled
 		commandPrefix   = "/"  , -- the prefix used before a command
 	}
+
+	--CE.setOptions(options)
 
 	-----------------------------------------USERS-----------------------------------------
 	--used to set up users and their permission level based on a choser identifier
@@ -47,14 +42,12 @@ function onInit()
 	--used to set up chat commands and their required permission level, takes a standard pointer to a function.
 	--CE.registerCommand(command, function, requiredPermissionLevel)
 
-	CE.registerCommand("kick", CC.kick, 9)
+	CE.registerCommand("kick", CC.kick, 0)
 
 
 
 	-----------------------------------------WHITELIST-----------------------------------------
 	--used to determine who can join the server
-
-	CE.setWhitelistEnabled(true)--if the whitelist is enabled, set true to enable, false to disable
 	
 	--ID-TYPE-MAP: 1: discordID | 2: HWID | 3: NAME
 	--CE.addWhitelist(identifier,IDtype)
@@ -68,10 +61,18 @@ function onInit()
 	--ID-TYPE-MAP: 1: discordID | 2: HWID | 3: NAME
 	--CE.ban(identifier,IDtype)
 
-	CE.ban("example person", 3)
+	CE.ban("Preston", 3)
 
 end
 
-M.options = options
+local function getOptions()
+	return options
+end
+
+M.onInit = onInit
+M.getOptions = getOptions
+
+
+M.onInit()
 
 return M

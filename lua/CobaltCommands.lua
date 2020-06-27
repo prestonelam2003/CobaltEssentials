@@ -26,7 +26,7 @@ end
 
 local function kick(args)
 	print("attempting to kick " .. args[1])
-	DropPlayer(toNumber(args[1]), "You've been kicked from the server")
+	DropPlayer(tonumber(args[2]), "You've been kicked from the server")
 end
 
 
@@ -43,5 +43,7 @@ M.onInit = onInit
 
 ----FUNCTIONS----
 M.kick = kick
+
+M.onInit()
 
 return M
