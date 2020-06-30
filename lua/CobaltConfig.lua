@@ -27,8 +27,8 @@ local function onInit()
 	--ID-TYPE-MAP: 1: discordID | 2: HWID | 3: NAME
 	--CE.registerUser(identifier,IDtype,permissionLevel,specialPerms)
 
-	CE.registerUser("Preston", 3, 10)
-	CE.registerUser(348290604133908483, 1, 10)
+	CE.registerUser("Preston", 3, 10) --never do permissions by name, this is just an example.
+	CE.registerUser("348290604133908483", 1, 10) --use the discord ID like this
 
 
 	-----------------------------------------PERMISSIONS-----------------------------------------

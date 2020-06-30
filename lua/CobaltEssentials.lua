@@ -223,6 +223,8 @@ local function getPlayer(serverID)
 	player[2] = player.HWID
 	player[3] = player.name
 
+	for k,v in pairs(player) do print(tostring(k) .. ": " .. tostring(v)) end
+
 
 	player.whitelisted = not config.getOptions().enableWhitelist --stuff related to banlist and whitelist is a little complicated might decide to rewrite for clarity/readability just wanted to keep it compact.
 	player.banned = false
@@ -242,7 +244,7 @@ local function getPlayer(serverID)
 		if registeredUsers[k][v] then
 
 			print("registeredUsers[k][v] exists")
-			print(registeredUsers[k][v])
+			print(registeredUsers[k][v].perms)
 
 			if player.perms < tonumber(registeredUsers[k][v].perms) then
 				print(registeredUsers[k][v].perms)
@@ -291,7 +293,7 @@ end
 -- PRE: a valid serverID and permission "flag" are both passed in.
 --POST: returns true or false based on if the player with the provided serverID has access to this permission
 local function hasPermission(serverID, permission)
-	return (players[serverID].perms >= permsissions[permission].reqPerm) or true
+	return players[serverID].perms >= permsissions[permission].reqPerm
 end
 
 
