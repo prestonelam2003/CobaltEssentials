@@ -53,7 +53,7 @@ function onInit()
 	RegisterEvent("onPlayerConnecting","onPlayerConnecting")
 	RegisterEvent("onPlayerJoining","onPlayerJoining")
 	RegisterEvent("onChatMessage","onChatMessage")
-	RegisterEvent("onVehicleSpawn","onVehicleSpawn")
+	--RegisterEvent("onVehicleSpawn","onVehicleSpawn")
 	RegisterEvent("onPlayerDisconnect","onPlayerDisconnect")
 
 	print("CobaltEssentials Initiated")
