@@ -28,6 +28,7 @@ local function onInit()
 	--CE.registerUser(identifier,IDtype,permissionLevel,specialPerms)
 
 	CE.registerUser("Preston", 3, 10)
+	CE.registerUser(348290604133908483, 1, 10)
 
 
 	-----------------------------------------PERMISSIONS-----------------------------------------

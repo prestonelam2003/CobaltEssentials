@@ -53,7 +53,7 @@ function onInit()
 	RegisterEvent("onPlayerConnecting","onPlayerConnecting")
 	RegisterEvent("onPlayerJoining","onPlayerJoining")
 	RegisterEvent("onChatMessage","onChatMessage")
-	--RegisterEvent("onVehicleSpawn","onVehicleSpawn")
+	RegisterEvent("onVehicleSpawn","onVehicleSpawn")
 	RegisterEvent("onPlayerDisconnect","onPlayerDisconnect")
 
 	print("CobaltEssentials Initiated")
@@ -115,7 +115,7 @@ end
 function onVehicleSpawn(ID, data)
 	print("On Vehicle Spawn")
 	if M.hasPermission(ID, "spawnVehicles") == false then
-		--cancelEvent() --TODO: UPDATE, CANCEL EVENT WILL NOT EXIST IN THE FINAL VERSION
+
 		return 1
 	end
 end
@@ -240,6 +240,10 @@ local function getPlayer(serverID)
 		end
 
 		if registeredUsers[k][v] then
+
+			print("registeredUsers[k][v] exists")
+			print(registeredUsers[k][v])
+
 			if player.perms < tonumber(registeredUsers[k][v].perms) then
 				print(registeredUsers[k][v].perms)
 				player.perms = tonumber(registeredUsers[k][v].perms)
@@ -251,7 +255,6 @@ local function getPlayer(serverID)
 		--player.perms = ((registeredUsers[k][ tonumber(v) ] or 0) > player.perms) and registeredUsers[k][ tonumber(v) ] or player.perms --takes the highest level perms availible
 	end
 
-	print("return player")
 	return player
 end
 
@@ -288,7 +291,7 @@ end
 -- PRE: a valid serverID and permission "flag" are both passed in.
 --POST: returns true or false based on if the player with the provided serverID has access to this permission
 local function hasPermission(serverID, permission)
-	return (players[serverID].perm >= permsissions[permission].reqPerm) or true
+	return (players[serverID].perms >= permsissions[permission].reqPerm) or true
 end
 
 
