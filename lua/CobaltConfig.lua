@@ -44,6 +44,7 @@ local function onInit()
 	--CE.registerCommand(command, function, requiredPermissionLevel)
 
 	CE.registerCommand("kick", CC.kick, 5)
+	--CE.registerCommand("testServer", server.makeServer, 0)
 
 
 

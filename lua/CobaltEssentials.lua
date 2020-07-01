@@ -313,11 +313,13 @@ local function command(ID, command, args)
 			return commands[command].func(args)
 		else
 			print("Insufficent Perms")
+			SendChatMessage(ID, "You do not have permission to this command")
 			return 0
 		end
 
 	else
 		print("Command does not exist")
+		SendChatMessage(ID, "This command does not exist type /help for a list of commands")
 		return -1
 
 	end
