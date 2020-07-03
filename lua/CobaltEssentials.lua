@@ -310,10 +310,14 @@ local function command(ID, command, args)
 
 		if players[ID].perms >= commands[command].reqPerm then
 			print("Executing command")
-			return commands[command].func(args)
+			local message = commands[command].func(args)
+			
+			if message ~= nil then
+				SendChatMessage(ID, message)
+			end
 		else
 			print("Insufficent Perms")
-			SendChatMessage(ID, "You do not have permission to this command")
+			SendChatMessage(ID, "You do not have permission for this command")
 			return 0
 		end
 

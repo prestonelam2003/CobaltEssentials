@@ -29,6 +29,21 @@ local function kick(args)
 	DropPlayer(tonumber(args[2]), "You've been kicked from the server")
 end
 
+local function ban(args)
+	print("banned" .. args[1] .. "for this session")
+	M.kick(args)
+	CE.ban( GetPlayerDiscordID(args[1]), 1)end
+
+local function list(args)
+	players = ""
+
+	for k,v in pairs(GetPlayers()) do
+		players = players .. tostring(k) .. ": " .. tostring(v) .. "\n"
+	end
+
+	return players
+end
+
 
 
 ------------------------------------------------------PUBLICINTERFACE------------------------------------------------------
@@ -43,6 +58,8 @@ M.onInit = onInit
 
 ----FUNCTIONS----
 M.kick = kick
+M.ban = ban
+M.list = list
 
 M.onInit()
 
