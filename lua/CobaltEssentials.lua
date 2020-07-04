@@ -95,6 +95,7 @@ function onChatMessage(playerID, name ,chatMessage)
 		--get the command and args from the chat message.
 		local command = chatMessage[1]
 		local args = chatMessage
+		args[0] = playerID
 
 		--run the command and react accordingly
 		print("trying to execute command")

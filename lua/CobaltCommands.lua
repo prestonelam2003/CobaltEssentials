@@ -31,17 +31,19 @@ end
 
 local function ban(args)
 	print("banned" .. args[1] .. "for this session")
+	CE.ban( GetPlayerDiscordID( args[1]), 1)end
 	M.kick(args)
-	CE.ban( GetPlayerDiscordID(args[1]), 1)end
 
 local function list(args)
 	players = ""
 
 	for k,v in pairs(GetPlayers()) do
 		players = players .. tostring(k) .. ": " .. tostring(v) .. "\n"
+		SendChatMessage(args[0], tostring(k) .. ": " .. tostring(v))
+		
 	end
 
-	return players
+	--return players
 end
 
 
