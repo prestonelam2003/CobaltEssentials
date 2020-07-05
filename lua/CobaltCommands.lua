@@ -31,7 +31,7 @@ end
 
 local function ban(args)
 	print("banned" .. args[2] .. "for this session")
-	CE.ban( GetPlayerDiscordID( args[2]), 1)end
+	CE.ban( GetPlayerDiscordID( args[2]), 1)
 	DropPlayer(tonumber(args[2]), "You've been banned from this server")
 end
 
