@@ -47,6 +47,12 @@ local function list(args)
 	--return players
 end
 
+local function help(args)
+	for k,v in pairs(CE.getCommands()) do
+		SendChatMessage(args[0], tostring(k) .. ": " .. v.desc)
+	end
+end
+
 
 
 ------------------------------------------------------PUBLICINTERFACE------------------------------------------------------
@@ -63,6 +69,7 @@ M.onInit = onInit
 M.kick = kick
 M.ban = ban
 M.list = list
+M.help = help
 
 M.onInit()
 

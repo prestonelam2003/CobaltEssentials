@@ -14,7 +14,7 @@ local function onInit()
 
 	-----------------------------------------OPTIONS-----------------------------------------
 	options = {
-		enableWhitelist = true , --weather or not the whitelist is enabled
+		enableWhitelist = false , --weather or not the whitelist is enabled
 		commandPrefix   = "/"  , -- the prefix used before a command
 	}
 
@@ -43,9 +43,10 @@ local function onInit()
 	--used to set up chat commands and their required permission level, takes a standard pointer to a function.
 	--CE.registerCommand(command, function, requiredPermissionLevel)
 
-	CE.registerCommand("kick", CC.kick, 5)
-	CE.registerCommand("ban", CC.ban, 6)
-	CE.registerCommand("list",CC.list,0)
+	CE.registerCommand("kick", CC.kick, 5, "kick a player from the session")
+	CE.registerCommand("ban", CC.ban, 6, "ban a player from the session")
+	CE.registerCommand("list",CC.list, 0, "get a list of each player and their ID")
+	CE.registerCommand("help",CC.help,0, "get a list of each command")
 
 	--CE.registerCommand("testServer", server.makeServer, 0)
 

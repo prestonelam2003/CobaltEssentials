@@ -61,6 +61,7 @@ end
 
 function onPlayerJoin(ID)
 	print("On Player Join")
+	--SendChatMessage(-1,)
 end
 
 function onPlayerConnecting(ID)
@@ -150,12 +151,13 @@ end
 
 -- PRE: a command name, function and the required permission level is passed in.
 --POST: the command is added to the commands table.
-local function registerCommand(command, func, reqPerm)
+local function registerCommand(command, func, reqPerm, desc)
 	print("Registered " .. command .. " Command @" .. reqPerm)
 
 	commands[command] = {}
 	commands[command].func = func
 	commands[command].reqPerm = reqPerm
+	commands[command].desc = desc
 end
 
 --POST: adds a player to the whitelist for this session
@@ -293,6 +295,11 @@ local function getServerID(identifier, IDtype)
 	return serverID
 end
 
+--POST: return the commands table
+local function getCommands()
+	return commands
+end
+
 
 -- PRE: a valid serverID and permission "flag" are both passed in.
 --POST: returns true or false based on if the player with the provided serverID has access to this permission
@@ -369,6 +376,7 @@ M.unban = unban
 M.getPlayer = getPlayer
 M.getServerID = getServerID
 M.hasPermission = hasPermission
+M.getCommands = getCommands
 
 ----FUNCTIONS----
 M.command = command
