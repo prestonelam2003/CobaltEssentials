@@ -32,7 +32,7 @@ end
 local function ban(args)
 	print("banned" .. args[1] .. "for this session")
 	CE.ban( GetPlayerDiscordID( args[1]), 1)end
-	M.kick(args)
+	M.kick(args[1])
 
 local function list(args)
 	players = ""

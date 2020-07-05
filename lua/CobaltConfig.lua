@@ -14,7 +14,7 @@ local function onInit()
 
 	-----------------------------------------OPTIONS-----------------------------------------
 	options = {
-		enableWhitelist = false , --weather or not the whitelist is enabled
+		enableWhitelist = true , --weather or not the whitelist is enabled
 		commandPrefix   = "/"  , -- the prefix used before a command
 	}
 
@@ -28,7 +28,7 @@ local function onInit()
 	--CE.registerUser(identifier,IDtype,permissionLevel,specialPerms)
 
 	CE.registerUser("Preston", 3, 10) --never do permissions by name, this is just an example.
-	CE.registerUser("348290604133908483", 1, 10) --use the discord ID like this
+	CE.registerUser("531662154303143951", 1, 10) --use the discord ID like this
 
 
 	-----------------------------------------PERMISSIONS-----------------------------------------
@@ -60,7 +60,7 @@ local function onInit()
 	CE.addWhitelist("Preston", 3)
 
 
-
+		
 	-----------------------------------------BANLIST-----------------------------------------
 	--used to disallow players from joining your server
 	--ID-TYPE-MAP: 1: discordID | 2: HWID | 3: NAME

@@ -224,7 +224,11 @@ local function getPlayer(serverID)
 	player[2] = player.HWID
 	player[3] = player.name
 
-	for k,v in pairs(player) do print(tostring(k) .. ": " .. tostring(v)) end
+	for k,v in pairs(player) do
+		if not (k == 1 or k == 2 or k == 3) then
+			print(tostring(k) .. ": " .. tostring(v))
+		end
+	end
 
 
 	player.whitelisted = not config.getOptions().enableWhitelist --stuff related to banlist and whitelist is a little complicated might decide to rewrite for clarity/readability just wanted to keep it compact.
@@ -244,7 +248,6 @@ local function getPlayer(serverID)
 
 		if registeredUsers[k][v] then
 
-			print("registeredUsers[k][v] exists")
 			print(registeredUsers[k][v].perms)
 
 			if player.perms < tonumber(registeredUsers[k][v].perms) then
