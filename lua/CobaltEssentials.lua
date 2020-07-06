@@ -61,7 +61,7 @@ end
 
 function onPlayerJoin(ID)
 	print("On Player Join")
-	--SendChatMessage(-1,)
+	SendChatMessage(-1, players[id].name .. " joined the game")
 end
 
 function onPlayerConnecting(ID)
@@ -102,7 +102,7 @@ function onChatMessage(playerID, name ,chatMessage)
 		print("trying to execute command")
 		M.command(playerID, command, args) --TODO: react accordingly
 
-		--make the chat message not appear in chat.
+		--make the chat message not appear in chat. 
 		return 1
 	else
 		
