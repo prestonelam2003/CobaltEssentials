@@ -178,6 +178,8 @@ end
 
 local function registerVehicle(name, reqPerm)
 	print("Set " .. name .. " @" .. reqPerm)
+
+	registeredVehicles[name] = {}
 	registeredVehicles[name].reqPerm = reqPerm
 end
 
