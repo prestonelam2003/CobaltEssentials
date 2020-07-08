@@ -69,6 +69,12 @@ local function onInit()
 
 	CE.ban("some loser", 3)
 
+	-----------------------------------------VEHICLES-----------------------------------------
+	--used to set required permissions for VEHICLES
+	--CE.registerVehicle(vehicleName, requiredPermissionLevel)
+
+	CE.registerVehicle("",10)
+
 end
 
 local function getOptions()

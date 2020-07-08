@@ -36,6 +36,8 @@ local registeredUsers = {}
 	  registeredUsers[2] = {}
 	  registeredUsers[3] = {}
 
+local registeredVehicles = {}
+
 local players = {}
 local permsissions = {}
 
@@ -118,9 +120,21 @@ end
 
 function onVehicleSpawn(ID, data)
 	print("On Vehicle Spawn")
-	if M.hasPermission(ID, "spawnVehicles") == false then
 
+	local vehName = data.information.name
+	print(tostring(ID) .."Tried to spawn \"" .. vehName .. '"')
+
+	if M.hasPermission(ID, "spawnVehicles") == false then --TODO: flip the two around because it makes more sense
+
+		print("Spawn Blocked")
 		return 1
+	else
+		if not registeredVehicles[vehName] == nil or registeredVehicles[vehName].reqPerm <= players[ID].perms then
+			print("Spawn successful")
+		else
+			print("Spawn Blocked")
+			return 1
+		end
 	end
 end
 
@@ -160,6 +174,10 @@ local function registerCommand(command, func, reqPerm, desc)
 	commands[command].func = func
 	commands[command].reqPerm = reqPerm
 	commands[command].desc = desc
+end
+
+local function registerVehicle(name, reqPerm)
+	registeredVehicles[name].reqPerm = reqPerm
 end
 
 --POST: adds a player to the whitelist for this session
