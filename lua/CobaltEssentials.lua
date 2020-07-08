@@ -61,7 +61,7 @@ end
 
 function onPlayerJoin(ID)
 	print("On Player Join")
-	SendChatMessage(-1, players[id].name .. " joined the game")
+	SendChatMessage(-1, players[ID].name .. " joined the game")
 end
 
 function onPlayerConnecting(ID)
