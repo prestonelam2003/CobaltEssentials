@@ -388,6 +388,7 @@ M.addPlayer = addPlayer
 M.registerUser = registerUser
 M.setPermission = setPermission
 M.registerCommand = registerCommand
+M.registerVehicle = registerVehicle
 M.addWhitelist = addWhitelist
 M.setWhitelistEnabled = setWhitelistEnabled
 M.ban = ban
