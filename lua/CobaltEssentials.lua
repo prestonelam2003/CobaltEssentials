@@ -177,6 +177,7 @@ local function registerCommand(command, func, reqPerm, desc)
 end
 
 local function registerVehicle(name, reqPerm)
+	print("Set " .. name .. " @" .. reqPerm)
 	registeredVehicles[name].reqPerm = reqPerm
 end
 

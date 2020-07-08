@@ -73,7 +73,7 @@ local function onInit()
 	--used to set required permissions for VEHICLES
 	--CE.registerVehicle(vehicleName, requiredPermissionLevel)
 
-	CE.registerVehicle("",10)
+	CE.registerVehicle("example",10)
 
 end
 
