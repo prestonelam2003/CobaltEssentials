@@ -118,7 +118,7 @@ local function onPlayerDisconnect(ID)
 end
 
 
-function onVehicleSpawn(ID, data)
+function onVehicleSpawn(playerID, vehID,  data)
 	print("On Vehicle Spawn")
 
 	local vehName = data.information.name
