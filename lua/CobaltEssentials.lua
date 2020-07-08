@@ -109,8 +109,10 @@ function onChatMessage(playerID, name ,chatMessage)
 	end
 end
 
-local function onPlayerDisconnect()
+local function onPlayerDisconnect(ID)
 	print("On Player Disconnect")
+	SendChatMessage(-1, players[ID].name .. " left the game")
+	players[ID] = nil
 end
 
 
