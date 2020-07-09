@@ -118,11 +118,33 @@ local function onPlayerDisconnect(ID)
 end
 
 
-function onVehicleSpawn(playerID, vehID,  data)
+function onVehicleSpawn(ID, vehID,  data)
 	print("On Vehicle Spawn")
+	
+	for i=1,2 do
+		local s, e = data:find(",")
+		data = data:sub(s+1)
+	end
+	
+	--local vehName = data.information.name
 
-	local vehName = data.information.name
+	--print(data)
+
+	local s, e = data:find('"')
+	data = data:sub(s+1)
+	local s, e = data:find('"')
+
+	local vehName = data:sub(1,e-1)
+
+	--data = load("return " .. data)
+
+	--for k,v in pairs(data) do print(tostring(k) .. ": " .. tostring(v)) end
+
+
+	--=print(data)
+
 	print(tostring(ID) .."Tried to spawn \"" .. vehName .. '"')
+
 
 	if M.hasPermission(ID, "spawnVehicles") == false then --TODO: flip the two around because it makes more sense
 
