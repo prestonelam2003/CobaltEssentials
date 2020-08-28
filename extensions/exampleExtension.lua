@@ -11,7 +11,7 @@ end
 --called once every tick
 local function onTick(age)
 	if age > lastAnnounce + announceStep then
-		local output = "Uptime: " .. (lastAnnounce + announceStep)/300000 .. " Minutes"
+		local output = "Uptime: " .. (lastAnnounce + announceStep)/60000 .. " Minutes"
 		
 		print(output)
 
