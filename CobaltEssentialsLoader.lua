@@ -2,7 +2,7 @@
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 --This is to fix BeamMP's apparently dysfunctional modules, it unfortunately breaks hotswapping
-cobaltVersion = "CE 1.3.3"
+cobaltVersion = "CE 1.3.5"
 pluginName = debug.getinfo(1).source:sub(2)
 
 for i = 0, 1 do
