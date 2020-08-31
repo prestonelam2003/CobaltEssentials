@@ -151,7 +151,7 @@ function onPlayerJoin(ID)
 end
 
 function onPlayerDisconnect(ID)
-	print("On Player Disconnect")
+	print(ID ..":On Player Disconnect")
 		
 	extensions.triggerEvent("onPlayerDisconnect", ID)
 		
@@ -628,7 +628,7 @@ local function getSpawnAllowed(ID, vehID,  data)
 	print(tostring(ID) .." Tried to spawn \"" .. data.name .. '"')
 
 	if M.hasPermission(ID, "spawnVehicles") == true then --TODO: flip the two around because it makes more sense
-		if registeredVehicles[vehName] == nil or registeredVehicles[vehName].reqPerm <= players[ID].perms then
+		if registeredVehicles[data.name] == nil or registeredVehicles[data.name].reqPerm <= players[ID].perms then
 			local vehCount = 0
 			--for k,v in pairs(GetPlayerVehicles(ID)) do
 				--vehCount = vehCount + 1

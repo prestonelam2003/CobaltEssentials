@@ -15,7 +15,7 @@ local function onInit()
 	-----------------------------------------OPTIONS-----------------------------------------
 	options = {
 		serverName = "Cobalt Essentials Server", --the name of the server as it's refered to within CobaltEssentials
-		maxActivePlayers = 2 , --max amount of nonspectator players allowed on a server, any further players will be spectator and placed on a queue.
+		maxActivePlayers = 5 , --max amount of nonspectator players allowed on a server, any further players will be spectator and placed on a queue.
 		enableWhitelist = false , --weather or not the whitelist is enabled
 		commandPrefix   = "/"  , -- the prefix used before a command
 		defaultVehicleReqPerm = 0, --default requiredPermissionLevel to spawn a vehicle
