@@ -25,7 +25,8 @@ local function onInit()
 		
 		RCONenabled = true , --if the server should also run a q3 compliant rcon server for remote acess to the server's console
 		RCONport = 20814 , --the port used to host the server. Since CE is external to beamMP make sure to not place this on the same port as the server.
-		RCONpassword = "password" --the password required to access the RCON.
+		RCONpassword = "password", --the password required to access the RCON.
+		RCONkeepAliveTick = 60 -- the amount of seconds between ticks sent to RCONclients to keep the connections alive, false to disable.
 	}
 
 	--CE.setOptions(options)

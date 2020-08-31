@@ -41,7 +41,7 @@ local players = {}
 local permissions = {}
 
 local rconClients = {} --RCON clients start with an R[ID]
-
+--local lastContact = 0
 
 local playerCount = 0
 local activeCount = 0
@@ -55,28 +55,25 @@ local delayedQueue = {n = 0}
 --OPTIONS--
 --whitelist.enabled = true --The default state of the whitelist.
 
+RegisterEvent("onTick","onTick")
+
+RegisterEvent("onPlayerConnecting","onPlayerConnecting")
+RegisterEvent("onPlayerJoining","onPlayerJoining")
+RegisterEvent("onPlayerJoin","onPlayerJoin")
+RegisterEvent("onPlayerDisconnect","onPlayerDisconnect")
+	
+RegisterEvent("onChatMessage","onChatMessage")
+
+RegisterEvent("onVehicleSpawn","onVehicleSpawn")
+RegisterEvent("onVehicleEdited","onVehicleEdited")
+RegisterEvent("onVehicleDeleted","onVehicleDeleted")
+
+RegisterEvent("onRconCommand","onRconCommand")
+RegisterEvent("onNewRconClient","onNewRconClient")
+
+print("CobaltEssentials Initiated")
 
 ----------------------------------------------------------EVENTS-----------------------------------------------------------
-
-function onInit()
-	RegisterEvent("onTick","onTick")
-
-	RegisterEvent("onPlayerConnecting","onPlayerConnecting")
-	RegisterEvent("onPlayerJoining","onPlayerJoining")
-	RegisterEvent("onPlayerJoin","onPlayerJoin")
-	RegisterEvent("onPlayerDisconnect","onPlayerDisconnect")
-	
-	RegisterEvent("onChatMessage","onChatMessage")
-	
-	RegisterEvent("onVehicleSpawn","onVehicleSpawn")
-	RegisterEvent("onVehicleEdited","onVehicleEdited")
-	RegisterEvent("onVehicleDeleted","onVehicleDeleted")
-
-	RegisterEvent("onRconCommand","onRconCommand")
-	RegisterEvent("onNewRconClient","onNewRconClient")
-
-	print("CobaltEssentials Initiated")
-end
 
 function onTick()
 
@@ -90,6 +87,13 @@ function onTick()
 			v.func(table.unpack(v.args))
 
 			delayedQueue[k] = nil
+		end
+	end
+
+	for ID, client in pairs(rconClients) do
+		if config.getOptions().RCONkeepAliveTick ~= false and age > client.lastContact + config.getOptions().RCONkeepAliveTick * 1000 then
+			TriggerGlobalEvent("keepAlive", ID)
+			client.lastContact = age
 		end
 	end
 
@@ -174,7 +178,7 @@ function onChatMessage(playerID, name ,chatMessage)
 	if chatMessage:sub(1,1) == config.getOptions().commandPrefix then
 		print("Command")
 
-		local command = M.split(chatMessage:sub(2)," ")[1]
+		local command = split(chatMessage:sub(2)," ")[1]
 
 		local args
 		local s, e = chatMessage:find(' ')
@@ -211,6 +215,7 @@ function onChatMessage(playerID, name ,chatMessage)
 	for rconID, rconClient in pairs(rconClients) do
 		if rconClient.chat == true then
 			TriggerGlobalEvent("RCONsend", rconID, formattedMessage)
+			rconClients[rconID].lastContact = age
 		end
 	end
 
@@ -220,14 +225,17 @@ end
 function onVehicleSpawn(ID, vehID,  data)
 	print("On Vehicle Spawn")
 	
-	data = M.parseVehData(data)
+	data = utils.parseVehData(data)
 
 	--for k,v in pairs(data) do print(tostring(k) .. ": " .. tostring(v)) end
 	--for k,v in pairs(data.parts) do print(tostring(k) .. ": " .. tostring(v)) end
 
 	if M.getSpawnAllowed(ID, vehID, data) == false or extensions.triggerEvent("onVehicleSpawn", ID, vehID, data) == false then
+		TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
 	end
+
+	players[ID].vehicles[vehID] = data
 	
 	print("Spawn Sucessful")
 end
@@ -235,12 +243,15 @@ end
 function onVehicleEdited(ID, vehID,  data)
 	print("On Vehicle Edit")
 
-	data = M.parseVehData(data)
+	data = utils.parseVehData(data)
 
 	if extensions.triggerEvent("onVehicleEdited", ID, vehID, data) == false then
-		
+		TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
 	end
+
+	players[ID].vehicles[vehID] = data
+
 end
 
 function onVehicleDeleted(ID, vehID)
@@ -249,6 +260,8 @@ function onVehicleDeleted(ID, vehID)
 	if extensions.triggerEvent("onVehicleDeleted", ID, vehID) == false then
 		return 1
 	end
+
+	players[ID].vehicles[vehID] = nil
 end
 
 
@@ -258,6 +271,8 @@ function onRconCommand(ID, message, password, prefix)
 
 	print(rconClients[ID].ip .. " : " ..prefix .. " " .. password .. " " .. message)
 
+	rconClients[ID].lastContact = age
+
 	if password == config.getOptions().RCONpassword then
 		
 		if extensions.triggerEvent("onRconCommand", ID, message, password, prefix) == false then
@@ -265,7 +280,7 @@ function onRconCommand(ID, message, password, prefix)
 		end
 
 		local args
-		local command = M.split(message," ")[1]
+		local command = split(message," ")[1]
 		local s, e = message:find(' ')
 		if s ~= nil then
 			args = message:sub(s+1)
@@ -296,6 +311,7 @@ function onNewRconClient(ID, ip, port)
 	client.ip = ip
 	client.port = port
 	client.chat = false
+	client.lastContact = age
 	
 	if extensions.triggerEvent("onNewRconClient", client) == false then
 		return 1
@@ -458,84 +474,90 @@ end
 -- PRE: Takes in the serverID of a player
 --POST: returns a complete table on the player.
 local function getPlayer(serverID)
-	local player = {}
-	player.serverID = serverID
-	player.discordID = GetPlayerDiscordID(serverID)
-	player.HWID = GetPlayerHWID(serverID)
-	player.name = GetPlayerName(serverID)
-	player[1] = player.discordID
-	player[2] = player.HWID
-	player[3] = player.name
+	if players[serverID] ~= nil then
+		return players[serverID]
+	else
+		local player = {}
+		player.serverID = serverID
+		player.discordID = GetPlayerDiscordID(serverID)
+		player.HWID = GetPlayerHWID(serverID)
+		player.name = GetPlayerName(serverID)
+
+		--ID-TYPE-MAP: 1: discordID | 2: HWID | 3: NAME
+		player[1] = player.discordID
+		player[2] = player.HWID
+		player[3] = player.name
 
 
-	player.whitelisted = not config.getOptions().enableWhitelist --stuff related to banlist and whitelist is a little complicated might decide to rewrite for clarity/readability just wanted to keep it compact.
-	player.banned = false
-	player.perms = 0
+		player.whitelisted = not config.getOptions().enableWhitelist --stuff related to banlist and whitelist is a little complicated might decide to rewrite for clarity/readability just wanted to keep it compact.
+		player.banned = false
+		player.perms = 0
 	
 	
-	--loop through the 3 id types
-	for k,v in ipairs(player) do
-		
-		--check if the player is whitelisted
-		if player.whitelisted == false and whitelist[k][v] == true then
-			print("Player is whitelisted")
-			player.whitelisted = true
-		end
+		--loop through the 3 id types
+		for k,v in ipairs(player) do
+			
+			--check if the player is whitelisted
+			if player.whitelisted == false and whitelist[k][v] == true then
+				print("Player is whitelisted")
+				player.whitelisted = true
+			end
+			--check if the player is banned
+			if player.banned == false and banlist[k][v] == true then
+				print("Player is banned")
+				player.banned = true
+			end
 
+			--set the player's permission level accordingly
+			if registeredUsers[k][v] then
 
-		--check if the player is banned
-		if player.banned == false and banlist[k][v] == true then
-			print("Player is banned")
-			player.banned = true
-		end
+				if player.perms < tonumber(registeredUsers[k][v].perms) then
 
-		--set the player's permission level accordingly
-		if registeredUsers[k][v] then
-
-			if player.perms < tonumber(registeredUsers[k][v].perms) then
-
-				player.perms = tonumber(registeredUsers[k][v].perms)
+					player.perms = tonumber(registeredUsers[k][v].perms)
+				end
 			end
 		end
-	end
 
-	if player.perms == 0 then
-		player.perms = config.getOptions().defaultPermlvl
-	end
-
-	--print a new player in chat
-	local playerString = "\n" .. player.serverID .. ":" .. player.name .. " @".. player.perms .. "\n"
-
-	for k,v in pairs(player) do
-		if not (k == 1 or k == 2 or k == 3) then
-			playerString = playerString .. "\t" .. tostring(k) .. ": " .. tostring(v) .. "\n"
+		if player.perms == 0 then
+			player.perms = config.getOptions().defaultPermlvl
 		end
-	end
-	print(playerString)
 
-	--info that changes
-	player.muted = false
+		--print a new player in chat
+		local playerString = "\n" .. player.serverID .. ":" .. player.name .. " @".. player.perms .. "\n"
+
+		for k,v in pairs(player) do
+			if not (k == 1 or k == 2 or k == 3) then
+				playerString = playerString .. "\t" .. tostring(k) .. ": " .. tostring(v) .. "\n"
+			end
+		end
+		print(playerString)
+
+		--info that changes
+		player.muted = false
 
 
-	player.activePerms = player.perms
+		player.activePerms = player.perms
 
-	--setup if the player is a spectator and the queue if they are.
+		--setup if the player is a spectator and the queue if they are.
 
-	print("playerCount:" .. GetPlayerCount())
+		print("playerCount:" .. GetPlayerCount())
 	
-	player.queue = activeCount - config.getOptions().maxActivePlayers
+		player.queue = activeCount - config.getOptions().maxActivePlayers
 
-	-- Mode-Map [-1:undefined 0:active, 1:inQueue 2:spectator]
-
-	if player.queue > 0 then
-		player.queue = 0
-		player.mode = 1
-	else
-		player.queue = 0
-		player.mode = 0
+		-- Mode-Map [-1:undefined 0:active, 1:inQueue 2:spectator]
+	
+		if player.queue > 0 then
+			player.queue = 0
+			player.mode = 1
+		else
+			player.queue = 0
+			player.mode = 0
+		end
+	
+		player.vehicles = {}
+	
+		return player
 	end
-
-	return player
 end
 
 --     PRE: the identifier is passed in along with type, type dictates the type of identifier that is being passed in.
@@ -693,7 +715,7 @@ local function command(ID, command, args)
 
 			local argCount = 0
 			if args ~= nil then
-				args = M.split(args, " ")
+				args = split(args, " ")
 
 				for k,v in pairs(args) do
 					if argCount < commands[command].argCount then
@@ -730,55 +752,6 @@ local function command(ID, command, args)
 	end
 end
 
-local function split(s, sep)
-	local fields = {}
-
-	local sep = sep or " "
-	local pattern = string.format("([^%s]+)", sep)
-	string.gsub(s, pattern, function(c) fields[#fields + 1] = c end)
-
-	return fields
-end
-
-local function parseVehData(data)
-	local s, e = data:find('%[')
-
-	data = data:sub(s)
-	data = json.parse(data)
-
-	data.serverVID = vehID
-	data.clientVID = data[2]
-	data.name = data[3]
-
-	if data[4] ~= nil then
-		data.info = json.parse(data[4])
-	end
-
-	return data
-end
-
-function exists(file)
-   local ok, err, code = os.rename(file, file)
-   if not ok then
-	  if code == 13 then
-		 -- Permission denied, but it exists
-		 return true
-	  end
-   end
-   return ok, err
-end
-
-function copyFile(path_src, path_dst)
-	local ltn12 = require("Resources/server/CobaltEssentials/socket/lua/ltn12")
-
-	ltn12.pump.all(
-		ltn12.source.file(assert(io.open(path_src, "rb"))),
-		ltn12.sink.file(assert(io.open(path_dst, "wb")))
-	)
-end
-
-
-
 ------------------------------------------------------PUBLICINTERFACE------------------------------------------------------
 
 ----MUTATORS----
@@ -807,11 +780,6 @@ M.evaluateModes = evaluateModes
 
 ----FUNCTIONS----
 M.command = command
-M.split = split
-M.parseVehData = parseVehData
-M.output = output
-
-onInit()
 
 return M
 

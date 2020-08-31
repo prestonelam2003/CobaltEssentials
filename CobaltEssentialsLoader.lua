@@ -2,7 +2,7 @@
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 --This is to fix BeamMP's apparently dysfunctional modules, it unfortunately breaks hotswapping
-cobaltVersion = "CE 1.3.2"
+cobaltVersion = "CE 1.3.3"
 
 
 local neededFiles = {"lua/socket.lua","lua/mime.lua","lua/ltn12.lua","socket/core.dll","mime/core.dll"}
@@ -16,6 +16,9 @@ CC = require("Resources/server/CobaltEssentials/lua/CobaltCommands")
 extensions = require("Resources/server/CobaltEssentials/lua/CobaltExtensions")
 print("CobaltExtensions Loaded")
 
+utils = require("Resources/server/CobaltEssentials/lua/CobaltUtils")
+print("Utils Loaded")
+
 json = require("Resources/server/CobaltEssentials/lua/json")
 print("json Lib Loaded")
 
@@ -27,7 +30,7 @@ if config.getOptions().RCONenabled == true then
 	print("Verifying LuaSocket Library")
 
 	for k,v in pairs({"lua","socket","mime"}) do
-		if exists(v) then
+		if utils.exists(v) then
 		
 		else
 			print(v .. " is missing!")
@@ -36,10 +39,10 @@ if config.getOptions().RCONenabled == true then
 	end
 
 	for k,v in pairs(neededFiles) do
-		if exists(v) then
+		if utils.exists(v) then
 		else
 			print(v .. " is missing!")
-			copyFile("Resources/server/CobaltEssentials/socket/" .. v, v)
+			utils.copyFile("Resources/server/CobaltEssentials/socket/" .. v, v)
 		end
 	end
 

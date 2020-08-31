@@ -55,7 +55,7 @@ local function onVehicleEdited(ID, vehID,  data)
 end
 
 --called whenever a vehicle is deleted
-local function onVehicleDeleted(ID, vehID,  data)
+local function onVehicleDeleted(ID, vehID,  source)
 	
 end
 

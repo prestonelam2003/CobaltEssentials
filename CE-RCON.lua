@@ -25,6 +25,7 @@ function startRCON(port)
 	server:settimeout(0.1)
 	server:setsockname('0.0.0.0', port)
 
+	RegisterEvent("keepAlive","keepAlive")
 	RegisterEvent("RCONsend","RCONsend")
 	RegisterEvent("RCONreply","RCONreply")
 	CreateThread("listenRCON",500)
@@ -73,7 +74,6 @@ function listenRCON()
 end
 
 function RCONsend(rconID, message)
-	local client = rconClients[rconID]
 
 	local splitMes = split(message,"\n")
 	
@@ -82,7 +82,18 @@ function RCONsend(rconID, message)
 	end
 
 	print("RCON > " .. rconID .. ": " .. splitMes[1])
-	server:sendto(magicChar .. "print " .. message , client.ip, client.port)
+
+	if rconID == "R-1" then
+		for k,v in pairs(rconClients) do
+			server:sendto(magicChar .. "print " .. message , v.ip, v.port)
+		end
+	else
+		server:sendto(magicChar .. "print " .. message , rconClients[rconID].ip, rconClients[rconID].port)
+	end
+end
+
+function keepAlive(rconID)
+	server:sendto(magicChar .. "print keepAlive" , rconClients[rconID].ip, rconClients[rconID].port)
 end
 
 function checkClient(ip, port)
@@ -131,7 +142,7 @@ function RCONreply(reply)
 		print("RCON REPLY: " .. splitReply[1])
 	end
 
-	server:sendto(magicChar .. "print " .. reply , ip, port)
+	server:sendto(magicChar .. "print" .. reply , ip, port)
 	waitingForReply = false
 end
 
