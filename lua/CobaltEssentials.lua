@@ -220,6 +220,11 @@ end
 function onVehicleSpawn(ID, vehID,  data)
 	print("On Vehicle Spawn")
 	
+	data = M.parseVehData(data)
+
+	--for k,v in pairs(data) do print(tostring(k) .. ": " .. tostring(v)) end
+	--for k,v in pairs(data.parts) do print(tostring(k) .. ": " .. tostring(v)) end
+
 	if M.getSpawnAllowed(ID, vehID, data) == false or extensions.triggerEvent("onVehicleSpawn", ID, vehID, data) == false then
 		return 1
 	end
@@ -229,7 +234,11 @@ end
 
 function onVehicleEdited(ID, vehID,  data)
 	print("On Vehicle Edit")
+
+	data = M.parseVehData(data)
+
 	if extensions.triggerEvent("onVehicleEdited", ID, vehID, data) == false then
+		
 		return 1
 	end
 end
@@ -593,18 +602,8 @@ end
 -- PRE: feed in  info from onCarSpawn
 --POST: returns true/false on if the spawn event should be canceled.
 local function getSpawnAllowed(ID, vehID,  data)
-	for i=1,2 do
-		local s, e = data:find(",")
-		data = data:sub(s+1)
-	end
-	
-	local s, e = data:find('"')
-	data = data:sub(s+1)
-	local s, e = data:find('"')
 
-	local vehName = data:sub(1,e-1)
-
-	print(tostring(ID) .." Tried to spawn \"" .. vehName .. '"')
+	print(tostring(ID) .." Tried to spawn \"" .. data.name .. '"')
 
 	if M.hasPermission(ID, "spawnVehicles") == true then --TODO: flip the two around because it makes more sense
 		if registeredVehicles[vehName] == nil or registeredVehicles[vehName].reqPerm <= players[ID].perms then
@@ -741,6 +740,23 @@ local function split(s, sep)
 	return fields
 end
 
+local function parseVehData(data)
+	local s, e = data:find('%[')
+
+	data = data:sub(s)
+	data = json.parse(data)
+
+	data.serverVID = vehID
+	data.clientVID = data[2]
+	data.name = data[3]
+
+	if data[4] ~= nil then
+		data.info = json.parse(data[4])
+	end
+
+	return data
+end
+
 function exists(file)
    local ok, err, code = os.rename(file, file)
    if not ok then
@@ -792,6 +808,7 @@ M.evaluateModes = evaluateModes
 ----FUNCTIONS----
 M.command = command
 M.split = split
+M.parseVehData = parseVehData
 M.output = output
 
 onInit()

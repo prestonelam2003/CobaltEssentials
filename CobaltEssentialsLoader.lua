@@ -2,7 +2,7 @@
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 --This is to fix BeamMP's apparently dysfunctional modules, it unfortunately breaks hotswapping
-cobaltVersion = "CE 1.3.0"
+cobaltVersion = "CE 1.3.2"
 
 
 local neededFiles = {"lua/socket.lua","lua/mime.lua","lua/ltn12.lua","socket/core.dll","mime/core.dll"}
@@ -15,6 +15,9 @@ CC = require("Resources/server/CobaltEssentials/lua/CobaltCommands")
 
 extensions = require("Resources/server/CobaltEssentials/lua/CobaltExtensions")
 print("CobaltExtensions Loaded")
+
+json = require("Resources/server/CobaltEssentials/lua/json")
+print("json Lib Loaded")
 
 print("-------------Loading CobaltEssentials Config-------------")
 config = require("Resources/server/CobaltEssentials/lua/CobaltConfig")
