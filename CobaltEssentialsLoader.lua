@@ -3,27 +3,36 @@
 
 --This is to fix BeamMP's apparently dysfunctional modules, it unfortunately breaks hotswapping
 cobaltVersion = "CE 1.3.3"
+pluginName = debug.getinfo(1).source:sub(2)
 
+for i = 0, 1 do
+	local s, e = pluginName:find("\\")
+	pluginName = pluginName:sub(e+1)
+end
+local s, e = pluginName:find("\\")
+pluginName = pluginName:sub(1,e-1)
+
+print(pluginName)
 
 local neededFiles = {"lua/socket.lua","lua/mime.lua","lua/ltn12.lua","socket/core.dll","mime/core.dll"}
 
 print("-------------Loading CobaltEssentials-------------")
-CE = require("Resources/server/CobaltEssentials/lua/CobaltEssentials")
+CE = require("Resources/server/" .. pluginName .. "/lua/CobaltEssentials")
 
 print("Loading CobaltCommands")
-CC = require("Resources/server/CobaltEssentials/lua/CobaltCommands")
+CC = require("Resources/server/" .. pluginName .. "/lua/CobaltCommands")
 
-extensions = require("Resources/server/CobaltEssentials/lua/CobaltExtensions")
+extensions = require("Resources/server/" .. pluginName .. "/lua/CobaltExtensions")
 print("CobaltExtensions Loaded")
 
-utils = require("Resources/server/CobaltEssentials/lua/CobaltUtils")
+utils = require("Resources/server/" .. pluginName .. "/lua/CobaltUtils")
 print("Utils Loaded")
 
-json = require("Resources/server/CobaltEssentials/lua/json")
+json = require("Resources/server/" .. pluginName .. "/lua/json")
 print("json Lib Loaded")
 
 print("-------------Loading CobaltEssentials Config-------------")
-config = require("Resources/server/CobaltEssentials/lua/CobaltConfig")
+config = require("Resources/server/" .. pluginName .. "/lua/CobaltConfig")
 
 if config.getOptions().RCONenabled == true then
 	print("-------------Loading RCON-------------")
@@ -42,7 +51,7 @@ if config.getOptions().RCONenabled == true then
 		if utils.exists(v) then
 		else
 			print(v .. " is missing!")
-			utils.copyFile("Resources/server/CobaltEssentials/socket/" .. v, v)
+			utils.copyFile("Resources/server/" .. pluginName .. "/socket/" .. v, v)
 		end
 	end
 

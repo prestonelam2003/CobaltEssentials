@@ -26,7 +26,7 @@ local function onInit()
 		RCONenabled = true , --if the server should also run a q3 compliant rcon server for remote acess to the server's console
 		RCONport = 20814 , --the port used to host the server. Since CE is external to beamMP make sure to not place this on the same port as the server.
 		RCONpassword = "password", --the password required to access the RCON.
-		RCONkeepAliveTick = 60 -- the amount of seconds between ticks sent to RCONclients to keep the connections alive, false to disable.
+		RCONkeepAliveTick = 30 -- the amount of seconds between ticks sent to RCONclients to keep the connections alive, false to disable.
 	}
 
 	--CE.setOptions(options)
@@ -39,7 +39,7 @@ local function onInit()
 	--CE.registerUser(identifier,IDtype,permissionLevel,specialPerms)
 
 	CE.registerUser("Preston", 3, 10) --never do permissions by name, this is just an example.
-	CE.registerUser("531662154303143951", 1, 10) --use the discord ID like this
+	CE.registerUser("168500725305835520", 1, 10) --use the discord ID like this
 
 
 	-----------------------------------------PERMISSIONS-----------------------------------------

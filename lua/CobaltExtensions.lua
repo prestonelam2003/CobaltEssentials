@@ -23,7 +23,7 @@ end
 -- PRE: the string "extension" is passed in.
 --POST: any file named <extension>.lua is loaded, the module is placed under a global variable named after string extension and it's init is executed, if the file exists, function returns true.
 local function load(extension)
-	local module = require("Resources/server/CobaltEssentials/extensions/" .. extension)
+	local module = require("Resources/server/" .. pluginName .. "/extensions/" .. extension)
 	
 	_G[extension] = module
 	loaded[extension] = module

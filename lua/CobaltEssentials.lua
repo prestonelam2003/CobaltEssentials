@@ -214,7 +214,7 @@ function onChatMessage(playerID, name ,chatMessage)
 
 	for rconID, rconClient in pairs(rconClients) do
 		if rconClient.chat == true then
-			TriggerGlobalEvent("RCONsend", rconID, formattedMessage)
+			TriggerGlobalEvent("RCONsend", rconID, formattedMessage) 
 			rconClients[rconID].lastContact = age
 		end
 	end
