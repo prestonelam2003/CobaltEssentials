@@ -14,8 +14,10 @@ local clientCount = 0
 
 RegisterEvent("startRCON","startRCON")
 
-function startRCON(port)
-	
+function startRCON(port, path, cpath)
+	package.path = path
+	package.cpath = cpath
+
 	local rconClients = {}
 
 	socket = require("socket")
