@@ -2,48 +2,118 @@
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 --This is to fix BeamMP's apparently dysfunctional modules, it unfortunately breaks hotswapping
-cobaltVersion = "CE 1.3.6"
-pluginName = debug.getinfo(1).source:sub(2)
+cobaltVersion = "1.4.0 [PUBLIC-BETA-1]"
 
-local resources = debug.getinfo(1).source:sub(2)
-local s, e = resources:find("\\")
+pluginName = debug.getinfo(1).source:sub(2)
+local s,e
+
+resources = debug.getinfo(1).source:sub(2)
+s, e = resources:find("\\")
 resources = resources:sub(0,e-1)
 
 for i = 0, 1 do
-	local s, e = pluginName:find("\\")
+	s, e = pluginName:find("\\")
 	pluginName = pluginName:sub(s+1)
 end
-local s, e = pluginName:find("\\")
+s, e = pluginName:find("\\") 
 pluginName = pluginName:sub(1,e-1)
 
+--print(resources)
+--print(pluginName)
 
-package.path = package.path .. ";;" .. resources .. "/server/" .. pluginName .. "/?.lua;;".. resources .. "/server/" .. pluginName .. "/lua/?.lua"
-package.cpath = package.cpath .. ";;" .. resources .. "/server/" .. pluginName .. "/?.dll"
+package.path = package.path .. ";;" .. resources .. "/Server/" .. pluginName .. "/?.lua;;".. resources .. "/Server/" .. pluginName .. "/lua/?.lua"
+package.cpath = package.cpath .. ";;" .. resources .. "/Server/" .. pluginName .. "/?.dll;;" .. resources .. "/Server/" .. pluginName .. "/lib/?.dll"
 
-local neededFiles = {"lua/socket.lua","lua/mime.lua","lua/ltn12.lua","socket/core.dll","mime/core.dll"}
 
-print("-------------Loading CobaltEssentials-------------")
-CE = require("CobaltEssentials")
+--local neededFiles = {"lua/socket.lua","lua/mime.lua","lua/ltn12.lua","socket/core.dll","mime/core.dll"}
 
-print("Loading CobaltCommands")
-CC = require("CobaltCommands")
+print("-------------Loading Cobalt Essentials v" .. cobaltVersion .. "-------------")
+	CE = require("CobaltEssentials")
 
-extensions = require("CobaltExtensions")
-print("CobaltExtensions Loaded")
+	print("Loading CobaltCommands")
+		CC = require("CobaltCommands")
 
-utils = require("CobaltUtils")
-print("Utils Loaded")
+	utils = require("CobaltUtils")
+		print("Utils Loaded")
 
-json = require("json")
-print("json Lib Loaded")
+	--TODO: WRITE A WAY TO LOAD THESE CONFIG OPTIONS AS AN OVERRIDE TO MAKE SERVER UPDATES/PORTS EASIER?
+	--CobaltConfigOld = require("CobaltConfig")
+		--print("CobaltConfig Loaded")
 
-print("-------------Loading CobaltEssentials Config-------------")
-config = require("CobaltConfig")
+	json = require("json")
+		print("json Lib Loaded")
 
-if config.getOptions().RCONenabled == true then
-	print("-------------Loading RCON-------------")
-	print("Verifying LuaSocket Library")
---
+	CobaltDB = require("CobaltDBconnector")
+		print("CobaltDB Connector Loaded")
+
+	players = require("CobaltPlayerMngr")
+		print("Cobalt Player Manager Loaded")
+
+	configMngr = require("CobaltConfigMngr")
+		print("Config Manager Loaded")
+
+		--Load CobaltExtensions & any of it's extensions
+	extensions = require("Cobaltextensions")
+		print("CobaltExtensions Loaded")
+
+
+	--See if CobaltConfig needs to be loaded for compatability
+	if utils.exists(resources .. "/Server/" .. pluginName .. "/lua/CobaltConfig.lua") then
+		CobaltCompat = require("CobaltCompat")
+	end
+
+	if config.RCONenabled.value == true then
+		print("opening RCON on port " .. config.RCONport.value)
+		TriggerLocalEvent("startRCON", config.RCONport.value, package.path, package.cpath)
+
+	end
+
+	if CobaltDB.setPort(config.CobaltDBport.value) then
+		print("CobaltDB port changed to " .. config.CobaltDBport.value)
+	end
+
+	
+	--WARNING for not having enough players in the config.
+	if beamMPconfig.MaxPlayers < config.maxActivePlayers.value then
+		print("/!\\ ---THE SERVER'S MAX PLAYER COUNT IS GREATER THAN THE MAX ACTIVE PLAYERS IN THE COBALT CONFIG--- /!\\")
+		Sleep(2000)
+	end
+
+	--TODO: WARNING FOR NOT HAVING ENOUGH CARS ALLOWED IN THE CONFIG
+	local highestCap
+	for reqPerm, cap in pairs(permissions.vehicleCap) do
+		if reqPerm ~= "description" and (highestCap == nil or cap > highestCap) then
+			highestCap = cap
+		end
+	end
+	if highestCap < beamMPconfig.Cars then
+		print("/!\\ -------------------------------SERVERSIDE-VEHICLE-CAP-FOR-CARS-TOO-LOW------------------------------- /!\\")
+		print("		The serverside vehicle cap (Cars) in the config is too low.")
+		print("		If you do not turn it up, dynamic vehicle caps based on permission level will not work!")
+		print("		Please adjust the serverside vehicle cap to " .. highestCap .. " or greater to avoid any problems.")
+		print("/!\\ -------------------------------SERVERSIDE-VEHICLE-CAP-FOR-CARS-TOO-LOW------------------------------- /!\\")
+		Sleep(5000)
+	end
+
+--print("-------------CobaltEssentials Config-------------")
+	--CobaltConfigOld.loadConfig()
+	--for k,v in pairs(config.beamMP) do print(tostring(k) .. ": " .. tostring(v)) end
+
+print("-------------Cobalt Essentials v" .. cobaltVersion .. " Loaded-------------")
+
+
+--UNUSED CODE THAT I WANT TO HOLD ON TO
+
+--sqlite = require("lsqlite3")
+--luasql = require("luasql")
+--sqlite, b ,c = package.loadlib("lsqlite3", "luaopen_lsqlite3")
+--sql = require("CobaltSQLite")
+--print("sqlite:"..tostring(sqlite))
+--print("B:".. tostring(b))
+--print("C:"..tostring(c))
+
+--for k,v in pairs(sqlite) do print(tostring(k) .. ": " .. tostring(v)) end
+
 --	for k,v in pairs({"lua","socket","mime"}) do
 --		if utils.exists(v) then
 --		
@@ -60,12 +130,3 @@ if config.getOptions().RCONenabled == true then
 --			utils.copyFile(resources .."/server/" .. pluginName .. "/socket/" .. v, v)
 --		end
 --	end
-
-	print("All good!")
-	print("opening RCON on port " .. config.getOptions().RCONport)
-
-	TriggerLocalEvent("startRCON", config.getOptions().RCONport, package.path, package.cpath)
-	
-end
-
-print("-------------" .. cobaltVersion .. " Loaded-------------")

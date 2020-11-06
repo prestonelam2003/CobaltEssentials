@@ -13,11 +13,10 @@
 
 local M = {}
 
-local commands = {}
+--local commands = {}
 
-local options = {}
+--local options = {}
 
---TODO: try to come up with a way to combine banlist, whitelist and registeredUsers in a way that keeps everything efficent (even if it's not nessesary) & makes things a little cleaner but not confusing.
 
 --ID-TYPE-MAP: 1: discordID | 2: HWID | 3: NAME
 local banlist = {}
@@ -37,23 +36,16 @@ local registeredUsers = {}
 
 local registeredVehicles = {}
 
-local players = {}
-local permissions = {}
+--players = {}
+--local permissions = {}
 
-local rconClients = {} --RCON clients start with an R[ID]
+rconClients = {} --RCON clients start with an R[ID]
 --local lastContact = 0
 
-local playerCount = 0
-local activeCount = 0
-local queueCount = 0
-local specCount = 0
 
-local age = 0 --age of the server in milliseconds
+age = 0 --age of the server in milliseconds
 --local ticks = 0
-local delayedQueue = {n = 0}
-
---OPTIONS--
---whitelist.enabled = true --The default state of the whitelist.
+delayedQueue = {n = 0}
 
 RegisterEvent("onTick","onTick")
 
@@ -79,19 +71,20 @@ function onTick()
 
 	age = os.clock() * 1000
 
-	for k,v in ipairs(delayedQueue) do
-		if v.complete == false and age >= v.execTime then
+	for k,v in pairs(delayedQueue) do
+		if k ~= "n" and v.complete == false and age >= v.execTime then
 			
 			v.complete = true
 
 			v.func(table.unpack(v.args))
 
 			delayedQueue[k] = nil
+			delayedQueue.n = delayedQueue.n - 1
 		end
 	end
 
 	for ID, client in pairs(rconClients) do
-		if config.getOptions().RCONkeepAliveTick ~= false and age > client.lastContact + config.getOptions().RCONkeepAliveTick * 1000 then
+		if config.RCONkeepAliveTick.value ~= false and age > client.lastContact + config.RCONkeepAliveTick.value * 1000 then
 			TriggerGlobalEvent("keepAlive", ID)
 			client.lastContact = age
 		end
@@ -106,33 +99,25 @@ function onTick()
 end
 
 function onPlayerConnecting(ID)
-	print("On Player Connecting: " .. tostring(ID))
+	print("On Player Connecting: " .. ID)
+	
+	--players[ID] = M.getPlayer(ID)
+	local player, canJoin, reason = players.new(ID)
 
-	if extensions.triggerEvent("onPlayerConnecting", ID) == false then
+	if extensions.triggerEvent("onPlayerConnecting", player) == false then
 		DropPlayer(ID,"You've been kicked from the server!")	
-	else
-
-
-		local player = M.getPlayer(ID)
-		
-		if player.banned then
-			DropPlayer(ID , "You are banned from this server!")
-		else
-			if not player.whitelisted then
-				DropPlayer(ID, "You are not whitelisted on this server!")
-			else
-				players[ID] = player
-			end
-		end
+	elseif canJoin == false then
+		player:kick(reason)
 	end
-	M.evaluateModes()
+
+	players.updateQueue()
 end
 
 function onPlayerJoining(ID)
 
-	print("On Player Joining: " .. tostring(ID))
+	print("On Player Joining: " .. ID)
 
-	if extensions.triggerEvent("onPlayerJoining", ID) == false then
+	if extensions.triggerEvent("onPlayerJoining", players[ID]) == false then
 		DropPlayer(ID,"You've been kicked from the server!")
 
 	else
@@ -141,41 +126,45 @@ function onPlayerJoining(ID)
 end
 
 function onPlayerJoin(ID)
-	print("On Player Join: " .. tostring(ID))
+	print("On Player Join: " .. ID)
 	
-	if extensions.triggerEvent("onPlayerJoin", ID) == false then
+	if extensions.triggerEvent("onPlayerJoin", players[ID]) == false then
 		DropPlayer(ID,"You've been kicked from the server!")
 	else
 		SendChatMessage(-1, players[ID].name .. " joined the game")
 	end
+
 end
 
 function onPlayerDisconnect(ID)
-	print(ID ..":On Player Disconnect")
 		
-	extensions.triggerEvent("onPlayerDisconnect", ID)
-		
+	extensions.triggerEvent("onPlayerDisconnect", players[ID]) --allow extensions to act first.
 
-	--bump join order
+	if players[ID] then
+		if players[ID].dropReason then
+			print("On Player Disconnect: " .. ID .. " | Dropped for " .. players[ID].dropReason)
+		else
+			print("On Player Disconnect: " .. ID .. " | Disconnect")
+		end
 
+		players[ID] = nil
+	else
+		print("On Player Disconnect: " .. ID .. " | Left while Loading.")
+	end
 
-	--loop through all players to decrement the join order where required
-	M.bumpQueue(1)
-
-	SendChatMessage(-1, players[ID].name .. " left the game")
-	players[ID] = nil
+	players.updateQueue()
 end
 
 
 function onChatMessage(playerID, name ,chatMessage)
 	chatMessage = chatMessage:sub(2)
 
-	if extensions.triggerEvent("onChatMessage", playerID, name, chatMessage) == false then
+	if extensions.triggerEvent("onChatMessage", players[ID], chatMessage) == false then
 		return -1
 	end
 
 
-	if chatMessage:sub(1,1) == config.getOptions().commandPrefix then
+	if chatMessage:sub(1,1) == config.commandPrefix.value then
 		print("Command")
 
 		local command = split(chatMessage:sub(2)," ")[1]
@@ -194,7 +183,7 @@ function onChatMessage(playerID, name ,chatMessage)
 		--run the command and react accordingly
 		print("trying to execute command")
 		
-		local reply = M.command(playerID, command, args)
+		local reply = M.command(players[playerID], command, args)
 		if reply ~= nil then
 			SendChatMessage(playerID, reply)
 		end
@@ -205,7 +194,8 @@ function onChatMessage(playerID, name ,chatMessage)
 			
 	end
 	
-	if players[playerID].muted == true or M.hasPermission(playerID, "sendMessage") == false then
+	if players[playerID].permissions.muted  == true or M.hasPermission(playerID, "sendMessage") == false then
+		print("MUTED:[".. playerID .. "]" .. name .. " : " .. chatMessage)
 		return 1
 	end
 
@@ -230,7 +220,7 @@ function onVehicleSpawn(ID, vehID,  data)
 	--for k,v in pairs(data) do print(tostring(k) .. ": " .. tostring(v)) end
 	--for k,v in pairs(data.parts) do print(tostring(k) .. ": " .. tostring(v)) end
 
-	if M.getSpawnAllowed(ID, vehID, data) == false or extensions.triggerEvent("onVehicleSpawn", ID, vehID, data) == false then
+	if players[ID].canSpawn(players[ID], vehID, data) == false or extensions.triggerEvent("onVehicleSpawn", players[ID], vehID, data) == false then
 		TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
 	end
@@ -245,7 +235,7 @@ function onVehicleEdited(ID, vehID,  data)
 
 	data = utils.parseVehData(data)
 
-	if extensions.triggerEvent("onVehicleEdited", ID, vehID, data) == false then
+	if extensions.triggerEvent("onVehicleEdited", players[ID], vehID, data) == false then
 		TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
 	end
@@ -255,13 +245,17 @@ function onVehicleEdited(ID, vehID,  data)
 end
 
 function onVehicleDeleted(ID, vehID)
+	ID = tonumber(ID)
+	vehID = tonumber(vehID)
 	print("on Vehicle Delete")
 
-	if extensions.triggerEvent("onVehicleDeleted", ID, vehID) == false then
+	if extensions.triggerEvent("onVehicleDeleted", players[ID], vehID) == false then
 		return 1
 	end
 
-	players[ID].vehicles[vehID] = nil
+	if players[ID].vehicles[vehID] then
+		players[ID].vehicles[vehID] = nil
+	end
 end
 
 
@@ -273,7 +267,7 @@ function onRconCommand(ID, message, password, prefix)
 
 	rconClients[ID].lastContact = age
 
-	if password == config.getOptions().RCONpassword then
+	if password == config.RCONpassword.value then
 		
 		if extensions.triggerEvent("onRconCommand", ID, message, password, prefix) == false then
 			return 1
@@ -286,9 +280,9 @@ function onRconCommand(ID, message, password, prefix)
 			args = message:sub(s+1)
 		end
 	
-		if commands[command] ~= nil then
+		if CobaltDB.tableExists("commands", command) then
 			
-			local reply = M.command(ID, command, args)
+			local reply = M.command(rconClients[ID], command, args)
 
 			--print("RCON REPLIES WITH COMMAND REPLY")
 			if reply ~= nil then
@@ -312,6 +306,10 @@ function onNewRconClient(ID, ip, port)
 	client.port = port
 	client.chat = false
 	client.lastContact = age
+
+	client.canExecute = function(client, command)
+		return command.sourceLimited ~= 1
+	end
 	
 	if extensions.triggerEvent("onNewRconClient", client) == false then
 		return 1
@@ -323,7 +321,8 @@ end
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 
 
-local function registerUser(identifier, IDtype, permissionLevel, specialPerms)
+local function registerUser(identifier, IDtype, permissionLevel, specialPerms) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
+	print("CE.setPermission() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
 	print("Registered " .. identifier .. " as ID Type " .. IDtype .. " @" .. permissionLevel)
 
 	registeredUsers[IDtype][identifier] = {}
@@ -333,8 +332,9 @@ end
 
 
 
---POST: set the permisson requirement for the "flag" optional value for things like car count
-local function setPermission(permission, reqPerm, value)
+--POST: set the permission requirement for the "flag" optional value for things like car count
+local function setPermission(permission, reqPerm, value) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
+	print("CE.setPermission() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'permissions' database to edit it directly.")
 	
 	if value == nil then
 		permissions[permission] = {}
@@ -359,7 +359,8 @@ end
 
 -- PRE: a command name, function and the required permission level is passed in.
 --POST: the command is added to the commands table.
-local function registerCommand(command, func, reqPerm, desc, argCount, RCONonly)
+local function registerCommand(command, func, reqPerm, desc, argCount, RCONonly) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
+	print("CE.registerCommand() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'commands' database to edit it directly.")
 	print("Registered " .. command .. " Command @" .. reqPerm)
 
 	commands[command] = {}
@@ -370,7 +371,8 @@ local function registerCommand(command, func, reqPerm, desc, argCount, RCONonly)
 	commands[command].RCONonly = RCONonly
 end
 
-local function registerVehicle(name, reqPerm)
+local function registerVehicle(name, reqPerm) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
+	print("CE.registerVehicle() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'vehicles' database to edit it directly.")
 	print("Set " .. name .. " @" .. reqPerm)
 
 	registeredVehicles[name] = {}
@@ -378,13 +380,15 @@ local function registerVehicle(name, reqPerm)
 end
 
 --POST: adds a player to the whitelist for this session
-local function addWhitelist(identifier, IDtype)
+local function addWhitelist(identifier, IDtype) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
+	print("CE.addWhitelist() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
 	print("Added " .. identifier .. " as ID Type " .. IDtype .. " to the whitelist" )
 	whitelist[IDtype][identifier] = true
 end
 
 --POST: removes a player from the whitelist for this session
-local function removeWhitelist(identifier, IDtype)
+local function removeWhitelist(identifier, IDtype) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
+	print("CE.removeWhitelist() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
 	print("Removed " .. identifier .. " as ID Type " .. IDtype .. " from the whitelist" )
 
 	whitelist[IDtype][identifier] = nil
@@ -392,15 +396,17 @@ end
 
 --POST: set the whitelist as enabled or disabled (true/false) if nil or invalid, the value will toggle.
 local function setWhitelistEnabled(enabled)
+	print("CE.setWhitelistEnabled() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'config' database to edit it directly.")	
+
 	if not enabled  then
-		config.getOptions().enableWhitelist = not config.getOptions().enableWhitelist
+		config.enableWhitelist.value = not config.enableWhitelist.value
 	else
 		enabled = enabled == true or false
-		config.getOptions().enableWhitelist = enabled
+		config.enableWhitelist.value = enabled
 	end
 
 
-	if config.getOptions().enableWhitelist == enabled then
+	if config.enableWhitelist.value == enabled then
 		print("Disabled Whitelist")
 	else
 		print("Enabled Whitelist")
@@ -408,24 +414,21 @@ local function setWhitelistEnabled(enabled)
 end
 
 --POST: bans a player from this session
-local function ban(identifier, IDtype)
+local function ban(identifier, IDtype) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
+	print("CE.ban() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
 	print("Banned " .. identifier .. " as ID Type " .. IDtype .. " from the server" )
 	banlist[IDtype][identifier] = true
 end
 
 --POST: unbans a player from this session
-local function unban(identifier, IDtype)
+local function unban(identifier, IDtype) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
+	print("CE.unban() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
 	print("Unbanned " .. identifier .. " as ID Type " .. IDtype .. " from the server" )
 	banlist[IDtype][identifier] = nil
 end
 
-local function setOptions(options)
-	options = options
-end
-
-
 local function bumpQueue(spots)
-	for k, v in pairs(players) do
+	for k, v in ipairs(players) do
 		-- Mode-Map [0:active, 1:inQueue 2:spectator]
 		if v.mode == 1	then
 			v.queue = v.queue - 1
@@ -438,8 +441,9 @@ end
 -- PRE: a valid playerID and a boolean state is passed in.
 --POST: the player at players[playerID] is either muted or unmuted based on state.
 local function setMuted(playerID, state)
+	print("CE.setMuted() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
 
-	players[playerID].muted = state
+	players[playerID].permissions.muted = state
 
 	if state == true then
 		SendChatMessage(playerID, "You've been muted")
@@ -473,7 +477,8 @@ end
 
 -- PRE: Takes in the serverID of a player
 --POST: returns a complete table on the player.
-local function getPlayer(serverID)
+local function getPlayer(serverID) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
+	print("CE.getPlayer() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. Please use players.new() instead.")
 	if players[serverID] ~= nil then
 		return players[serverID]
 	else
@@ -488,70 +493,54 @@ local function getPlayer(serverID)
 		player[2] = player.HWID
 		player[3] = player.name
 
+		player.permissions = CobaltPermissions.getPlayerPermissions(player.discordID)
 
-		player.whitelisted = not config.getOptions().enableWhitelist --stuff related to banlist and whitelist is a little complicated might decide to rewrite for clarity/readability just wanted to keep it compact.
-		player.banned = false
-		player.perms = 0
-	
-	
-		--loop through the 3 id types
-		for k,v in ipairs(player) do
-			
-			--check if the player is whitelisted
-			if player.whitelisted == false and whitelist[k][v] == true then
-				print("Player is whitelisted")
-				player.whitelisted = true
-			end
-			--check if the player is banned
-			if player.banned == false and banlist[k][v] == true then
-				print("Player is banned")
-				player.banned = true
-			end
-
-			--set the player's permission level accordingly
-			if registeredUsers[k][v] then
-
-				if player.perms < tonumber(registeredUsers[k][v].perms) then
-
-					player.perms = tonumber(registeredUsers[k][v].perms)
-				end
-			end
-		end
-
-		if player.perms == 0 then
-			player.perms = config.getOptions().defaultPermlvl
-		end
+		--local playerPerms = CobaltPermissions.getPlayerPermissions(player.discordID)
+		--player.permissions = {}
+		--playerPerms.whitelisted = playerPerms.whitelisted == 1
+		--playerPerms.banned = playerPerms.banned == 1
+		--for k,v in pairs(playerPerms) do
+			--player.permissions[k] = v
+		--end
 
 		--print a new player in chat
-		local playerString = "\n" .. player.serverID .. ":" .. player.name .. " @".. player.perms .. "\n"
+		local playerString = "\n" .. player.serverID .. ":" .. player.name .. " @".. player.permissions.level .. "\n"
 
 		for k,v in pairs(player) do
-			if not (k == 1 or k == 2 or k == 3) then
+			if not (k == 1 or k == 2 or k == 3 or k == "permissions") then
 				playerString = playerString .. "\t" .. tostring(k) .. ": " .. tostring(v) .. "\n"
 			end
+		end
+		playerString = playerString .. "\tPermissions\n"
+		for k,v in pairs(player.permissions) do
+			playerString = playerString .. "\t\t" .. tostring(k) .. ": " .. tostring(v) .. "\n"
 		end
 		print(playerString)
 
 		--info that changes
-		player.muted = false
+		--player.permissions.muted = false
 
-
-		player.activePerms = player.perms
-
-		--setup if the player is a spectator and the queue if they are.
 
 		print("playerCount:" .. GetPlayerCount())
-	
-		player.queue = activeCount - config.getOptions().maxActivePlayers
+
+		--TODO: work out a more friendly way to handle activePerms vs permissions.level with everything else
+		------GAMEMODE------
+		--setup if the player is a spectator and the queue if they are.
+		
+		player.gamemode = {}
+
+		--player.gamemode.activePerms = player.permissions.level
+
+		player.gamemode.queue = activeCount - config.maxActivePlayers.value
 
 		-- Mode-Map [-1:undefined 0:active, 1:inQueue 2:spectator]
 	
-		if player.queue > 0 then
-			player.queue = 0
-			player.mode = 1
+		if player.gamemode.queue > 0 then
+			player.gamemode.queue = 0
+			player.gamemode.mode = 1
 		else
-			player.queue = 0
-			player.mode = 0
+			player.gamemode.queue = 0
+			player.gamemode.mode = 0
 		end
 	
 		player.vehicles = {}
@@ -560,60 +549,53 @@ local function getPlayer(serverID)
 	end
 end
 
---     PRE: the identifier is passed in along with type, type dictates the type of identifier that is being passed in.
---TYPE-MAP: 1: discordID | 2: HWID | 3: NAME
--- RETURNS: the serverID of said player, will return -1 if no one is found
-local function getServerID(identifier, IDtype)
-	local serverID = -1
-
-	for ID,Name in pairs(GetPlayers()) do
-		
-		--TYPE = 1
-		if type == 1 and GetPlayerDiscordID(ID) == identifier then
-			serverID = ID
-		end
-		
-		--TYPE = 2
-		if type == 2 and GetPlayerHWID(ID) == identifier then
-			serverID = ID
-		end
-		
-		--TYPE = 3
-		if type == 3 and name == identifier then
-			serverID = ID
-		end
-
+-- PRE: the identifier is passed in
+--POST: the serverID of the player will be returned, will return -1 if no one is found
+local function getPlayerID(identifier)
+	local idType
+	if tostring(tonumber(identifier)):len() == 8 then --discordID
+		idType = discordID
+	else --likely name
+		idType = name
 	end
 
-	return serverID
+	for playerID, player in pairs(players) do
+		if players[idType] == identifier then
+			return playerID
+		end
+	end
+
+	return -1
 end
 
 --POST: return the commands table
-local function getCommands()
+local function getCommands() --DEPRECATED
+	print("CE.getCommands is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. The commands table is now public, so directly use it instead.")
 	return commands
 end
 
 
 -- PRE: a valid serverID and permission "flag" are both passed in.
 --POST: returns true or false based on if the player with the provided serverID has access to this permission
-local function hasPermission(serverID, permission)
-	
+local function hasPermission(serverID, permission) --DEPRECATED
+	print("CE.hasPermission() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. Please use player:hasPermission() instead.")
+
 	if permissions[permission].multiValue then
 		local lastVal = 0
 
-		for i=0,players[serverID].perms do
+		for i=0,players[serverID].permissions.level do
 			if permissions[permission].reqPerm[i] then
 				lastVal = permissions[permission].reqPerm[i]
 			end
 		end
 		return lastVal
 	else
-		return players[serverID].perms >= permissions[permission].reqPerm
-
+		return players[serverID].permissions.level >= permissions[permission].reqPerm
 	end
 end
 
-local function getPlayers()
+local function getPlayers() --DEPRECATED
+	print("CE.getPlayers is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. The players table is now public, so directly use it instead.")
 	return players
 end
 
@@ -623,12 +605,13 @@ end
 
 -- PRE: feed in  info from onCarSpawn
 --POST: returns true/false on if the spawn event should be canceled.
-local function getSpawnAllowed(ID, vehID,  data)
+local function getSpawnAllowed(ID, vehID,  data) --DEPRECATED
+	print("CE.getSpawnAllowed() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. Please use player:canSpawn() instead.")
 
 	print(tostring(ID) .." Tried to spawn \"" .. data.name .. '"')
 
 	if M.hasPermission(ID, "spawnVehicles") == true then --TODO: flip the two around because it makes more sense
-		if registeredVehicles[data.name] == nil or registeredVehicles[data.name].reqPerm <= players[ID].perms then
+		if registeredVehicles[data.name] == nil or registeredVehicles[data.name].reqPerm <= players[ID].permissions.level then
 			local vehCount = 0
 			--for k,v in pairs(GetPlayerVehicles(ID)) do
 				--vehCount = vehCount + 1
@@ -651,38 +634,38 @@ local function getSpawnAllowed(ID, vehID,  data)
 end
 
 local function evaluateModes()
-	inactivePermlvl = config.getOptions().inactivePermlvl
+	inactivePermlvl = config.inactivePermlvl
 
-	for k, v in pairs(players) do
+	for playerID, player in ipairs(players) do
 		-- Mode-Map [-1:undefined 0:active, 1:inQueue 2:spectator]
-		if v.mode == 0 then
+		if player.gamemode.mode == 0 then
 
-			if v.perms == inactivePermlvl then
-				v.perms = v.activePerms
+			--if player.permissions.level == inactivePermlvl then
+				--player.permissions.level = player.gamemode.activePerms
+			--else
+				--player.gamemode.activePerms = player.permissions.level
+			--end
+
+		elseif player.gamemode.mode == 1 then
+
+			if player.queue == 0 then
+
+				player.gamemode.mode = 0
+				--player.permissions.level = player.gamemode.activePerms
+
+				print(player.name .. " promoted to active player")
+				SendChatMessage(playerID, "You have been promoted to an active player, you may now spawn vehicles.")
+
 			else
-				v.activePerms = v.perms
-			end
 
-		elseif v.mode == 1 then
-
-			if v.queue == 0 then
-
-				v.mode = 0
-				v.perms = v.activePerms
-
-				print(v.name .. " promoted to active player")
-				SendChatMessage(v.serverID, "You have been promoted to an active player, you may now spawn vehicles.")
-
-			else
-
-				v.perms = inactivePermlvl
-				SendChatMessage(v.serverID, "You are now in queue position " .. v.queue)
+				--player.permissions.level = inactivePermlvl
+				SendChatMessage(pplayerID, "You are now in queue position " .. player.queue)
 
 			end
 			
-		elseif v.mode == 2 then
+		--elseif player.gamemode.mode == 2 then
 			
-			v.perms = inactivePermlvl
+			--player.permissions.level = inactivePermlvl
 			
 		end
 	end
@@ -691,12 +674,12 @@ local function evaluateModes()
 	activeCount = 0
 	queueCount = 0
 	specCount = 0
-	for k, v in pairs(players) do
-		if v.mode == 0 then
+	for serverID, player in ipairs(players) do
+		if player.gamemode.mode == 0 then
 			activeCount = activeCount + 1
-		elseif v.mode == 1 then
+		elseif player.gamemode.mode == 1 then
 			queueCount = queueCount + 1
-		elseif v.mode == 2 then
+		elseif player.gamemode.mode == 2 then
 			specCount = specCount + 1
 		end
 	end
@@ -707,43 +690,85 @@ end
 
 -- PRE: a valid command is passed in along with args
 --POST: the command is ran, any return info is passed back from the original function
-local function command(ID, command, args)
-	if commands[command] then
+local function command(sender, command, args)
+	if CobaltDB.tableExists("commands",command) then
+		local commandName = command
+		command = commands[command]
 
-
-		if rconClients[ID] ~= nil or players[ID].perms >= commands[command].reqPerm then
-
+		if sender:canExecute(command) then
+			--count the arguments
 			local argCount = 0
 			if args ~= nil then
 				args = split(args, " ")
 
 				for k,v in pairs(args) do
-					if argCount < commands[command].argCount then
+					if argCount < command.arguments then
 						argCount = argCount + 1
 					else
 						args[argCount] = args[argCount] .. " " .. v
 						args[k] = nil
 					end
 				end
-
 			end
-
-			if argCount < commands[command].argCount then
+			if argCount < command.arguments then
 				print("Not enough arguments")
-				return "Not enough arguments (" .. command .. " takes " .. commands[command].argCount .. ")"
+				return "Not enough arguments (" .. commandName .. " takes " .. command.arguments .. ")"
 			end
 
-			print(ID .. " is Executing command")
+			print((sender.ID or sender.playerID) .. " is Executing " .. commandName)
+
 			if args == nil then
-				return commands[command].func(ID)
+				return _G[command.orginModule][commandName](sender)
 			else
-				return commands[command].func(ID, table.unpack(args))
+				return _G[command.orginModule][commandName](sender, table.unpack(args))
 			end
 
 		else
 			print("Insufficent Perms")
-			return "You do not have permission for this command"
+			return "You do not have permission to use this command."
 		end
+
+		
+		--if rconClients[ID] ~= nil or players[ID].permissions.level >= commands[command].reqPerm then
+
+			--local argCount = 0
+			--if args ~= nil then
+				--args = split(args, " ")
+
+				--for k,v in pairs(args) do
+					--if argCount < commands[command].argCount then
+						--argCount = argCount + 1
+					--else
+						--args[argCount] = args[argCount] .. " " .. v
+						--args[k] = nil
+					--end
+				--end
+
+			--end
+
+			--if argCount < commands[command].argCount then
+				--print("Not enough arguments")
+				--return "Not enough arguments (" .. command .. " takes " .. commands[command].argCount .. ")"
+			--end
+
+			--print(ID .. " is Executing command")
+
+			--local sender = ID
+
+			--if players[ID] ~= nil then
+				--sender = players[ID]
+			--end
+
+			--if args == nil then
+				--return commands[command].func(sender)
+			--else
+				--return commands[command].func(sender, table.unpack(args))
+			--end
+
+		--else
+			--print("Insufficent Perms")
+			--return "You do not have permission for this command"
+		--end
 
 	else
 		print("Command does not exist")
@@ -755,28 +780,27 @@ end
 ------------------------------------------------------PUBLICINTERFACE------------------------------------------------------
 
 ----MUTATORS----
-M.addPlayer = addPlayer
-M.registerUser = registerUser
-M.setPermission = setPermission
-M.registerCommand = registerCommand
-M.registerVehicle = registerVehicle
-M.addWhitelist = addWhitelist
-M.setWhitelistEnabled = setWhitelistEnabled
-M.ban = ban
-M.unban = unban
-M.bumpQueue = bumpQueue
-M.setMuted = setMuted
+--M.registerUser = registerUser --deprecated
+--M.setPermission = setPermission --deprecated
+--M.registerCommand = registerCommand --deprecated
+--M.registerVehicle = registerVehicle --deprecated
+--M.addWhitelist = addWhitelist --deprecated
+M.setWhitelistEnabled = setWhitelistEnabled --deprecated
+--M.ban = ban --deprecated
+--M.unban = unban --deprecated
+--M.bumpQueue = bumpQueue --deprecated
+M.setMuted = setMuted --deprecated
 M.delayExec = delayExec
 
 ----ACCESSORS----
-M.getPlayer = getPlayer
-M.getServerID = getServerID
-M.hasPermission = hasPermission
-M.getCommands = getCommands
-M.getPlayers = getPlayers
+M.getPlayer = getPlayer --deprecated
+M.getPlayerID = getPlayerID --deprecated
+--M.hasPermission = hasPermission --deprecated
+M.getCommands = getCommands --deprecated
+---M.getPlayers = getPlayers --deprecated
 M.getRconClients = getRconClients
-M.getSpawnAllowed = getSpawnAllowed
-M.evaluateModes = evaluateModes
+--M.getSpawnAllowed = getSpawnAllowed --deprecated
+--M.evaluateModes = evaluateModes --deprecated
 
 ----FUNCTIONS----
 M.command = command

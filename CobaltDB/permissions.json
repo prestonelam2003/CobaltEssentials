@@ -1,0 +1,17 @@
+{	
+"vehicleCap":{	
+	"10":10,
+	"3":2,
+	"1":1,
+	"5":5,
+	"description":"The  amount of vehicles that may be spawned based on permission level."
+},
+"spawnVehicles":{	
+	"description":"If you may spawn vehicles or not.",
+	"0":true
+},
+"sendMessage":{	
+	"description":"If send messages in chat or not.",
+	"0":true
+}
+}

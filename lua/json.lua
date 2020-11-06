@@ -111,14 +111,15 @@ function json.stringify(obj, as_key)
     s[#s + 1] = ']'
   elseif kind == 'table' then
     if as_key then error('Can\'t encode table as key.') end
-    s[#s + 1] = '{'
+    s[#s + 1] = '{\t'
     for k, v in pairs(obj) do
-      if #s > 1 then s[#s + 1] = ', ' end
-      s[#s + 1] = json.stringify(k, true)
-      s[#s + 1] = ':'
-      s[#s + 1] = json.stringify(v)
+      if #s > 1 then s[#s + 1] = ',' end
+      if kind_of(v) == 'table' then s[#s + 1] = "\n" else s[#s + 1] = "\n\t" end
+       s[#s + 1] = json.stringify(k, true)
+       s[#s + 1] = ':'
+       s[#s + 1] = json.stringify(v)
     end
-    s[#s + 1] = '}'
+    s[#s + 1] = '\n}'
   elseif kind == 'string' then
     return '"' .. escape_str(obj) .. '"'
   elseif kind == 'number' then

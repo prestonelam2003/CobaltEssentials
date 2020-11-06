@@ -20,47 +20,47 @@ local function onTick(age)
 end
 
 --called whenever someone begins connecting to the server
-local function onPlayerConnecting(ID)
+local function onPlayerConnecting(player)
 	
 end
 
 --called when a player begins loading
-local function onPlayerJoining(ID)
+local function onPlayerJoining(player)
 	
 end
 
 --called whenever a player has fully joined the session
-local function onPlayerJoin(ID)
+local function onPlayerJoin(player)
 	
 end
 
 --called whenever a player disconnects from the server
-local function onPlayerDisconnect(ID)
+local function onPlayerDisconnect(player)
 	
 end
 
 --called whenever a player sends a chat message
-local function onChatMessage(playerID, name ,chatMessage)
+local function onChatMessage(player, chatMessage)
 	
 end
 
 --called whenever a player spawns a vehicle.
-local function onVehicleSpawn(ID, vehID,  data)
+local function onVehicleSpawn(player, vehID,  data)
 
 end
 
 --called whenever a player applies their vehicle edits.
-local function onVehicleEdited(ID, vehID,  data)
+local function onVehicleEdited(player, vehID,  data)
 	
 end
 
 --called whenever a vehicle is deleted
-local function onVehicleDeleted(ID, vehID,  source)
+local function onVehicleDeleted(player, vehID,  source)
 	
 end
 
 --whenever a message is sent to the Rcon
-local function onRconCommand(ID, message, password, prefix)
+local function onRconCommand(player, message, password, prefix)
 	
 end
 

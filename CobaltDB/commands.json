@@ -1,0 +1,100 @@
+{	
+"lua":{	
+	"arguments":1,
+	"orginModule":"CC",
+	"level":10,
+	"sourceLimited":2,
+	"description":"Execute Lua, return the desired reply."
+},
+"mute":{	
+	"arguments":1,
+	"orginModule":"CC",
+	"level":5,
+	"sourceLimited":0,
+	"description":"Disallow a player from talking"
+},
+"status":{	
+	"arguments":0,
+	"orginModule":"CC",
+	"level":0,
+	"sourceLimited":0,
+	"description":"Lists all the players on the server with their ids and basic information on the server"
+},
+"help":{	
+	"arguments":0,
+	"orginModule":"CC",
+	"level":0,
+	"sourceLimited":0,
+	"description":"Lists all commands accessible by the player"
+},
+"setperm":{	
+	"arguments":2,
+	"orginModule":"CC",
+	"level":10,
+	"sourceLimited":0,
+	"description":"Change a player's permission level"
+},
+"about":{	
+	"arguments":0,
+	"orginModule":"CC",
+	"level":0,
+	"sourceLimited":0,
+	"description":"Displays the license, version, and copyright notice assosiated with Cobalt Essentials."
+},
+"uptime":{	
+	"arguments":0,
+	"orginModule":"CC",
+	"level":0,
+	"sourceLimited":0,
+	"description":"Get the uptime of the server"
+},
+"togglechat":{	
+	"arguments":0,
+	"orginModule":"CC",
+	"level":10,
+	"sourceLimited":2,
+	"description":"Toggles viewing chat in the RCON client"
+},
+"ban":{	
+	"arguments":1,
+	"orginModule":"CC",
+	"level":10,
+	"sourceLimited":0,
+	"description":"Ban a player from the session"
+},
+"kick":{	
+	"arguments":1,
+	"orginModule":"CC",
+	"level":5,
+	"sourceLimited":0,
+	"description":"Kick a player from the session"
+},
+"statusdetail":{	
+	"arguments":0,
+	"orginModule":"CC",
+	"level":0,
+	"sourceLimited":0,
+	"description":"Lists all the players on the server in detail along with basic server information"
+},
+"countdown":{	
+	"arguments":0,
+	"orginModule":"CC",
+	"level":1,
+	"sourceLimited":0,
+	"description":"Start a countdown in chat"
+},
+"unmute":{	
+	"arguments":1,
+	"orginModule":"CC",
+	"level":5,
+	"sourceLimited":0,
+	"description":"Allow a muted player to talk"
+},
+"say":{	
+	"arguments":1,
+	"orginModule":"CC",
+	"level":5,
+	"sourceLimited":0,
+	"description":"Say a message as the server."
+}
+}

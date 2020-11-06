@@ -5,32 +5,45 @@
 --POST: Postcondition
 --RETURNS: What the method returns
 
+-----------------------------------------------------------INIT------------------------------------------------------------
+
 local M = {}
 
 loaded = {}
 
 local eventAllowed = true
 
-----------------------------------------------------------EVENTS-----------------------------------------------------------
+local function init()
+	print("-------------Loading Extensions-------------")
 
---runs when the script is called.
-function onInit()
-    
+	local extensionsToLoad = utils.readCfg(resources .. "/server/" .. pluginName .. "/LoadExtensions.cfg")
+
+	for extensionName,extensionPath in pairs(extensionsToLoad) do
+		--print(tostring(extensionName) .. ": " .. tostring(extensionPath))
+		M.load(extensionName, extensionPath)
+	end
+	print("-------------Extensions Loaded-------------")
 end
+
+----------------------------------------------------------EVENTS-----------------------------------------------------------
 
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 
 -- PRE: the string "extension" is passed in.
 --POST: any file named <extension>.lua is loaded, the module is placed under a global variable named after string extension and it's init is executed, if the file exists, function returns true.
-local function load(extension)
-	local module = require("extensions/" .. extension)
+local function load(extension, extensionPath)
+	extensionPath = extensionPath or extension
 	
-	_G[extension] = module
-	loaded[extension] = module
+	if loaded[extension] == nil then
+		local module = require("extensions/" .. extensionPath)
+	
+		_G[extension] = module
+		loaded[extension] = module
 
-	module.onInit()
+		module.onInit()
 
-	print("Loaded Extension " .. extension)
+		print("Loaded Extension " .. extension)
+	end
 end
 
 
@@ -93,7 +106,6 @@ end
 
 ------------------------------------------------------PUBLICINTERFACE------------------------------------------------------
 
-
 ----EVENTS-----
 
 ----MUTATORS-----
@@ -108,4 +120,5 @@ M.getLoaded = getLoaded
 
 ----FUNCTIONS----
 
+init()
 return M
