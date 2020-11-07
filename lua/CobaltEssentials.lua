@@ -13,32 +13,6 @@
 
 local M = {}
 
---local commands = {}
-
---local options = {}
-
-
---ID-TYPE-MAP: 1: discordID | 2: HWID | 3: NAME
-local banlist = {}
-	  banlist[1] = {}
-	  banlist[2] = {}
-	  banlist[3] = {}
-
-local whitelist = {}
-	  whitelist[1] = {}
-	  whitelist[2] = {}
-	  whitelist[3] = {}
-
-local registeredUsers = {}
-	  registeredUsers[1] = {}
-	  registeredUsers[2] = {}
-	  registeredUsers[3] = {}
-
-local registeredVehicles = {}
-
---players = {}
---local permissions = {}
-
 rconClients = {} --RCON clients start with an R[ID]
 --local lastContact = 0
 
@@ -144,7 +118,7 @@ function onPlayerDisconnect(ID)
 		if players[ID].dropReason then
 			print("On Player Disconnect: " .. ID .. " | Dropped for " .. players[ID].dropReason)
 		else
-			print("On Player Disconnect: " .. ID .. " | Disconnect")
+			print("On Player Disconnect: " .. ID .. " | Disconnected")
 		end
 
 		players[ID] = nil
@@ -194,7 +168,9 @@ function onChatMessage(playerID, name ,chatMessage)
 			
 	end
 	
-	if players[playerID].permissions.muted  == true or M.hasPermission(playerID, "sendMessage") == false then
+	if players[playerID].permissions.muted  == true or M.hasPermission(playerID, "sendMessage") == true then
+		print("[".. playerID .. "]" .. name .. " : " .. chatMessage)
+	else
 		print("MUTED:[".. playerID .. "]" .. name .. " : " .. chatMessage)
 		return 1
 	end
@@ -213,27 +189,30 @@ end
 
 
 function onVehicleSpawn(ID, vehID,  data)
-	print("On Vehicle Spawn")
 	
 	data = utils.parseVehData(data)
 
 	--for k,v in pairs(data) do print(tostring(k) .. ": " .. tostring(v)) end
 	--for k,v in pairs(data.parts) do print(tostring(k) .. ": " .. tostring(v)) end
+	local canSpawn, reason = players[ID]:canSpawn(vehID, data)
+	local canSpawn = canSpawn and extensions.triggerEvent("onVehicleSpawn", players[ID], vehID, data)
 
-	if players[ID].canSpawn(players[ID], vehID, data) == false or extensions.triggerEvent("onVehicleSpawn", players[ID], vehID, data) == false then
+	if canSpawn then
+		print(players[ID].name .. " Spawned a '" .. data.name .. "' (".. ID .."-".. vehID ..")")
+	else
 		TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
 	end
 
 	players[ID].vehicles[vehID] = data
 	
-	print("Spawn Sucessful")
 end
 
 function onVehicleEdited(ID, vehID,  data)
-	print("On Vehicle Edit")
 
 	data = utils.parseVehData(data)
+
+	print(players[ID].name .. " edited their '" .. data.name .. "' (".. ID .."-".. vehID ..")")
 
 	if extensions.triggerEvent("onVehicleEdited", players[ID], vehID, data) == false then
 		TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
@@ -247,7 +226,7 @@ end
 function onVehicleDeleted(ID, vehID)
 	ID = tonumber(ID)
 	vehID = tonumber(vehID)
-	print("on Vehicle Delete")
+	print(players[ID].name .. " deleted their '" .. players[ID].vehicles[vehID].name .. "' (".. ID .."-".. vehID ..")")
 
 	if extensions.triggerEvent("onVehicleDeleted", players[ID], vehID) == false then
 		return 1

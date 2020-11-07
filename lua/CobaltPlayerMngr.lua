@@ -300,8 +300,6 @@ end
 
 local function canSpawn(player, vehID,  data)
 
-	print(player.playerID  .. ":".. tostring(player.name) .." Tried to spawn \"" .. data.name .. '"')
-
 	if player:hasPermission("spawnVehicles") == true then
 		--if vehiclePermissions[data.name] == nil or registeredVehicles[data.name].reqPerm <= player.permissions.level then
 		
@@ -342,12 +340,14 @@ local function canSpawn(player, vehID,  data)
 			end
 		else
 			print("Insufficent Permissions for this Vehicle, Spawn Blocked")
-			return false, "Insufficent Vehicle Permissions"
+			return false, "Insufficent permissions to spawn '" .. data.name .. "'"
 		end
 	else
 		print("Insufficent Permissions, Spawn Blocked")
 		return false, "Insufficent Spawn Permissions"
 	end
+
+	return true
 end
 
 local function canExecute(player, command)
