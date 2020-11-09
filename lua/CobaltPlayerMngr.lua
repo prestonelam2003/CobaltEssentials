@@ -300,56 +300,61 @@ end
 
 local function canSpawn(player, vehID,  data)
 
-	if player:hasPermission("spawnVehicles") == true then
-		--if vehiclePermissions[data.name] == nil or registeredVehicles[data.name].reqPerm <= player.permissions.level then
-		
-		
-		local vehicleDBobject --database object of the vehicle
-		local defaultVehiclePermissions --a boolean refering to if vehicleDBobject is of the "default" slot
-		if vehiclePermissions[data.name]:exists() then
-			vehicleDBobject = vehiclePermissions[data.name]
-			defaultVehiclePermissions = false
-		else
-			vehicleDBobject = vehiclePermissions["default"]
-			defaultVehiclePermissions = true
-		end
-
-		if player.permissions.level >= vehicleDBobject.level then
-			for key, value in pairs(vehicleDBobject) do
-				if key:sub(1,10) == "partlevel:" then
-					local part = key:sub(11)
-					print(part)
-
-					for slot, part2 in pairs(data.info.parts) do
-						if part == part2 then
-							if value > player.permissions.level then
-								print('Insufficent Permissions for "' .. part .. "' Spawn Blocked" )
-								return false, "Insufficent permissions for " .. part
-							
+	if data then --make sure the car's data exists in the first place.
+		if player:hasPermission("spawnVehicles") == true then
+			--if vehiclePermissions[data.name] == nil or registeredVehicles[data.name].reqPerm <= player.permissions.level then
+				
+			
+			local vehicleDBobject --database object of the vehicle
+			local defaultVehiclePermissions --a boolean refering to if vehicleDBobject is of the "default" slot
+			if vehiclePermissions[data.name]:exists() then
+				vehicleDBobject = vehiclePermissions[data.name]
+				defaultVehiclePermissions = false
+			else
+				vehicleDBobject = vehiclePermissions["default"]
+				defaultVehiclePermissions = true
+			end
+	
+			if player.permissions.level >= vehicleDBobject.level then
+				for key, value in pairs(vehicleDBobject) do
+					if key:sub(1,10) == "partlevel:" then
+						local part = key:sub(11)
+						print(part)
+	
+						for slot, part2 in pairs(data.info.parts) do
+							if part == part2 then
+								if value > player.permissions.level then
+									print('Insufficent Permissions for "' .. part .. "' Spawn Blocked" )
+									return false, "Insufficent permissions for " .. part
+								
+								end
+								break
 							end
-							break
 						end
+	
 					end
-
 				end
-			end
-
-			if #player.vehicles + 1 + ((player.vehicles[0] and 1) or 0) > player:hasPermission("vehicleCap") then
-				print("Vehicle Cap Reached, Spawn Blocked")
-				return false, "Vehicle Cap Reached"
+	
+				if #player.vehicles + 1 + ((player.vehicles[0] and 1) or 0) > player:hasPermission("vehicleCap") then
+					print("Vehicle Cap Reached, Spawn Blocked")
+					return false, "Vehicle Cap Reached"
+				end
+			else
+				print("Insufficent Permissions for this Vehicle, Spawn Blocked")
+				return false, "Insufficent permissions to spawn '" .. data.name .. "'"
 			end
 		else
-			print("Insufficent Permissions for this Vehicle, Spawn Blocked")
-			return false, "Insufficent permissions to spawn '" .. data.name .. "'"
+			print("Insufficent Permissions, Spawn Blocked")
+			return false, "Insufficent Spawn Permissions"
 		end
+	
+		return true
 	else
-		print("Insufficent Permissions, Spawn Blocked")
-		return false, "Insufficent Spawn Permissions"
+		print("Vehicle JSON could not be read for some reason, Try again.")
+		return false, "There was an error processing your car, please try again."
 	end
-
-	return true
 end
-
+	
 local function canExecute(player, command)
 	return player.permissions.level >= command.level and command.sourceLimited ~= 2
 end

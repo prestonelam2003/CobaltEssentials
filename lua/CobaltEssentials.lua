@@ -195,11 +195,14 @@ function onVehicleSpawn(ID, vehID,  data)
 	--for k,v in pairs(data) do print(tostring(k) .. ": " .. tostring(v)) end
 	--for k,v in pairs(data.parts) do print(tostring(k) .. ": " .. tostring(v)) end
 	local canSpawn, reason = players[ID]:canSpawn(vehID, data)
-	local canSpawn = canSpawn and extensions.triggerEvent("onVehicleSpawn", players[ID], vehID, data)
+	canSpawn = canSpawn and extensions.triggerEvent("onVehicleSpawn", players[ID], vehID, data)
+	reason = reason or "Spawn blocked by extension"
 
 	if canSpawn then
 		print(players[ID].name .. " Spawned a '" .. data.name .. "' (".. ID .."-".. vehID ..")")
 	else
+		print(players[ID].name .. " Tried to spawn '" .. data.name .. "' The spawn was blocked due to: " .. reason .. "  ' (".. ID .."-".. vehID ..")")
+		players[ID]:tell("Unable to spawn vehicle: " .. reason)
 		TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
 	end
