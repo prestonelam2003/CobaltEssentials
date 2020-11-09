@@ -2,7 +2,7 @@
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 --This is to fix BeamMP's apparently dysfunctional modules, it unfortunately breaks hotswapping
-cobaltVersion = "1.4.0 [PUBLIC-BETA-2]"
+cobaltVersion = "1.4.0"
 
 pluginName = debug.getinfo(1).source:sub(2)
 local s,e
@@ -100,33 +100,3 @@ print("-------------Loading Cobalt Essentials v" .. cobaltVersion .. "----------
 	--for k,v in pairs(config.beamMP) do print(tostring(k) .. ": " .. tostring(v)) end
 
 print("-------------Cobalt Essentials v" .. cobaltVersion .. " Loaded-------------")
-
-
---UNUSED CODE THAT I WANT TO HOLD ON TO
-
---sqlite = require("lsqlite3")
---luasql = require("luasql")
---sqlite, b ,c = package.loadlib("lsqlite3", "luaopen_lsqlite3")
---sql = require("CobaltSQLite")
---print("sqlite:"..tostring(sqlite))
---print("B:".. tostring(b))
---print("C:"..tostring(c))
-
---for k,v in pairs(sqlite) do print(tostring(k) .. ": " .. tostring(v)) end
-
---	for k,v in pairs({"lua","socket","mime"}) do
---		if utils.exists(v) then
---		
---		else
---			print(v .. " is missing!")
---			os.execute("mkdir " .. v)
---		end
---	end
---
---	for k,v in pairs(neededFiles) do
---		if utils.exists(v) then
---		else
---			print(v .. " is missing!")
---			utils.copyFile(resources .."/server/" .. pluginName .. "/socket/" .. v, v)
---		end
---	end
