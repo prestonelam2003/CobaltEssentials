@@ -201,7 +201,7 @@ function onVehicleSpawn(ID, vehID,  data)
 	if canSpawn then
 		print(players[ID].name .. " Spawned a '" .. data.name .. "' (".. ID .."-".. vehID ..")")
 	else
-		print(players[ID].name .. " Tried to spawn '" .. data.name .. "' The spawn was blocked due to: " .. reason .. "  ' (".. ID .."-".. vehID ..")")
+		print(players[ID].name .. " Tried to spawn '" .. data.name .. "' (".. ID .."-".. vehID ..") The spawn was blocked due to '" .. reason .. "'")
 		players[ID]:tell("Unable to spawn vehicle: " .. reason)
 		TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
@@ -215,9 +215,15 @@ function onVehicleEdited(ID, vehID,  data)
 
 	data = utils.parseVehData(data)
 
-	print(players[ID].name .. " edited their '" .. data.name .. "' (".. ID .."-".. vehID ..")")
 
-	if extensions.triggerEvent("onVehicleEdited", players[ID], vehID, data) == false then
+	local canSpawn, reason = players[ID]:canSpawn(vehID, data)
+	canSpawn = canSpawn and extensions.triggerEvent("onVehicleEdited", players[ID], vehID, data)
+	reason = reason or "Spawn blocked by extension"
+
+	if canSpawn then
+		print(players[ID].name .. " edited their '" .. data.name .. "' (".. ID .."-".. vehID ..")")
+	else
+		print(players[ID].name .. "tried to edit their '" .. data.name .. "' (".. ID .."-".. vehID ..") The edit has been blocked, and the vehicle deleted due to ")
 		TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
 	end
@@ -229,13 +235,13 @@ end
 function onVehicleDeleted(ID, vehID)
 	ID = tonumber(ID)
 	vehID = tonumber(vehID)
-	print(players[ID].name .. " deleted their '" .. players[ID].vehicles[vehID].name .. "' (".. ID .."-".. vehID ..")")
 
 	if extensions.triggerEvent("onVehicleDeleted", players[ID], vehID) == false then
 		return 1
 	end
 
 	if players[ID].vehicles[vehID] then
+		print(players[ID].name .. " deleted their '" .. players[ID].vehicles[vehID].name .. "' (".. ID .."-".. vehID ..")")
 		players[ID].vehicles[vehID] = nil
 	end
 end

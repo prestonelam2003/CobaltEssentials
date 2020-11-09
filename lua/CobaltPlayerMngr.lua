@@ -324,8 +324,8 @@ local function canSpawn(player, vehID,  data)
 						for slot, part2 in pairs(data.info.parts) do
 							if part == part2 then
 								if value > player.permissions.level then
-									print('Insufficent Permissions for "' .. part .. "' Spawn Blocked" )
-									return false, "Insufficent permissions for " .. part
+									print('Insufficent Permissions for the part: "' .. part .. "' Spawn Blocked" )
+									return false, "Insufficent permissions for the part " .. part
 								
 								end
 								break
