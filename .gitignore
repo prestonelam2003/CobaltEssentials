@@ -1,2 +1,4 @@
 lua/*.old
 .vs/*
+CobaltDBold/*
+lua/CobaltConfig.lua

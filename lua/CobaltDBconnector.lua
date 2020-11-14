@@ -68,6 +68,15 @@ databaseTemplate.protectedKeys =
 
 --DATABASE TABLE
 local tableTemplate = {}
+
+tableTemplate.protectedKeys = 
+{
+	CobaltDB_databaseName = true,
+	CobaltDB_tableName = true,
+	exists = true
+}
+
+
 tableTemplate.metatable = 
 {
 	__index = function(table, key)
@@ -77,7 +86,7 @@ tableTemplate.metatable =
 	__newindex = function(table, key, value)
 		
 		--is this a protectedKey?
-		if table.protectedKeys[key] ~= nil then
+		if tableTemplate.protectedKeys[key] ~= nil then
 			rawset(table,key,value)
 		else
 			return M.set(table.CobaltDB_databaseName, table.CobaltDB_tableName, key, value)
@@ -90,13 +99,6 @@ tableTemplate.metatable =
 				
 		return next, cobaltTable, nil
 	end
-}
-
-tableTemplate.protectedKeys = 
-{
-	CobaltDB_databaseName = true,
-	CobaltDB_tableName = true,
-	exists = true
 }
 
 
