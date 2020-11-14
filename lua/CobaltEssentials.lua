@@ -23,6 +23,7 @@ delayedQueue = {n = 0}
 
 RegisterEvent("onTick","onTick")
 
+RegisterEvent("onPlayerFirstConnecting","onPlayerFirstConnecting")
 RegisterEvent("onPlayerConnecting","onPlayerConnecting")
 RegisterEvent("onPlayerJoining","onPlayerJoining")
 RegisterEvent("onPlayerJoin","onPlayerJoin")
@@ -69,6 +70,17 @@ function onTick()
 	end
 
 	--ticks = ticks + 1
+
+end
+
+
+--The first time a player has began connecting to the server, this is called.
+function onPlayerFirstConnecting(ID)
+	print("onPlayerFirstConnecting: " .. ID)
+
+	if extensions.triggerEvent("onPlayerFirstConnecting", players[ID]) == false then
+		DropPlayer(ID,"You've been kicked from the server!")
+	end
 
 end
 
@@ -223,7 +235,7 @@ function onVehicleEdited(ID, vehID,  data)
 	if canSpawn then
 		print(players[ID].name .. " edited their '" .. data.name .. "' (".. ID .."-".. vehID ..")")
 	else
-		print(players[ID].name .. "tried to edit their '" .. data.name .. "' (".. ID .."-".. vehID ..") The edit has been blocked, and the vehicle deleted due to ")
+		print(players[ID].name .. "tried to edit their '" .. data.name .. "' (".. ID .."-".. vehID ..") The edit has been blocked, and the vehicle deleted due to " .. reason)
 		TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
 	end

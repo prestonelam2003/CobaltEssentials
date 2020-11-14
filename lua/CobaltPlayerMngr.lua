@@ -8,6 +8,7 @@
 local players = {}
 
 local playerPermissions = CobaltDB.new("playerPermissions")
+local playerData = CobaltDB.new("playerData")
 local defaultPermissions = playerPermissions.default
 local inactivePermissions = playerPermissions.inactive
 
@@ -25,6 +26,25 @@ specCount = 0
 
 
 -----------------------------------------------------(META)-TABLES-INIT-----------------------------------------------------
+playersMetatable = 
+{
+	__len = function(table)
+		return GetPlayerCount()
+	end
+}
+
+setmetatable(players, playersMetatable)
+
+vehiclesTableTemplate = {}
+vehiclesTableTemplate.metatable =
+{
+	__len = function(table)
+		return #player.vehicles + ((player.vehicles[0] and 1) or 0)
+	end
+}
+
+
+
 playerTemplate = {}
 playerTemplate.metatable = 
 {
@@ -48,7 +68,7 @@ playerTemplate.metatable =
 			end
 		end
 
-		if #player.vehicles > 0 or player.vehicles[0] ~= nil then
+		if #player.vehicles > 0 then
 			playerString = playerString .. "\tvehicles:\n"
 				for k,v in pairs(player.vehicles) do
 					playerString = playerString .. "\t\t" .. tostring(k) .. ": " .. tostring(v.name) .. "\n"
@@ -148,10 +168,15 @@ local function new(playerID)
 	newPlayer.permissions.playerID = newPlayer.playerID
 	newPlayer.permissions.CobaltPlrMgmt_database = playerPermissions[newPlayer.discordID]
 
+	--PLAYER DATA
+	local playerData, databaseLoaderInfo = CobaltDB.new("playersDB/" .. newPlayer.discordID)
+	newPlayer.data = playerData
+
+
 	--GAMEMODE
 	-- Mode-Map [-1:undefined 0:active, 1:inQueue 2:spectator]
 	newPlayer.gamemode = {}
-	newPlayer.gamemode.queue = activeCount - config.maxActivePlayers.value
+	newPlayer.gamemode.queue = activeCount + 1 - config.maxActivePlayers.value
 	
 	if newPlayer.gamemode.queue > 0 then
 		newPlayer.gamemode.mode = 1
@@ -165,6 +190,7 @@ local function new(playerID)
 
 	--VEHICLES
 	newPlayer.vehicles = {}
+	setmetatable(newPlayer.vehicles, vehiclesTableTemplate.metatable)
 
 	for methodName, method in pairs(playerTemplate.methods) do
 		newPlayer[methodName] = method
@@ -187,6 +213,10 @@ local function new(playerID)
 
 
 	players[playerID] = newPlayer
+
+	if databaseLoaderInfo == "new" then
+		TriggerGlobalEvent("onPlayerFirstConnecting", playerID)
+	end
 
 	print(newPlayer)
 
@@ -335,7 +365,7 @@ local function canSpawn(player, vehID,  data)
 					end
 				end
 	
-				if #player.vehicles + 1 + ((player.vehicles[0] and 1) or 0) > player:hasPermission("vehicleCap") then
+				if #player.vehicles > player:hasPermission("vehicleCap") then
 					print("Vehicle Cap Reached, Spawn Blocked")
 					return false, "Vehicle Cap Reached"
 				end

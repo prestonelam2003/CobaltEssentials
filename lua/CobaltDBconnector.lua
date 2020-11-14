@@ -26,8 +26,8 @@ TriggerLocalEvent("initDB", package.path, package.cpath, dbPath, json.stringify(
 
 --Set up metatable so that CobaltDB is intuitive to work with.
 --Setup metatable for the main layer.
-local cobaltTable = {}
-cobaltTable.metatable =
+local databaseTemplate = {}
+databaseTemplate.metatable =
 {
 	__index = function(DB, key)
 	--print(key, type(key))
@@ -59,7 +59,7 @@ cobaltTable.metatable =
 	end
 }
 
-cobaltTable.protectedKeys = 
+databaseTemplate.protectedKeys = 
 {
 	CobaltDB_databaseName = true,
 	CobaltDB_newTable = true
@@ -67,8 +67,8 @@ cobaltTable.protectedKeys =
 
 
 --DATABASE TABLE
-local identifierTable = {}
-identifierTable.metatable = 
+local tableTemplate = {}
+tableTemplate.metatable = 
 {
 	__index = function(table, key)
 		return M.query(table.CobaltDB_databaseName, table.CobaltDB_tableName,key)
@@ -77,7 +77,7 @@ identifierTable.metatable =
 	__newindex = function(table, key, value)
 		
 		--is this a protectedKey?
-		if identifierTable.protectedKeys[key] ~= nil then
+		if table.protectedKeys[key] ~= nil then
 			rawset(table,key,value)
 		else
 			return M.set(table.CobaltDB_databaseName, table.CobaltDB_tableName, key, value)
@@ -92,7 +92,7 @@ identifierTable.metatable =
 	end
 }
 
-identifierTable.protectedKeys = 
+tableTemplate.protectedKeys = 
 {
 	CobaltDB_databaseName = true,
 	CobaltDB_tableName = true,
@@ -103,20 +103,25 @@ identifierTable.protectedKeys =
 --------------------------------------------------------CONSTRUCTOR--------------------------------------------------------
 
 local function newDatabase(DBname)
-	TriggerLocalEvent("openDB", DBname)
+	TriggerLocalEvent("openDatabase", DBname)
 	
-	if server:receive() == DBname then
+	databaseLoaderInfo = server:receive()
+
+	if databaseLoaderInfo ~= nil then
 		print("CobaltDB: " .. DBname .. " sucessfully opened.")
 
 		newDatabase = 
 		{
 			CobaltDB_databaseName = DBname,
-			CobaltDB_newTable = M.newTable
+			CobaltDB_newTable = M.newTable,
+			close = function(table)
+				TriggerLocalEvent("closeDatabase",DBname)
+			end
 
 		}
-		setmetatable(newDatabase, cobaltTable.metatable)
+		setmetatable(newDatabase, databaseTemplate.metatable)
 
-		return newDatabase
+		return newDatabase, databaseLoaderInfo
 	else
 		return nil
 	end
@@ -131,7 +136,7 @@ local function newTable(DB, tableName)
 			return M.tableExists(table.CobaltDB_databaseName, table.CobaltDB_tableName)
 		end
 	}
-	setmetatable(newTable, identifierTable.metatable)
+	setmetatable(newTable, tableTemplate.metatable)
 
 	return newTable
 end
@@ -239,8 +244,8 @@ end
 
 
 ---------------------------------------------------------FUNCTIONS---------------------------------------------------------
-local function openDB(DBname)
-	TriggerLocalEvent("openDB", DBname)
+local function openDatabase(DBname)
+	TriggerLocalEvent("openDatabase", DBname)
 	if server:receive() == DBname then
 		print("CobaltDB: " .. DBname .. " sucessfully opened.")
 		return true
@@ -269,6 +274,6 @@ M.getTables = getTables
 M.getKeys = getKeys
 M.tableExists = tableExists
 ----FUNCTIONS----
-M.openDB = openDB
+M.openDatabase = openDatabase
 
 return M

@@ -17,7 +17,8 @@ local cobaltSysChar = string.char(0x99, 0x99, 0x99, 0x99)
 local CobaltDBport = 58933
 
 RegisterEvent("initDB","initDB")
-RegisterEvent("openDB","openDB")
+RegisterEvent("openDatabase","openDatabase")
+RegisterEvent("closeDatabase","closeDatabase")
 RegisterEvent("setCobaltDBport","setCobaltDBport")
 
 RegisterEvent("query","query")
@@ -51,13 +52,16 @@ function initDB(path, cpath, dbpath, config)
 end
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 
-function openDB(DBname)
+function openDatabase(DBname)
 	local jsonPath = dbpath .. DBname .. ".json"
 
 	local jsonFile, error = io.open(jsonPath,"r")
 	--print(jsonFile, error)
 
+	local databaseLoaderInfo = "loaded" -- defines if the DB was created just now or if it was pre-existing.
+
 	if jsonFile == nil then	
+		databaseLoaderInfo = "new"
 		--print("CobaltDB: json file does not exist, creating one now.")
 		--print(jsonFile, error)
 		jsonFile, error = io.open(jsonPath, "w")
@@ -75,7 +79,14 @@ function openDB(DBname)
 		jsonFile:close()
 	end
 
-	connector:sendto(DBname ,"127.0.0.1", CobaltDBport)
+	connector:sendto(databaseLoaderInfo ,"127.0.0.1", CobaltDBport)
+end
+
+function closeDatabase(DBname)
+	updateDatabase(DBname)
+
+	loadedJson[DBname] = nil
+	loadedDatabases[DBname] = nil
 end
 
 function setCobaltDBport(port)

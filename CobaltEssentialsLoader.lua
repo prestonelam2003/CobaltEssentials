@@ -2,24 +2,23 @@
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 --This is to fix BeamMP's apparently dysfunctional modules, it unfortunately breaks hotswapping
-cobaltVersion = "1.4.0"
+cobaltVersion = "1.4.1"
 
 pluginName = debug.getinfo(1).source:sub(2)
 local s,e
 
 resources = debug.getinfo(1).source:sub(2)
-s, e = resources:find("\\")
+
+local s, e = resources:find("\\")
 resources = resources:sub(0,e-1)
+local s, e = resources:find("Server")
+resources = resources:sub(1,s-2)
 
-for i = 0, 1 do
-	s, e = pluginName:find("\\")
-	pluginName = pluginName:sub(s+1)
-end
-s, e = pluginName:find("\\") 
-pluginName = pluginName:sub(1,e-1)
+s, e = pluginName:find("\\")
+pluginName = pluginName:sub(s+1)
+s, e = pluginName:find("\\")
+pluginName = pluginName:sub(1,s-1)
 
---print(resources)
---print(pluginName)
 
 package.path = package.path .. ";;" .. resources .. "/Server/" .. pluginName .. "/?.lua;;".. resources .. "/Server/" .. pluginName .. "/lua/?.lua"
 package.cpath = package.cpath .. ";;" .. resources .. "/Server/" .. pluginName .. "/?.dll;;" .. resources .. "/Server/" .. pluginName .. "/lib/?.dll"

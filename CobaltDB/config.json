@@ -1,34 +1,34 @@
 {	
-"RCONenabled":{	
-	"description":"weather or not the server should run a q3 compliant rcon server for remote acess to the server",
-	"value":true
-},
-"maxActivePlayers":{	
-	"description":"max amount of active\/nonspectator players allowed on a server, any further players will be spectator and placed on a queue.",
-	"value":5
-},
-"CobaltDBport":{	
-	"description":"The port used for internal CobaltDB communications, please keep it unique to each server or there may be interference.",
-	"value":10814
-},
 "RCONport":{	
-	"description":"The port used to host the server. Since CE is external to beamMP make sure to not place this on the same port as the server.",
-	"value":20814
-},
-"commandPrefix":{	
-	"description":"The character placed at the beginning of a chat message when using a command",
-	"value":"\/"
-},
-"enableWhitelist":{	
-	"description":"weather or not the whitelist is enabled",
-	"value":false
-},
-"RCONkeepAliveTick":{	
-	"description":"The amount of seconds between ticks sent to RCONclients to keep the connections alive, false to disable, This may not work?",
-	"value":30
+	"value":20814,
+	"description":"The port used to host the server. Since CE is external to beamMP make sure to not place this on the same port as the server."
 },
 "RCONpassword":{	
-	"description":"The password required to connect to the RCON",
-	"value":"password"
+	"value":"password",
+	"description":"The password required to connect to the RCON"
+},
+"commandPrefix":{	
+	"value":"\/",
+	"description":"The character placed at the beginning of a chat message when using a command"
+},
+"CobaltDBport":{	
+	"value":10814,
+	"description":"The port used for internal CobaltDB communications, please keep it unique to each server or there may be interference."
+},
+"RCONenabled":{	
+	"value":true,
+	"description":"weather or not the server should run a q3 compliant rcon server for remote acess to the server"
+},
+"enableWhitelist":{	
+	"value":false,
+	"description":"weather or not the whitelist is enabled"
+},
+"RCONkeepAliveTick":{	
+	"value":30,
+	"description":"The amount of seconds between ticks sent to RCONclients to keep the connections alive, false to disable, This may not work?"
+},
+"maxActivePlayers":{	
+	"value":2,
+	"description":"max amount of active\/nonspectator players allowed on a server, any further players will be spectator and placed on a queue."
 }
 }

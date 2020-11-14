@@ -19,6 +19,12 @@ local function onTick(age)
 	end
 end
 
+--called whenever a player begins connecting to the server for the first time.
+local function onPlayerFirstConnecting(player)
+
+end
+
+
 --called whenever someone begins connecting to the server
 local function onPlayerConnecting(player)
 	
