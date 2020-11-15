@@ -85,7 +85,9 @@ print("-------------Loading Cobalt Essentials v" .. cobaltVersion .. "----------
 			highestCap = cap
 		end
 	end
-	if highestCap < beamMPconfig.Cars then
+	print("highestCap:" ..highestCap)
+	print("serverCap" .. beamMPconfig.Cars)
+	if tonumber(highestCap) > tonumber(beamMPconfig.Cars) then
 		print("/!\\ -------------------------------SERVERSIDE-VEHICLE-CAP-FOR-CARS-TOO-LOW------------------------------- /!\\")
 		print("		The serverside vehicle cap (Cars) in the config is too low.")
 		print("		If you do not turn it up, dynamic vehicle caps based on permission level will not work!")
@@ -94,7 +96,8 @@ print("-------------Loading Cobalt Essentials v" .. cobaltVersion .. "----------
 		Sleep(5000)
 	end
 
---print("-------------CobaltEssentials Config-------------")
+--
+print("-------------CobaltEssentials Config-------------")
 	--CobaltConfigOld.loadConfig()
 	--for k,v in pairs(config.beamMP) do print(tostring(k) .. ": " .. tostring(v)) end
 

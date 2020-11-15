@@ -39,7 +39,13 @@ vehiclesTableTemplate = {}
 vehiclesTableTemplate.metatable =
 {
 	__len = function(table)
-		return #player.vehicles + ((player.vehicles[0] and 1) or 0)
+		local count	= 0
+		for k,v in pairs(table) do
+			if type(v) == "table" then	
+				count = count + 1
+			end
+		end
+		return count
 	end
 }
 
@@ -218,7 +224,7 @@ local function new(playerID)
 		TriggerGlobalEvent("onPlayerFirstConnecting", playerID)
 	end
 
-	print(newPlayer)
+	print(tostring(newPlayer))
 
 
 	return newPlayer, canJoin, reason
@@ -324,6 +330,9 @@ local function hasPermission(player, permission)
 			end
 		end
 
+		print(highestLevel)
+
+
 		return highestLevel and permissions[permission][highestLevel]
 	end
 end
@@ -344,14 +353,14 @@ local function canSpawn(player, vehID,  data)
 				vehicleDBobject = vehiclePermissions["default"]
 				defaultVehiclePermissions = true
 			end
-	
+
 			if player.permissions.level >= vehicleDBobject.level then
 				for key, value in pairs(vehicleDBobject) do
 					if key:sub(1,10) == "partlevel:" then
 						local part = key:sub(11)
 						print(part)
 	
-						for slot, part2 in pairs(data.info.parts) do
+						for slot, part2 in pairs(data.vcf.parts) do
 							if part == part2 then
 								if value > player.permissions.level then
 									print('Insufficent Permissions for the part: "' .. part .. "' Spawn Blocked" )

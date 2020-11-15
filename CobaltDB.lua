@@ -65,6 +65,10 @@ function openDatabase(DBname)
 		--print("CobaltDB: json file does not exist, creating one now.")
 		--print(jsonFile, error)
 		jsonFile, error = io.open(jsonPath, "w")
+		if error then
+			os.execute("mkdir " .. dbpath:gsub("/","\\") .. "\\playersDB")
+			jsonFile, error = io.open(jsonPath, "w")
+		end
 		jsonFile:write("{}")
 		jsonFile:close()
 		jsonFile, error = io.open(jsonPath,"r")

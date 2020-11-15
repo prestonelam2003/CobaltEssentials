@@ -96,22 +96,22 @@ local function copyFile(path_src, path_dst)
 end
 
 local function parseVehData(data)
-	--print(data)
-	local s, e = data:find('%[')
+	local s, e = data:find('%{')
 
 	data = data:sub(s)
+
 	local sucessful, tempData = pcall(json.parse, data)
+	print(sucessful,tempData)
 	if not sucessful then
 		--TODO: BACKUP THE JSON IN A FILE. tempData is the error, data is the json.
 		return false
 	end
 	data = tempData
-	
-	--for k,v in pairs(data) do print(tostring(k) .. ": " .. tostring(v)) end
+
 
 	data.serverVID = vehID
-	data.clientVID = data[2]
-	data.name = data[3]
+	data.clientVID = data.VID
+	data.name = data.jbm
 
 
 	if data[4] ~= nil then

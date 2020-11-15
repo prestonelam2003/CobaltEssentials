@@ -30,7 +30,7 @@ local databaseTemplate = {}
 databaseTemplate.metatable =
 {
 	__index = function(DB, key)
-	--print(key, type(key))
+	--print("TABLE ACCESS TRY" ,key, type(key))
 		if key and not rawget(DB, key) then
 			local table = DB:CobaltDB_newTable(key)
 			DB[key] = table
