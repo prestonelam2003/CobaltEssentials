@@ -329,7 +329,7 @@ local function hasPermission(player, permission)
 		
 		for level, value in pairs(permissions[permission]) do
 			print(tostring(level), tostring(value))
-			if level ~= "description" and (player.permissions.level >= tonumber(level) and (highestLevel == nil or (tonumber(level) > tonumber(highestLevel)))) and permissions[permission][highestLevel] ~= nil then
+			if level ~= "description" and (player.permissions.level >= tonumber(level) and (highestLevel == nil or (tonumber(level) > tonumber(highestLevel)))) and permissions[permission][level] ~= nil then
 				highestLevel = level
 			end
 		end
