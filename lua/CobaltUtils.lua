@@ -101,7 +101,6 @@ local function parseVehData(data)
 	data = data:sub(s)
 
 	local sucessful, tempData = pcall(json.parse, data)
-	print(sucessful,tempData)
 	if not sucessful then
 		--TODO: BACKUP THE JSON IN A FILE. tempData is the error, data is the json.
 		return false

@@ -317,7 +317,6 @@ function onNewRconClient(ID, ip, port)
 
 	rconClients[ID] = client
 end
-
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 
 

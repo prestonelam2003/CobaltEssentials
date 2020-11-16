@@ -25,7 +25,8 @@ TriggerLocalEvent("initDB", package.path, package.cpath, dbPath, json.stringify(
 
 
 --Set up metatable so that CobaltDB is intuitive to work with.
---Setup metatable for the main layer.
+--setup metatable for the MAIN LAYER
+--THIS TABLE IS THE MAIN LAYER / IT IS NOT THE SUB-TABLE
 local databaseTemplate = {}
 databaseTemplate.metatable =
 {
@@ -74,8 +75,8 @@ tableTemplate.protectedKeys =
 	CobaltDB_tableName = true,
 	exists = true
 }
-
-
+--Setup metatable for the sub-table
+--THIS IS THE SUBTABLE
 tableTemplate.metatable = 
 {
 	__index = function(table, key)

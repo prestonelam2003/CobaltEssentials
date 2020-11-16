@@ -325,16 +325,19 @@ end
 -- PRE: a valid serverID and permission "flag" are both passed in.
 --POST: returns true or false based on if the player with the provided serverID has access to this permission
 local function hasPermission(player, permission) 
-	if CobaltDB.tableExists("permissions",permission) then
-		
+	
+	local highestLevel
+	
+	if permissions[permission]:exists() then
+		print(permission)
+
 		for level, value in pairs(permissions[permission]) do
-			print(tostring(level), tostring(value))
 			if level ~= "description" and (player.permissions.level >= tonumber(level) and (highestLevel == nil or (tonumber(level) > tonumber(highestLevel)))) and permissions[permission][level] ~= nil then
 				highestLevel = level
 			end
 		end
-
-		return permissions[permission][highestLevel]
+		
+		return highestLevel and permissions[permission][highestLevel]
 	end
 end
 
