@@ -1,11 +1,15 @@
 {	
-"default":{	
-	"whitelisted":false,
-	"level":1,
-	"muted":false,
-	"banned":false
-},
 "inactive":{	
 	"level":0
+},
+"default":{	
+	"banned":false,
+	"level":1,
+	"muted":false,
+	"whitelisted":false
+},
+"168500725305835520":{	
+	"lastName":"Preston",
+	"level":1
 }
 }

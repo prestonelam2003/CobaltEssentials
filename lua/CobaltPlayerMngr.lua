@@ -206,6 +206,11 @@ local function new(playerID)
 	setmetatable(newPlayer.permissions, playerTemplate.permissions.metatable)
 	setmetatable(newPlayer, playerTemplate.metatable)
 
+	--RECORD NAME
+	if newPlayer.permissions.CobaltPlrMgmt_database:exists() then
+		newPlayer.permissions.lastName = newPlayer.name
+	end
+
 	--CAN THE PLAYER JOIN?
 	if newPlayer.permissions.whitelisted == false and config.enableWhitelist.value == true then
 		canJoin = false
@@ -322,7 +327,6 @@ end
 local function hasPermission(player, permission) 
 	if CobaltDB.tableExists("permissions",permission) then
 		
-		local highestLevel
 		
 		for level, value in pairs(permissions[permission]) do
 			if level ~= "description" and (player.permissions.level >= tonumber(level) and (highestLevel == nil or tonumber(level) > tonumber(highestLevel))) then
@@ -330,7 +334,6 @@ local function hasPermission(player, permission)
 			end
 		end
 
-		print(highestLevel)
 
 
 		return highestLevel and permissions[permission][highestLevel]
@@ -358,7 +361,6 @@ local function canSpawn(player, vehID,  data)
 				for key, value in pairs(vehicleDBobject) do
 					if key:sub(1,10) == "partlevel:" then
 						local part = key:sub(11)
-						print(part)
 	
 						for slot, part2 in pairs(data.vcf.parts) do
 							if part == part2 then
@@ -374,7 +376,7 @@ local function canSpawn(player, vehID,  data)
 					end
 				end
 	
-				if player.vehicles + ((player.vehicles[0] and 1) or 0) > player:hasPermission("vehicleCap") then
+				if #player.vehicles + ((player.vehicles[0] and 1) or 0) > player:hasPermission("vehicleCap") then
 					print("Vehicle Cap Reached, Spawn Blocked")
 					return false, "Vehicle Cap Reached"
 				end
