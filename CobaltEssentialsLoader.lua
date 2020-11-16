@@ -2,7 +2,7 @@
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 --This is to fix BeamMP's apparently dysfunctional modules, it unfortunately breaks hotswapping
-cobaltVersion = "1.4.3"
+cobaltVersion = "1.4.4"
 
 pluginName = debug.getinfo(1).source:sub(2)
 local s,e
@@ -85,8 +85,7 @@ print("-------------Loading Cobalt Essentials v" .. cobaltVersion .. "----------
 			highestCap = cap
 		end
 	end
-	print("highestCap:" ..highestCap)
-	print("serverCap" .. beamMPconfig.Cars)
+
 	if tonumber(highestCap) > tonumber(beamMPconfig.Cars) then
 		print("/!\\ -------------------------------SERVERSIDE-VEHICLE-CAP-FOR-CARS-TOO-LOW------------------------------- /!\\")
 		print("		The serverside vehicle cap (Cars) in the config is too low.")

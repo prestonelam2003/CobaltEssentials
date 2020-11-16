@@ -374,7 +374,7 @@ local function canSpawn(player, vehID,  data)
 					end
 				end
 	
-				if #player.vehicles > player:hasPermission("vehicleCap") then
+				if player.vehicles + ((player.vehicles[0] and 1) or 0) > player:hasPermission("vehicleCap") then
 					print("Vehicle Cap Reached, Spawn Blocked")
 					return false, "Vehicle Cap Reached"
 				end

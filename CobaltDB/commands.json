@@ -1,0 +1,100 @@
+{	
+"say":{	
+	"level":5,
+	"description":"Say a message as the server.",
+	"arguments":1,
+	"orginModule":"CC",
+	"sourceLimited":0
+},
+"lua":{	
+	"level":10,
+	"description":"Execute Lua, return the desired reply.",
+	"arguments":1,
+	"orginModule":"CC",
+	"sourceLimited":2
+},
+"unmute":{	
+	"level":5,
+	"description":"Allow a muted player to talk",
+	"arguments":1,
+	"orginModule":"CC",
+	"sourceLimited":0
+},
+"ban":{	
+	"level":10,
+	"description":"Ban a player from the session",
+	"arguments":1,
+	"orginModule":"CC",
+	"sourceLimited":0
+},
+"status":{	
+	"level":0,
+	"description":"Lists all the players on the server with their ids and basic information on the server",
+	"arguments":0,
+	"orginModule":"CC",
+	"sourceLimited":0
+},
+"kick":{	
+	"level":5,
+	"description":"Kick a player from the session",
+	"arguments":1,
+	"orginModule":"CC",
+	"sourceLimited":0
+},
+"setperm":{	
+	"level":10,
+	"description":"Change a player's permission level",
+	"arguments":2,
+	"orginModule":"CC",
+	"sourceLimited":0
+},
+"mute":{	
+	"level":5,
+	"description":"Disallow a player from talking",
+	"arguments":1,
+	"orginModule":"CC",
+	"sourceLimited":0
+},
+"uptime":{	
+	"level":0,
+	"description":"Get the uptime of the server",
+	"arguments":0,
+	"orginModule":"CC",
+	"sourceLimited":0
+},
+"countdown":{	
+	"level":1,
+	"description":"Start a countdown in chat",
+	"arguments":0,
+	"orginModule":"CC",
+	"sourceLimited":0
+},
+"about":{	
+	"level":0,
+	"description":"Displays the license, version, and copyright notice assosiated with Cobalt Essentials.",
+	"arguments":0,
+	"orginModule":"CC",
+	"sourceLimited":0
+},
+"togglechat":{	
+	"level":10,
+	"description":"Toggles viewing chat in the RCON client",
+	"arguments":0,
+	"orginModule":"CC",
+	"sourceLimited":2
+},
+"help":{	
+	"level":0,
+	"description":"Lists all commands accessible by the player",
+	"arguments":0,
+	"orginModule":"CC",
+	"sourceLimited":0
+},
+"statusdetail":{	
+	"level":0,
+	"description":"Lists all the players on the server in detail along with basic server information",
+	"arguments":0,
+	"orginModule":"CC",
+	"sourceLimited":0
+}
+}

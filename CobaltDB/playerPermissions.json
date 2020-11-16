@@ -1,0 +1,11 @@
+{	
+"default":{	
+	"whitelisted":false,
+	"level":1,
+	"muted":false,
+	"banned":false
+},
+"inactive":{	
+	"level":0
+}
+}
