@@ -327,16 +327,14 @@ end
 local function hasPermission(player, permission) 
 	if CobaltDB.tableExists("permissions",permission) then
 		
-		
 		for level, value in pairs(permissions[permission]) do
-			if level ~= "description" and (player.permissions.level >= tonumber(level) and (highestLevel == nil or tonumber(level) > tonumber(highestLevel))) then
-			highestLevel = level
+			print(tostring(level), tostring(value))
+			if level ~= "description" and (player.permissions.level >= tonumber(level) and (highestLevel == nil or (tonumber(level) > tonumber(highestLevel)))) and permissions[permission][highestLevel] ~= nil then
+				highestLevel = level
 			end
 		end
 
-
-
-		return highestLevel and permissions[permission][highestLevel]
+		return permissions[permission][highestLevel]
 	end
 end
 
@@ -358,6 +356,7 @@ local function canSpawn(player, vehID,  data)
 			end
 
 			if player.permissions.level >= vehicleDBobject.level then
+
 				for key, value in pairs(vehicleDBobject) do
 					if key:sub(1,10) == "partlevel:" then
 						local part = key:sub(11)

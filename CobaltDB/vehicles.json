@@ -1,11 +1,4 @@
 {	
-"example":{	
-	"level":10
-},
-"semi":{	
-	"level":1,
-	"partlevel:semi_ramplow":10
-},
 "default":{	
 	"level":1
 }
