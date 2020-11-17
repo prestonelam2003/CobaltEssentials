@@ -2,7 +2,10 @@
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 --This is to fix BeamMP's apparently dysfunctional modules, it unfortunately breaks hotswapping
-cobaltVersion = "1.4.7"
+
+RegisterEvent("onCobaltDBhandshake","onCobaltDBhandshake")
+
+cobaltVersion = "1.4.8"
 
 pluginName = debug.getinfo(1).source:sub(2)
 local s,e
@@ -45,6 +48,10 @@ print("-------------Loading Cobalt Essentials v" .. cobaltVersion .. "----------
 	CobaltDB = require("CobaltDBconnector")
 		print("CobaltDB Connector Loaded")
 
+--FOR WHEN COBALTDB REPORTS BACK
+function onCobaltDBhandshake(port)
+	CobaltDB.init(port)
+
 	players = require("CobaltPlayerMngr")
 		print("Cobalt Player Manager Loaded")
 
@@ -64,13 +71,7 @@ print("-------------Loading Cobalt Essentials v" .. cobaltVersion .. "----------
 	if config.RCONenabled.value == true then
 		print("opening RCON on port " .. config.RCONport.value)
 		TriggerLocalEvent("startRCON", config.RCONport.value, package.path, package.cpath)
-
 	end
-
-	if CobaltDB.setPort(config.CobaltDBport.value) then
-		print("CobaltDB port changed to " .. config.CobaltDBport.value)
-	end
-
 	
 	--WARNING for not having enough players in the config.
 	if beamMPconfig.MaxPlayers < config.maxActivePlayers.value then
@@ -78,14 +79,14 @@ print("-------------Loading Cobalt Essentials v" .. cobaltVersion .. "----------
 		Sleep(2000)
 	end
 
-	--TODO: WARNING FOR NOT HAVING ENOUGH CARS ALLOWED IN THE CONFIG
+		--TODO: WARNING FOR NOT HAVING ENOUGH CARS ALLOWED IN THE CONFIG
 	local highestCap
 	for reqPerm, cap in pairs(permissions.vehicleCap) do
 		if reqPerm ~= "description" and (highestCap == nil or cap > highestCap) then
-			highestCap = cap
+		highestCap = cap
 		end
 	end
-
+		
 	if tonumber(highestCap) > tonumber(beamMPconfig.Cars) then
 		print("/!\\ -------------------------------SERVERSIDE-VEHICLE-CAP-FOR-CARS-TOO-LOW------------------------------- /!\\")
 		print("		The serverside vehicle cap (Cars) in the config is too low.")
@@ -94,6 +95,7 @@ print("-------------Loading Cobalt Essentials v" .. cobaltVersion .. "----------
 		print("/!\\ -------------------------------SERVERSIDE-VEHICLE-CAP-FOR-CARS-TOO-LOW------------------------------- /!\\")
 		Sleep(5000)
 	end
+end
 
 --
 print("-------------CobaltEssentials Config-------------")

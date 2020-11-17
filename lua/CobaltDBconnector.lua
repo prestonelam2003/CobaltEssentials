@@ -9,19 +9,24 @@
 
 
 ------------------------------------------------------------INIT-----------------------------------------------------------
-
-local M = {}
+local M = {}	
 
 local dbPath = resources .. "/server/" .. pluginName .. "/CobaltDB/"
 local cobaltSysChar = string.char(0x99, 0x99, 0x99, 0x99)
 
-socket = require("socket")
-local server = socket.udp()
-
-server:settimeout(3)
-server:setsockname('0.0.0.0', 58933)
-
 TriggerLocalEvent("initDB", package.path, package.cpath, dbPath, json.stringify(config))
+
+socket = require("socket")
+local server
+
+local function init(port)
+
+	server = socket.udp()
+
+	server:settimeout(3)
+	server:setsockname('0.0.0.0', tonumber(port))
+
+end
 
 
 --Set up metatable so that CobaltDB is intuitive to work with.
@@ -261,6 +266,7 @@ end
 
 
 -----CONSTRUCTOR-----
+M.init = init
 M.setPort = setPort
 M.new = newDatabase
 M.newTable = newTable

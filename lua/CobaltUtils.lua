@@ -86,6 +86,10 @@ local function exists(file)
    return ok, err
 end
 
+local function createDirectory(path)
+	os.execute("mkdir " .. dbpath:gsub("/","\\"))
+end
+
 local function copyFile(path_src, path_dst)
 	local ltn12 = require("Resources/server/CobaltEssentials/socket/lua/ltn12")
 

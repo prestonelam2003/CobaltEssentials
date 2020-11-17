@@ -46,7 +46,15 @@ function initDB(path, cpath, dbpath, config)
 
 	config = json.parse(config)
 	
+
 	_G.dbpath = dbpath
+
+	local jsonFile, error = io.open(dbpath .."config.json")
+	if error == nil then
+		CobaltDBport = tonumber(json.parse(jsonFile:read("*a")).CobaltDBport.value)
+	end
+
+	TriggerLocalEvent("onCobaltDBhandshake",CobaltDBport)
 
 	connector = socket.udp()
 end

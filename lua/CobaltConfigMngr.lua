@@ -13,7 +13,45 @@ permissions = CobaltDB.new("permissions")
 commands = CobaltDB.new("commands")
 vehiclePermissions = CobaltDB.new("vehicles")
 config = CobaltDB.new("config")
-beamMPconfig = utils.readCfg("server.cfg")
+
+beamMPconfig = {}
+local currentcfg = {}
+local beamMPcfg = utils.readCfg("server.cfg")
+
+
+--for key,value in pairs(beamMPcfg) do
+	--beamMPconfig[key] = value
+--end
+
+local beamMPconfigMetatable = {
+	
+	__index = function(table, key)
+		return currentcfg[key] or beamMPcfg[key]
+	end,
+	
+	__newindex = function(table, key, value)
+		if key == "Debug" then
+			Set(0, value)
+		elseif key == "Private" then
+			Set(1, value)
+		elseif key == "Cars" then
+			Set(2, value)
+		elseif key == "MaxPlayers" then
+			Set(3, value)
+		elseif key == "Map" then
+			Set(4, value)
+		elseif key == "Name" then 
+			Set(5, value)
+		elseif key == "description" then
+			Set(6, value)
+		else
+			return nil
+		end
+		currentcfg[key] = value
+	end
+}
+
+setmetatable(beamMPconfig, beamMPconfigMetatable)
 
 ----------------------------------------------------------EVENTS-----------------------------------------------------------
 
@@ -44,7 +82,6 @@ end
 
 
 ---------------------------------------------------------FUNCTIONS---------------------------------------------------------
-
 
 ------------------------------------------------------DEFAULT-CONFIGS------------------------------------------------------
 --THIS IS NOT THE NEW CONFIG, DO NOT CHANGE THESE FOR STARTERS, IT WONT DO ANYTHING.
