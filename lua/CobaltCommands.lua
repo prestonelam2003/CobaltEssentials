@@ -191,6 +191,8 @@ local function togglechat(sender, ...)
 	end
 end
 
+local function stop(snder, ...)
+
 --This is part of the copyright notice, if you edit Cobalt Essentials, you may not remove the copyright notice here.
 --The /about command, which points back to this function, must also stay enabled for all permissions.
 --The command must output the text as seen below, the function can be updated/modernized however, it must ultimately get this copyright notice back to the user in clear text.
@@ -234,6 +236,7 @@ M.say = say
 M.lua = lua
 M.uptime = uptime
 M.togglechat = togglechat
+M.stop = stop
 M.about = about
 
 M.testCommand = testCommand

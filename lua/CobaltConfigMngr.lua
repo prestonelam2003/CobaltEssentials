@@ -125,7 +125,8 @@ local defaultCommands =
 	ban =			{orginModule = "CC",	level = 10,	arguments = 1,	sourceLimited = 0,	description = "Ban a player from the session"},
 	setperm =		{orginModule = "CC",	level = 10,	arguments = 2,	sourceLimited = 0,	description = "Change a player's permission level"},
 	lua =			{orginModule = "CC",	level = 10,	arguments = 1,	sourceLimited = 2,	description = "Execute Lua, return the desired reply."},
-	togglechat =	{orginModule = "CC",	level = 10,	arguments = 0,	sourceLimited = 2,	description = "Toggles viewing chat in the RCON client"}
+	togglechat =	{orginModule = "CC",	level = 10,	arguments = 0,	sourceLimited = 2,	description = "Toggles viewing chat in the RCON client"},
+	stop =			{orginModule = "CC",	level = 10,	arguments = 0,	sourceLimited = 0,	description = "Stops the server"}
 }
 
 local defaultVehiclePermissions = 
