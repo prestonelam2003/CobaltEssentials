@@ -115,6 +115,7 @@ local function parseVehData(data)
 	data.serverVID = vehID
 	data.clientVID = data.VID
 	data.name = data.jbm
+	data.cfg = data.vcf
 
 
 	if data[4] ~= nil then
