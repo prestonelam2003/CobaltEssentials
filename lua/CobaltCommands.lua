@@ -192,6 +192,8 @@ local function togglechat(sender, ...)
 end
 
 local function stop(snder, ...)
+	CE.stopServer()
+end
 
 --This is part of the copyright notice, if you edit Cobalt Essentials, you may not remove the copyright notice here.
 --The /about command, which points back to this function, must also stay enabled for all permissions.
