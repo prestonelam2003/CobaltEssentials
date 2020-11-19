@@ -9,21 +9,21 @@
 
 
 ------------------------------------------------------------INIT-----------------------------------------------------------
-local M = {}	
+local M = {}
 
 local dbPath = resources .. "/server/" .. pluginName .. "/CobaltDB/"
 local cobaltSysChar = string.char(0x99, 0x99, 0x99, 0x99)
 
 TriggerLocalEvent("initDB", package.path, package.cpath, dbPath, json.stringify(config))
 
+local port = 10814
 socket = require("socket")
-local server
+local server = socket.udp()
+server:settimeout(3)
 
-local function init(port)
+local function init(configPort)
 
-	server = socket.udp()
-
-	server:settimeout(3)
+	port = configPort
 	server:setsockname('0.0.0.0', tonumber(port))
 
 end
@@ -109,6 +109,7 @@ tableTemplate.metatable =
 
 --------------------------------------------------------CONSTRUCTOR--------------------------------------------------------
 
+
 local function newDatabase(DBname)
 	TriggerLocalEvent("openDatabase", DBname)
 	
@@ -154,6 +155,13 @@ end
 
 
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
+
+--used to make sure the socket is connected
+local function reconnectSocket()
+	server:setsockname('0.0.0.0', tonumber(port))
+end
+
+
 --changes the a value in the table in
 local function set(DBname, tableName, key, value)
 	
@@ -171,6 +179,8 @@ end
 ---------------------------------------------------------ACCESSORS---------------------------------------------------------
 --returns a specific value from the table
 local function query(DBname, tableName, key)
+	--reconnectSocket()
+	
 	TriggerLocalEvent("query", DBname, tableName, key)
 	
 	local data = server:receive()
@@ -190,12 +200,14 @@ local function query(DBname, tableName, key)
 		end
 	end
 		
-
+	--server:close()
 	return data, error
 end
 
 --returns a read-only version of the table, or sub-table as json.
 local function getTable(DBname, tableName)
+	--reconnectSocket()
+	
 	TriggerLocalEvent("getTable", DBname, tableName)
 	
 	local data = server:receive()
@@ -208,11 +220,14 @@ local function getTable(DBname, tableName)
 		data = json.parse(data)
 	end
 
+	--server:close()
 	return data, error
 end
 
 --returns a read-only list of all tables within the database
 local function getTables(DBname)
+	--reconnectSocket()
+	
 	TriggerLocalEvent("getTables", DBname)
 	
 	local data = server:receive()
@@ -225,10 +240,13 @@ local function getTables(DBname)
 		data = json.parse(data)
 	end
 
+	--server:close()
 	return data, error
 end
 
 local function getKeys(DBname, tableName)
+	--reconnectSocket()
+
 	TriggerLocalEvent("getKeys", DBname, tableName)
 		
 	local data = server:receive()
@@ -241,22 +259,35 @@ local function getKeys(DBname, tableName)
 		data = json.parse(data)
 	end
 
+	--server:close()
 	return data, error
 end
 
 local function tableExists(DBname, tableName)
+	--reconnectSocket()	
+
 	TriggerLocalEvent("tableExists", DBname, tableName)
-	return server:receive() == tableName
+	
+	exists = server:receive() == tableName
+
+	--server:close()
+	return exists
 end
 
 
 ---------------------------------------------------------FUNCTIONS---------------------------------------------------------
 local function openDatabase(DBname)
+	--reconnectSocket()
+	
 	TriggerLocalEvent("openDatabase", DBname)
 	if server:receive() == DBname then
 		print("CobaltDB: " .. DBname .. " sucessfully opened.")
+		
+		--server:close()
 		return true
 	else
+		
+		--server:close()
 		return false
 	end
 end
