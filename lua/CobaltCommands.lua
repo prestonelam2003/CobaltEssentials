@@ -180,18 +180,18 @@ local function uptime(sender, ...)
 end
 
 local function togglechat(sender, ...)
-	if CE.getRconClients()[sender].chat == false then
-		CE.getRconClients()[sender].chat = true
+	if rconClients[sender.ID].chat == false then
+		rconClients[sender.ID].chat = true
 		return "You are now listening to chat"
 
 	else
-		CE.getRconClients()[sender].chat = false
+		rconClients[sender.ID].chat = false
 		return "You are no longer listening to chat"
 
 	end
 end
 
-local function stop(snder, ...)
+local function stop(sender, ...)
 	CE.stopServer()
 end
 
