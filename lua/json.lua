@@ -98,6 +98,42 @@ end
 
 -- Public values and functions.
 
+function json.rawStringify(obj, as_key)
+  local s = {}  -- We'll build the string as an array of strings to be concatenated.
+  local kind = kind_of(obj)  -- This is 'array' if it's an array or type(obj) otherwise.
+  if kind == 'array' then
+    if as_key then error('Can\'t encode array as key.') end
+    s[#s + 1] = '['
+    for i, val in ipairs(obj) do
+      if i > 1 then s[#s + 1] = ', ' end
+      s[#s + 1] = json.rawStringify(val)
+    end
+    s[#s + 1] = ']'
+  elseif kind == 'table' then
+    if as_key then error('Can\'t encode table as key.') end
+    s[#s + 1] = '{'
+    for k, v in pairs(obj) do
+      if #s > 1 then s[#s + 1] = ', ' end
+      s[#s + 1] = json.rawStringify(k, true)
+      s[#s + 1] = ':'
+      s[#s + 1] = json.rawStringify(v)
+    end
+    s[#s + 1] = '}'
+  elseif kind == 'string' then
+    return '"' .. escape_str(obj) .. '"'
+  elseif kind == 'number' then
+    if as_key then return '"' .. tostring(obj) .. '"' end
+    return tostring(obj)
+  elseif kind == 'boolean' then
+    return tostring(obj)
+  elseif kind == 'nil' then
+    return 'null'
+  else
+    error('Unjsonifiable type: ' .. kind .. '.')
+  end
+  return table.concat(s)
+end
+
 function json.stringify(obj, as_key)
   local s = {}  -- We'll build the string as an array of strings to be concatenated.
   local kind = kind_of(obj)  -- This is 'array' if it's an array or type(obj) otherwise.
