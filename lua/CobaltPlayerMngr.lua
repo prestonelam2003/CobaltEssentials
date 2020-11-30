@@ -69,7 +69,7 @@ playerTemplate.metatable =
 		
 		for k,v in pairs(player) do
 
-			if not (type(v) == "function" or k == "permissions" or k == "gamemode" or k == "vehicles") then
+			if not (type(v) == "function" or k == "permissions" or k == "gamemode" or k == "vehicles" or k == "data") then
 				playerString = playerString .. "\t" .. tostring(k) .. ": " .. tostring(v) .. "\n"
 			end
 		end
