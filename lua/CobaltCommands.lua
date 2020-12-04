@@ -62,7 +62,7 @@ local function status(sender, ...)
 
 			if player.gamemode.mode == 0 then 
 				playersList = playersList .. "[A] " .. currentPlayer
-			elseif players.gamemode.mode == 1 then
+			elseif player.gamemode.mode == 1 then
 				specPlayersList = specPlayersList .. "[Q] " .. currentPlayer
 			elseif player.gamemode.mode == 2 then
 				specPlayersList = specPlayersList .. "[S] " .. currentPlayer
@@ -91,7 +91,7 @@ local function statusdetail(sender, ...)
 
 			if player.gamemode.mode == 0 then 
 				playersList = playersList .. currentPlayer
-			elseif players.gamemode.mode == 1 then
+			elseif player.gamemode.mode == 1 then
 				specPlayersList = specPlayersList .. currentPlayer
 			elseif player.gamemode.mode == 2 then
 				specPlayersList = specPlayersList .. currentPlayer
