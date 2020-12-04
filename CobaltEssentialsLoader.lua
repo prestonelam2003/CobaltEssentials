@@ -5,7 +5,7 @@
 
 RegisterEvent("onCobaltDBhandshake","onCobaltDBhandshake")
 
-cobaltVersion = "1.4.9b"
+cobaltVersion = "1.4.11"
 
 pluginName = debug.getinfo(1).source:sub(2)
 local s,e
@@ -76,7 +76,7 @@ function onCobaltDBhandshake(port)
 	--WARNING for not having enough players in the config.
 	if beamMPconfig.MaxPlayers < config.maxActivePlayers.value then
 		print("/!\\ ---THE SERVER'S MAX PLAYER COUNT IS GREATER THAN THE MAX ACTIVE PLAYERS IN THE COBALT CONFIG--- /!\\")
-		Sleep(2000)
+		--Sleep(2000)
 	end
 
 		--TODO: WARNING FOR NOT HAVING ENOUGH CARS ALLOWED IN THE CONFIG
@@ -93,7 +93,8 @@ function onCobaltDBhandshake(port)
 		print("		If you do not turn it up, dynamic vehicle caps based on permission level will not work!")
 		print("		Please adjust the serverside vehicle cap to " .. highestCap .. " or greater to avoid any problems.")
 		print("/!\\ -------------------------------SERVERSIDE-VEHICLE-CAP-FOR-CARS-TOO-LOW------------------------------- /!\\")
-		Sleep(5000)
+		beamMPcfg.Cars = highestCap
+		--Sleep(5000)
 	end
 end
 

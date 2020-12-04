@@ -69,7 +69,7 @@ playerTemplate.metatable =
 		
 		for k,v in pairs(player) do
 
-			if not (type(v) == "function" or k == "permissions" or k == "gamemode" or k == "vehicles") then
+			if not (type(v) == "function" or k == "permissions" or k == "gamemode" or k == "vehicles" or k == "data") then
 				playerString = playerString .. "\t" .. tostring(k) .. ": " .. tostring(v) .. "\n"
 			end
 		end
@@ -345,7 +345,6 @@ local function canSpawn(player, vehID,  data)
 
 	if data then --make sure the car's data exists in the first place.
 		if player:hasPermission("spawnVehicles") == true then
-			--if vehiclePermissions[data.name] == nil or registeredVehicles[data.name].reqPerm <= player.permissions.level then
 				
 			
 			local vehicleDBobject --database object of the vehicle
@@ -377,10 +376,10 @@ local function canSpawn(player, vehID,  data)
 	
 					end
 				end
-	
-				if #player.vehicles + ((player.vehicles[0] and 1) or 0) > player:hasPermission("vehicleCap") then
-					print("Vehicle Cap Reached, Spawn Blocked")
-					return false, "Vehicle Cap Reached"
+				
+				if #player.vehicles - ((player.vehicles[vehID] == nil and 0) or 1) >= player:hasPermission("vehicleCap") then
+						print("Vehicle Cap Reached, Spawn Blocked")
+						return false, "Vehicle Cap Reached"
 				end
 			else
 				print("Insufficent Permissions for this Vehicle, Spawn Blocked")

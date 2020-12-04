@@ -52,6 +52,7 @@ function initDB(path, cpath, dbpath, config)
 	local jsonFile, error = io.open(dbpath .."config.json")
 	if error == nil then
 		CobaltDBport = tonumber(json.parse(jsonFile:read("*a")).CobaltDBport.value)
+		jsonFile:close()
 	end
 
 	TriggerLocalEvent("onCobaltDBhandshake",CobaltDBport)
@@ -68,15 +69,24 @@ function openDatabase(DBname)
 
 	local databaseLoaderInfo = "loaded" -- defines if the DB was created just now or if it was pre-existing.
 
-	if jsonFile == nil then	
+	if jsonFile == nil then
 		databaseLoaderInfo = "new"
 		--print("CobaltDB: json file does not exist, creating one now.")
 		--print(jsonFile, error)
 		jsonFile, error = io.open(jsonPath, "w")
+		local openAttempts = 1
 		if error then
 			os.execute("mkdir " .. dbpath:gsub("/","\\") .. "\\playersDB")
-			jsonFile, error = io.open(jsonPath, "w")
+			--while error and openAttempts < 5 do
+				jsonFile, error = io.open(jsonPath, "w")
+				--openAttempts = openAttempts + 1
+			--end
 		end
+		--if error then
+			--connector:sendto("E:" .. error ,"127.0.0.1", CobaltDBport)
+			--return false
+		--end
+
 		jsonFile:write("{}")
 		jsonFile:close()
 		jsonFile, error = io.open(jsonPath,"r")
@@ -112,9 +122,8 @@ function updateDatabase(DBname)
 	loadedJson[DBname] = json.stringify(loadedDatabases[DBname])
 
 	--write table
-	local jsonFile, error = io.open(dbpath .. DBname .. ".json","w")
+	local jsonFile, error = io.open(dbpath .. DBname .. ".json","r+")
 	jsonFile:write(loadedJson[DBname])
-
 	jsonFile:close()
 end
 

@@ -5,3 +5,4 @@ CobaltDB-*
 CobaltDB*
 lua/CobaltConfig.lua
 extensions/CobaltMotorsports.lua
+LoadExtensions.cfg

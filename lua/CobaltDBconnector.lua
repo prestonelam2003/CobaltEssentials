@@ -114,24 +114,28 @@ local function newDatabase(DBname)
 	TriggerLocalEvent("openDatabase", DBname)
 	
 	databaseLoaderInfo = server:receive()
-
 	if databaseLoaderInfo ~= nil then
-		print("CobaltDB: " .. DBname .. " sucessfully opened.")
+		if databaseLoaderInfo:sub(1,2) == "E:" then
+			print("CobaltDB: " .. DBname .. " could not be opened after 5 tries due to: " .. databaseLoaderInfo:sub(3))
+			return nil, "CobaltDB failed to load " .. DBname .. "after 5 tries due to : " .. databaseLoaderInfo:sub(3)
+		else
+			print("CobaltDB: " .. DBname .. " sucessfully opened.")
 
-		newDatabase = 
-		{
-			CobaltDB_databaseName = DBname,
-			CobaltDB_newTable = M.newTable,
-			close = function(table)
-				TriggerLocalEvent("closeDatabase",DBname)
-			end
+			newDatabase = 
+			{
+				CobaltDB_databaseName = DBname,
+				CobaltDB_newTable = M.newTable,
+				close = function(table)
+					TriggerLocalEvent("closeDatabase",DBname)
+				end
 
-		}
-		setmetatable(newDatabase, databaseTemplate.metatable)
+			}
+			setmetatable(newDatabase, databaseTemplate.metatable)
 
-		return newDatabase, databaseLoaderInfo
+			return newDatabase, databaseLoaderInfo
+		end
 	else
-		return nil
+		return nil, "No response from CobaltDB"
 	end
 end
 
