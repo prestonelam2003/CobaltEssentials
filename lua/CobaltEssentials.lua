@@ -188,7 +188,6 @@ function onChatMessage(playerID, name ,chatMessage)
 	end
 
 	local formattedMessage = "[".. playerID .. "]" .. name .. " : " .. chatMessage
-	print(formattedMessage)
 
 	for rconID, rconClient in pairs(rconClients) do
 		if rconClient.chat == true then

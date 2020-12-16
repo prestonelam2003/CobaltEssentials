@@ -29,9 +29,8 @@ local function kick(sender, kickID, reason, ...)
 end
 
 local function ban(sender, banID, reason, ...)
-	print("banned" .. banID .. "for this session")
-	CobaltPermissions.ban(GetPlayerDiscordID(banID), 1)
-	DropPlayer(tonumber(banID), "You've been banned from this server")
+	print("banned" .. banID)
+	players[banID]:ban(reason)
 end
 
 local function mute(sender, muteID, reason, ...)

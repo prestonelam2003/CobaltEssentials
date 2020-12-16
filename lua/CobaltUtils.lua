@@ -184,6 +184,29 @@ local function readCfg(path)
 	return cfg
 end
 
+-- PRE: number, time in seconds is passed in, followed by boolean hours, boolean minutes, boolean seconds, boolean milliseconds.
+--POST: the formatted time is output as a string.
+function formatTime(time)
+	time = math.floor((time * 1000) + 0.5)
+	local milliseconds = time % 1000
+	time = math.floor(time/1000)
+	local seconds = time % 60
+	time = math.floor(time/60)
+	if seconds < 10 then
+		seconds = "0" .. seconds
+	end
+	if time < 10 then
+		time = "0" .. time
+	end
+	if milliseconds < 10 then
+		milliseconds = "00" .. milliseconds
+	elseif milliseconds < 100 then
+		milliseconds = "0" .. milliseconds
+	end
+
+	return  time ..":".. seconds .. ":" .. milliseconds
+end
+
 M.copyFile = copyFile
 M.exists = exists
 M.parseVehData = parseVehData
