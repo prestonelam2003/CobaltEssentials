@@ -7,7 +7,7 @@ Replaced player.permissons.playerID with player.permissons.CobaltPlayerMgnr_play
 Replaced getPlayerByID with getPlayerByName
 Implemented permission groups
 	in playerPermissions.json, create an entry group:<groupName> under it, permissons as per usual.
-	to players can be given the key group, followed by string groupName, to be assigned all permisssons of a certain group.
+	players can be given the key 'group', followed by string groupName, to be assigned all permisssons of a certain group.
 Turned default, and inactive into permission groups under the new system.
 Implemented new permission group for guests, aptly named "guest"
 Implemented setgroup command
