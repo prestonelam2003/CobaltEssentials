@@ -5,7 +5,7 @@
 
 RegisterEvent("onCobaltDBhandshake","onCobaltDBhandshake")
 
-cobaltVersion = "1.4.11A"
+cobaltVersion = "1.5.0"
 
 pluginName = debug.getinfo(1).source:sub(2)
 local s,e

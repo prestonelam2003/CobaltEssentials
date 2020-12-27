@@ -23,26 +23,56 @@ end
 
 ---------------------------------------------------------FUNCTIONS---------------------------------------------------------
 
-local function kick(sender, kickID, reason, ...)
-	print("attempting to kick " .. kickID)
-	DropPlayer(tonumber(kickID), "You've been kicked from the server")
+local function kick(sender, name, reason, ...)
+	local player = players.getPlayerByName(name)
+	if player then
+		player:kick(reason)
+		return "Kicked " .. name .. " for: " .. reason
+	end
 end
 
-local function ban(sender, banID, reason, ...)
-	print("banned" .. banID)
-	players[banID]:ban(reason)
+local function ban(sender, name, reason, ...)
+	local player = players.getPlayerByName(name)
+	if player then
+		player:ban(reason)
+	else
+		players.database[name].banned = true
+		players.database[name].banReason = reason
+	end
+
+	print("Banned " .. name .. " for: " .. reason)
+	return "Banned " .. name .. " for: " .. reason
 end
 
-local function mute(sender, muteID, reason, ...)
-	players[muteID]:setMuted(true, reason)
-
-	return "You have muted " .. muteID
+local function unban(sender, name)
+	print("unbanned " .. name)
+	players.database[name].banned = false
+	return "Unbanned " .. name
 end
 
-local function unmute(sender, unmuteID, ...)
-	players[muteID]:setMuted(false, reason)
+local function mute(sender, name, reason, ...)
+	local player = players.getPlayerByName(name)
+	if player then
+		player:setMuted(true, reason)
+	else
+		players.database[name].muted = true
+		players.database[name].muteReason = reason
+	end
 
-	return "You have unmuted " .. unmuteID
+	print("Muted " .. name .. " for: " .. reason)
+	return "You have muted " .. name .. " for: " .. reason
+end
+
+local function unmute(sender, name, ...)
+	local player = players.getPlayerByName(name)
+	if player then
+		player:setMuted(false)
+	else
+		players.database[name].muted = false
+	end
+
+	print("unmuted " .. name)
+	return "You have unmuted " .. name
 end
 
 local function status(sender, ...)
@@ -61,7 +91,7 @@ local function status(sender, ...)
 
 			if player.gamemode.mode == 0 then 
 				playersList = playersList .. "[A] " .. currentPlayer
-			elseif players.gamemode.mode == 1 then
+			elseif player.gamemode.mode == 1 then
 				specPlayersList = specPlayersList .. "[Q] " .. currentPlayer
 			elseif player.gamemode.mode == 2 then
 				specPlayersList = specPlayersList .. "[S] " .. currentPlayer
@@ -88,9 +118,9 @@ local function statusdetail(sender, ...)
 			currentPlayer = tostring(player)
 
 
-			if player.gamemode.mode == 0 then 
+			if player.gamemode.mode == 0 then
 				playersList = playersList .. currentPlayer
-			elseif players.gamemode.mode == 1 then
+			elseif player.gamemode.mode == 1 then
 				specPlayersList = specPlayersList .. currentPlayer
 			elseif player.gamemode.mode == 2 then
 				specPlayersList = specPlayersList .. currentPlayer
@@ -115,18 +145,89 @@ local function help(sender, ...)
 	return commandList
 end
 
-local function setperm(sender, ID, permLvl, ...)
+local function setperm(sender, name, permLvl, ...)
 	--local players = CE.getPlayers()
-	local reply = ID .. " PermLvl: " .. players[tonumber(ID)].permissions.level .. " > " .. permLvl
+	local reply = "Set level of " .. name .. " to " .. permLvl
 
 
 	--security measure.
 	--if type(sender) == "string" or sender.permissions.level >= tonumber(permLvl) then
-		players[tonumber(ID)].permissions.level = tonumber(permLvl)
+		players.database[name].level = permLvl
 	--end
 
 	print(reply)
 	return reply
+end
+local function setgroup(sender, name, group, ...)
+	--local players = CE.getPlayers()
+	local reply = "Set group of " .. name .. " to " .. group
+
+
+	--security measure.
+	--if type(sender) == "string" or sender.permissions.level >= tonumber(permLvl) then
+		players.database[name].group = group
+	--end
+
+	print(reply)
+	return reply
+end
+local function whitelist(sender, arguments)
+	local returnString = ""
+	local action
+	local argument
+	if arguments:find(" ") then
+		action = arguments:sub(1,arguments:find(" ") - 1)
+		argument = arguments:sub(arguments:find(" ")+1)
+	else
+		action = arguments
+		argument = nil
+	end
+	
+	if action == "enable" then
+		config.enableWhitelist.value = true
+		returnString = "The whitelist has been enabled."
+	elseif action == "disable" then
+		config.enableWhitelist.value = false
+		returnString = "The whitelist has been disabled."
+	elseif action == "add" then
+		
+		if argument then
+			returnString = argument .. " has been whitelisted on this server."
+			players.database[argument].whitelisted = true
+		else
+			returnString = "You must specify a player"
+		end
+
+	elseif action == "remove" then
+		
+		if argument then
+			returnString = argument .. " has been unwhitelisted on this server."
+			players.database[argument].whitelisted = false
+		else
+			returnString = "You must specify a player"
+		end
+	
+	elseif action == "help" then
+		returnString = returnString .. "enable: turns on the whitelist\n"
+		returnString = returnString .. "disable: turns off the whitelist\n"
+		returnString = returnString .. "add: adds a player to the whitelist\n"
+		returnString = returnString .. "remove: removes a player from the whitelist\n"
+	else
+		returnString = action .. " is not a valid sub command of the whitelist, try whitelist help"
+	end
+
+	return returnString
+end
+
+local function setcfg(sender, option, value)
+	local from
+	if beamMPconfig[option] then
+		from = beamMPconfig[option]
+		beamMPconfig[option] = value
+		return option .. " changed from " .. from .. " to " .. value
+	else
+		return option .." is not a config option, please use the same names as used in the Server.cfg"
+	end
 end
 
 local function countdown(sender, ...)
@@ -226,12 +327,16 @@ M.onInit = onInit
 ----COMMANDS----
 M.kick = kick
 M.ban = ban
+M.unban = unban --TODO
 M.mute = mute
 M.unmute = unmute
 M.status = status
 M.statusdetail = statusdetail
 M.help = help
+M.setgroup = setgroup
 M.setperm = setperm
+M.whitelist = whitelist
+M.setcfg = setcfg
 M.countdown = countdown
 M.say = say
 M.lua = lua

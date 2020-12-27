@@ -91,7 +91,7 @@ tableTemplate.metatable =
 	__newindex = function(table, key, value)
 		
 		--is this a protectedKey?
-		if tableTemplate.protectedKeys[key] ~= nil then
+		if tableTemplate.protectedKeys[key] then
 			rawset(table,key,value)
 		else
 			return M.set(table.CobaltDB_databaseName, table.CobaltDB_tableName, key, value)
@@ -168,8 +168,12 @@ end
 
 --changes the a value in the table in
 local function set(DBname, tableName, key, value)
-	
-	value = json.stringify(value)
+	if value then
+		value = json.stringify(value)
+	else
+		value = "nil"
+	end
+
 	TriggerLocalEvent("set", DBname, tableName, key, value)
 end
 

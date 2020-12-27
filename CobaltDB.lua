@@ -138,7 +138,11 @@ function set(DBname, tableName, key, value)
 		end
 		
 		if key ~= nil then
-			loadedDatabases[DBname][tableName][key] = json.parse(value)
+			if value == "nil" then
+				loadedDatabases[DBname][tableName][key] = nil
+			else
+				loadedDatabases[DBname][tableName][key] = json.parse(value)
+			end
 			updateDatabase(DBname)
 		end
 

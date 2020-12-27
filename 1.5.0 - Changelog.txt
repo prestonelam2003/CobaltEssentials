@@ -1,0 +1,21 @@
+-------Cobalt Essentials 1.5.0 Changelog-------
+Fully implemented onPlayerAuth event
+Repurposed the onPlayerConnecting event, which now only serves to bind an ID to an authenticated player and grab values that are only availible once a player has been assigned an ID.
+Renamed onPlayerFirstConnecting to onPlayerFirstAuth
+Renamed player.permissions.CobaltPlrMgmt_database to player.permissions.CobaltPlayerMgnr_database for consistency
+Replaced player.permissons.playerID with player.permissons.CobaltPlayerMgnr_playerObject
+Replaced getPlayerByID with getPlayerByName
+Implemented permission groups
+	in playerPermissions.json, create an entry group:<groupName> under it, permissons as per usual.
+	to players can be given the key group, followed by string groupName, to be assigned all permisssons of a certain group.
+Turned default, and inactive into permission groups under the new system.
+Implemented new permission group for guests, aptly named "guest"
+Implemented setgroup command
+Implemented whitelist command, for controlling the whitelist.
+Moved commands that refer to players from their playerID to their name.
+Implemented unban command
+
+Fixed permisson problems caused by exceeding the maxActivePlayers cap (spectators)
+Fixed status being broken by players not in gamemode 0 due to a typo.
+Actually Fixed ban this time.
+Fixed mutes because everything was broken.

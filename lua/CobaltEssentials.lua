@@ -23,7 +23,8 @@ delayedQueue = {n = 0}
 
 RegisterEvent("onTick","onTick")
 
-RegisterEvent("onPlayerFirstConnecting","onPlayerFirstConnecting")
+RegisterEvent("onPlayerAuth","onPlayerAuth")
+RegisterEvent("onPlayerFirstAuth","onPlayerFirstAuth")
 RegisterEvent("onPlayerConnecting","onPlayerConnecting")
 RegisterEvent("onPlayerJoining","onPlayerJoining")
 RegisterEvent("onPlayerJoin","onPlayerJoin")
@@ -73,28 +74,44 @@ function onTick()
 
 end
 
-
 --The first time a player has began connecting to the server, this is called.
-function onPlayerFirstConnecting(ID)
-	print("onPlayerFirstConnecting: " .. ID)
+function onPlayerFirstAuth(name)
+	print("onPlayerFirstAuth: " .. name)
 
-	if extensions.triggerEvent("onPlayerFirstConnecting", players[ID]) == false then
-		DropPlayer(ID,"You've been kicked from the server!")
+	if extensions.triggerEvent("onPlayerFirstAuth", players[ID]) == false then
+		--return("You were blocked from joining by an extension")
 	end
+
+end
+
+--the player is authenticated by the backend
+function onPlayerAuth(name, role, isGuest)
+	
+	local player, canJoin, reason = players.new(name, role, isGuest)
+
+	if extensions.triggerEvent("onPlayerAuth", player) == false then
+		return players.cancelBind(name, "You were blocked from joining by an extension")
+	elseif canJoin == false then
+		return players.cancelBind(name, reason)
+	end
+
+	local authenticatedMessage = name
+	if isGuest then
+		authenticatedMessage = authenticatedMessage .. " authenticated as a GUEST"
+	else
+		authenticatedMessage = authenticatedMessage .. " authenticated as a " .. role
+	end
+	authenticatedMessage = authenticatedMessage .. " @" .. player.permissions.level
+	print(authenticatedMessage)
 
 end
 
 function onPlayerConnecting(ID)
 	print("On Player Connecting: " .. ID)
-	
-	--players[ID] = M.getPlayer(ID)
-	local player, canJoin, reason = players.new(ID)
 
-	if extensions.triggerEvent("onPlayerConnecting", player) == false then
-		DropPlayer(ID,"You've been kicked from the server!")	
-	elseif canJoin == false then
-		player:kick(reason)
-	end
+	local name = GetPlayerName(ID)
+
+	players.bindPlayerToID(name, ID)
 
 	players.updateQueue()
 end
@@ -180,7 +197,7 @@ function onChatMessage(playerID, name ,chatMessage)
 			
 	end
 	
-	if players[playerID].permissions.muted == true or players[playerID]:hasPermission("sendMessage") == true then
+	if players[playerID].permissions.muted == false and players[playerID]:hasPermission("sendMessage") == true then
 		print("[".. playerID .. "]" .. name .. " : " .. chatMessage)
 	else
 		print("MUTED:[".. playerID .. "]" .. name .. " : " .. chatMessage)

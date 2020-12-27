@@ -118,14 +118,18 @@ local defaultCommands =
 	about =			{orginModule = "CC",	level = 0,	arguments = 0,	sourceLimited = 0,	description = "Displays the license, version, and copyright notice assosiated with Cobalt Essentials."},
 	uptime =		{orginModule = "CC",	level = 0,	arguments = 0,	sourceLimited = 0,	description = "Get the uptime of the server"},
 	countdown =		{orginModule = "CC",	level = 1,	arguments = 0,	sourceLimited = 0,	description = "Start a countdown in chat"},
+	whitelist =		{orginModule = "CC",	level = 5,	arguments = 1,	sourceLimited = 0,	description = "Control the server's whitelist"},
 	say =			{orginModule = "CC",	level = 5,	arguments = 1,	sourceLimited = 0,	description = "Say a message as the server."},
-	mute =			{orginModule = "CC",	level = 5,	arguments = 1,	sourceLimited = 0,	description = "Disallow a player from talking"},
-	unmute =		{orginModule = "CC",	level = 5,	arguments = 1,	sourceLimited = 0,	description = "Allow a muted player to talk"},
-	kick =			{orginModule = "CC",	level = 5,	arguments = 1,	sourceLimited = 0,	description = "Kick a player from the session"},
-	ban =			{orginModule = "CC",	level = 10,	arguments = 1,	sourceLimited = 0,	description = "Ban a player from the session"},
+	mute =			{orginModule = "CC",	level = 5,	arguments = 2,	sourceLimited = 0,	description = "Disallow a player from talking"},
+	unmute =		{orginModule = "CC",	level = 5,	arguments = 1,	sourceLimited = 0,	description = "Allow a muted player to talk again"},
+	kick =			{orginModule = "CC",	level = 5,	arguments = 2,	sourceLimited = 0,	description = "Kick a player from the session"},
+	setcfg =		{orginModule = "CC",	level = 5,	arguments = 2,	sourceLimited = 0,	description = "Set a vanilla beamMP server config option."},
+	ban =			{orginModule = "CC",	level = 10,	arguments = 2,	sourceLimited = 0,	description = "Ban a player from the server"},
+	unban =			{orginModule = "CC",	level = 10,	arguments = 1,	sourceLimited = 0,	description = "Unban a player from the server"},
 	setperm =		{orginModule = "CC",	level = 10,	arguments = 2,	sourceLimited = 0,	description = "Change a player's permission level"},
+	setgroup =		{orginModule = "CC",	level = 10,	arguments = 2,	sourceLimited = 0,	description = "Set a player's permission group"},
 	lua =			{orginModule = "CC",	level = 10,	arguments = 1,	sourceLimited = 2,	description = "Execute Lua, return the desired reply."},
-	togglechat =	{orginModule = "CC",	level = 10,	arguments = 0,	sourceLimited = 2,	description = "Toggles viewing chat in the RCON client"},
+	togglechat =	{orginModule = "CC",	level =	10,	arguments = 0,	sourceLimited = 2,	description = "Toggles viewing chat in the RCON client"},
 	stop =			{orginModule = "CC",	level = 10,	arguments = 0,	sourceLimited = 0,	description = "Stops the server"}
 }
 
@@ -136,8 +140,12 @@ local defaultVehiclePermissions =
 
 local defaultPlayerPermissions =
 {
-	default =	{level = 1,	whitelisted = false,	banned = false,	muted = false},
-	inactive =	{level = 0}
+	["group:inactive"] =	{level = 0},
+	["group:guest"] =		{level = 1,	whitelisted = false,banned = false,	muted = false},
+	["group:default"] =		{level = 1,	whitelisted = false,banned = false,	muted = false, banReason = "You must be signed in to join this server"},
+	["group:mod"] =			{level = 5,	whitelisted = true,	banned = false,	muted = false},
+	["group:admin"] =		{level = 10,whitelisted = true,	banned = false,	muted = false},
+	["group:owner"] =		{level = 11,whitelisted = true,	banned = false,	muted = false}
 }
 
 applyDefaults(config, defaultConfig)

@@ -9,10 +9,13 @@ local players = {}
 
 local playerPermissions = CobaltDB.new("playerPermissions")
 local playerData = CobaltDB.new("playerData")
-local defaultPermissions = playerPermissions.default
-local inactivePermissions = playerPermissions.inactive
+local defaultPermissions = playerPermissions["group:default"]
+local inactivePermissions = playerPermissions["group:inactive"]
 
 local weakSources = {"queue"}
+
+local nameIDs = {}
+local unboundAuthenticated = {} --Authenticated players that haven't sent a onPlayerConnecting event yet.
 
 local activePlayers = {}
 local playerQueue = {}
@@ -107,33 +110,46 @@ playerTemplate.permissions = {}
 playerTemplate.permissions.metatable =
 {
 	__index = function(table, key)
-		
-		if players[table.playerID] and players[table.playerID].gamemode.mode > 0 then
+		if key == "group" then
+			if table.CobaltPlayerMgnr_playerObject.guest == true then
+				return "guest"
+			else
+				return table.CobaltPlayerMgnr_database.group or "default"
+			end
+		end
+
+		if table.CobaltPlayerMgnr_playerObject and rawget(table.CobaltPlayerMgnr_playerObject, "gamemode") and table.CobaltPlayerMgnr_playerObject.gamemode.mode > 0 then
 			-- Mode-Map [-1:undefined 0:active, 1:inQueue 2:spectator]
 			return inactivePermissions[key] or defaultPermissions[key]
 		else
-			if table.CobaltPlrMgmt_database:exists() then
-				return table.CobaltPlrMgmt_database[key] or defaultPermissions[key]
-					
-			else
-				return defaultPermissions[key]
-			end
-			--return (table.CobaltPlrMgmt_database:exists() and table.CobaltPlrMgmt_database[key]) or defaultPermissions[key]
+			return (table.CobaltPlayerMgnr_database:exists() and table.CobaltPlayerMgnr_database[key]) or (table.group and players.database["group:" .. table.group]:exists() and players.database["group:" .. table.group][key]) or defaultPermissions[key]
+			--return (table.CobaltPlayerMgnr_database:exists() and table.CobaltPlayerMgnr_database[key]) or defaultPermissions[key]
 		end
 	end,
 
 	__newindex = function(table, key, value)
-		--table.CobaltPlrMgmt_playerRegistered = true
-		table.CobaltPlrMgmt_database[key] = value
+		table.CobaltPlayerMgnr_database[key] = value
 	end,
 
 	__pairs = function(table)
 		
 		local newTable = {}
 
-		if table.CobaltPlrMgmt_database:exists() then
-			for k,v in pairs(table.CobaltPlrMgmt_database) do
+		if table.CobaltPlayerMgnr_playerObject.guest == true then
+			newTable.group = "guest"
+		end
+
+		if table.CobaltPlayerMgnr_database:exists() then
+			for k,v in pairs(table.CobaltPlayerMgnr_database) do
 				newTable[k] = v
+			end
+		end
+
+		if table.group then
+			for k,v in pairs(players.database["group:" .. table.group]) do
+				if newTable[k] == nil then
+					newTable[k] = players.database["group:" .. table.group][k]
+				end
 			end
 		end
 
@@ -149,50 +165,50 @@ playerTemplate.permissions.metatable =
 
 playerTemplate.permissions.protectedKeys =
 {
-	CobaltPlrMgmt_playerID = true,
-	CobaltPlrMgmt_database = true,
-	--CobaltPlrMgmt_playerRegistered = true
 
+	CobaltPlayerMgnr_database = true,
+	CobaltPlayerMgnr_playerObject = true
 }
 
 --------------------------------------------------------CONSTRUCTOR--------------------------------------------------------
-local function new(playerID)
+local function new(name, role, isGuest)
 	local newPlayer = {} --player object
 	local canJoin = true --if the player is allowed to join
 	local reason = nil --if the canJoin is false, why can't they join.
 
-	
 	--BASE STUFF
-	newPlayer.playerID = playerID
-	newPlayer.discordID = GetPlayerDiscordID(playerID)
-	newPlayer.hardwareID = GetPlayerHWID(playerID)
-	newPlayer.name = GetPlayerName(playerID)
+	--newPlayer.discordID = GetPlayerDiscordID(playerID)
+	--newPlayer.hardwareID = GetPlayerHWID(playerID)
+	newPlayer.guest = isGuest
+	newPlayer.name = name
 	newPlayer.joinTime = age
 
+
 	--PERMISSIONS
+	--newPlayer.permissions.playerID = newPlayer.playerID
 	newPlayer.permissions = {}
-	newPlayer.permissions.playerID = newPlayer.playerID
-	newPlayer.permissions.CobaltPlrMgmt_database = playerPermissions[newPlayer.discordID]
+	newPlayer.permissions.CobaltPlayerMgnr_playerObject = newPlayer
+	newPlayer.permissions.CobaltPlayerMgnr_database = playerPermissions[newPlayer.name]
 
 	--PLAYER DATA
-	local playerData, databaseLoaderInfo = CobaltDB.new("playersDB/" .. newPlayer.discordID)
+	local playerData, databaseLoaderInfo = CobaltDB.new("playersDB/" .. newPlayer.name)
 	newPlayer.data = playerData
 
 
 	--GAMEMODE
 	-- Mode-Map [-1:undefined 0:active, 1:inQueue 2:spectator]
-	newPlayer.gamemode = {}
-	newPlayer.gamemode.queue = activeCount + 1 - config.maxActivePlayers.value
+	--newPlayer.gamemode = {}
+	--newPlayer.gamemode.queue = activeCount + 1 - config.maxActivePlayers.value
 	
-	if newPlayer.gamemode.queue > 0 then
-		newPlayer.gamemode.mode = 1
-	else
-		newPlayer.gamemode.queue = 0
-		newPlayer.gamemode.mode = 0
-	end
+	--if newPlayer.gamemode.queue > 0 then
+		--newPlayer.gamemode.mode = 1
+	--else
+		--newPlayer.gamemode.queue = 0
+		--newPlayer.gamemode.mode = 0
+	--end
 	
-	newPlayer.gamemode.locked =  false
-	newPlayer.gamemode.source = "default"
+	--newPlayer.gamemode.locked =  false
+	--newPlayer.gamemode.source = "default"
 
 	--VEHICLES
 	newPlayer.vehicles = {}
@@ -207,7 +223,7 @@ local function new(playerID)
 	setmetatable(newPlayer, playerTemplate.metatable)
 
 	--RECORD NAME
-	if newPlayer.permissions.CobaltPlrMgmt_database:exists() then
+	if newPlayer.permissions.CobaltPlayerMgnr_database:exists() then
 		newPlayer.permissions.lastName = newPlayer.name
 	end
 
@@ -222,14 +238,14 @@ local function new(playerID)
 		reason = newPlayer.permissions.banReason or "You are banned from this server!"
 	end
 
+	unboundAuthenticated[name] = newPlayer
+	--players[playerID] = newPlayer
 
-	players[playerID] = newPlayer
+	--if databaseLoaderInfo == "new" then
+		--TriggerGlobalEvent("onPlayerFirstConnecting", playerID)
+	--end
 
-	if databaseLoaderInfo == "new" then
-		TriggerGlobalEvent("onPlayerFirstConnecting", playerID)
-	end
-
-	print(tostring(newPlayer))
+	--print(tostring(newPlayer))
 
 
 	return newPlayer, canJoin, reason
@@ -239,6 +255,46 @@ local function new(playerID)
 
 end
 
+local function bindPlayerToID(name, playerID)
+	local player = unboundAuthenticated[name]
+	
+	--assign some values that require a playerID
+	player.playerID = playerID
+	player.hardwareID = GetPlayerHWID(playerID)
+
+
+	--GAMEMODE
+	-- Mode-Map [-1:undefined 0:active, 1:inQueue 2:spectator]
+	player.gamemode = {}
+	player.gamemode.queue = activeCount + 1 - config.maxActivePlayers.value
+	
+	if player.gamemode.queue > 0 then
+		player.gamemode.mode = 1
+	else
+		player.gamemode.queue = 0
+		player.gamemode.mode = 0
+	end
+
+	player.gamemode.locked =  false
+	player.gamemode.source = "default"
+
+	--add player to playerList
+	players[playerID] = player
+
+	if databaseLoaderInfo == "new" then
+		TriggerGlobalEvent("onPlayerFirstAuth", playerID)
+	end
+	unboundAuthenticated[name] = nil
+
+	print(tostring(player))
+	
+end
+
+local function cancelBind(name, reason)
+	print(name .. " was blocked from joining due to: " .. reason)
+	unboundAuthenticated[name] = nil
+	return reason
+end
 
 ----------------------------------------------------------EVENTS-----------------------------------------------------------
 local function updateQueue()
@@ -290,6 +346,9 @@ local function setMuted(player, state, reason)
 
 	if state == true then
 		player.permissions.muteReason = reason
+		player:tell("You've been muted for: " .. reason )
+	else
+		player:tell("You've been unmuted")
 	end
 end
 
@@ -401,17 +460,13 @@ local function canExecute(player, command)
 	return player.permissions.level >= command.level and command.sourceLimited ~= 2
 end
 
-local function getPlayerByID(identifier)
-	local idType
-	if tostring(tonumber(identifier)):len() == 8 then --discordID
-		idType = discordID
-	else --likely name
-		idType = name
-	end
-
-	for playerID, player in pairs(players) do
-		if players[idType] == identifier then
-			return players[playerID]
+--DEPRECATED
+local function getPlayerByName(name)
+	for playerID, player in pairs(players)  do
+		if type(player) == "table" and type(playerID) == "number" then
+			if player.name == name then
+				return players[playerID]
+			end
 		end
 	end
 
@@ -429,7 +484,7 @@ end
 
 local function ban(player, reason)
 	--state = (state == true and 1) or (state == true or 0)
-	player.permissions.banned = 1
+	player.permissions.banned = true
 	player.permissions.banReason = reason
 
 	DropPlayer(player.playerID, reason or "You are banned from this server!")
@@ -442,6 +497,8 @@ end
 
 ---CONSTRUCTOR---
 players.new = new
+players.bindPlayerToID = bindPlayerToID
+players.cancelBind = cancelBind
 -----EVENTS------
 players.updateQueue = updateQueue
 
@@ -453,7 +510,7 @@ playerTemplate.methods.hasPermission = hasPermission
 playerTemplate.methods.canSpawn = canSpawn
 playerTemplate.methods.canExecute = canExecute
 
-players.getPlayerByID = getPlayerByID
+players.getPlayerByName = getPlayerByName
 ----FUNCTIONS----
 playerTemplate.methods.tell = tell
 playerTemplate.methods.kick = kick

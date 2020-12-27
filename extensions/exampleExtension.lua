@@ -19,11 +19,17 @@ local function onTick(age)
 	end
 end
 
---called whenever a player begins connecting to the server for the first time.
-local function onPlayerFirstConnecting(player)
 
+--called whenever a player is authenticated by the server for the first time.
+local function onPlayerFirstAuth(player)
+	
 end
 
+
+--called whenever the player is authenticated by the server.
+local function onPlayerAuth(player)
+	
+end
 
 --called whenever someone begins connecting to the server
 local function onPlayerConnecting(player)
@@ -44,6 +50,7 @@ end
 local function onPlayerDisconnect(player)
 	
 end
+
 
 --called whenever a player sends a chat message
 local function onChatMessage(player, chatMessage)
@@ -78,6 +85,9 @@ end
 M.onInit = onInit
 M.onTick = onTick
 
+M.onPlayerFirstAuth = onPlayerFirstAuth
+
+M.onPlayerAuth = onPlayerAuth
 M.onPlayerConnecting = onPlayerConnecting
 M.onPlayerJoining = onPlayerJoining
 M.onPlayerJoin = onPlayerJoin
