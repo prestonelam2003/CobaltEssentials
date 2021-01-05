@@ -19,3 +19,10 @@ Fixed permisson problems caused by exceeding the maxActivePlayers cap (spectator
 Fixed status being broken by players not in gamemode 0 due to a typo.
 Actually Fixed ban this time.
 Fixed mutes because everything was broken.
+
+-------Cobalt Essentials 1.5.1 Changelog-------
+Fixed setperm because im a dumb idiot
+hotfix to mute/chat, did not fix underlying problem.
+Credit to @Dudekahedron for help with both of these problems.
+
+

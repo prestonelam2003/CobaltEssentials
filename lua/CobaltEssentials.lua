@@ -197,7 +197,7 @@ function onChatMessage(playerID, name ,chatMessage)
 			
 	end
 	
-	if players[playerID].permissions.muted == false and players[playerID]:hasPermission("sendMessage") == true then
+	if players[playerID].permissions.muted ~= true and players[playerID]:hasPermission("sendMessage") == true then
 		print("[".. playerID .. "]" .. name .. " : " .. chatMessage)
 	else
 		print("MUTED:[".. playerID .. "]" .. name .. " : " .. chatMessage)

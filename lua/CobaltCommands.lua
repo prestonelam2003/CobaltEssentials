@@ -152,7 +152,7 @@ local function setperm(sender, name, permLvl, ...)
 
 	--security measure.
 	--if type(sender) == "string" or sender.permissions.level >= tonumber(permLvl) then
-		players.database[name].level = permLvl
+		players.database[name].level = tonumber(permLvl)
 	--end
 
 	print(reply)
