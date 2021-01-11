@@ -149,8 +149,8 @@ local defaultVehiclePermissions =
 local defaultPlayerPermissions =
 {
 	["group:inactive"] =	{level = 0},
-	["group:guest"] =		{level = 1,	whitelisted = false,banned = false,	muted = false},
-	["group:default"] =		{level = 1,	whitelisted = false,banned = false,	muted = false, banReason = "You must be signed in to join this server"},
+	["group:guest"] =		{level = 1,	whitelisted = false,banned = false,	muted = false, banReason = "You must be signed in to join this server"},
+	["group:default"] =		{level = 1,	whitelisted = false,banned = false,	muted = false},
 	["group:mod"] =			{level = 5,	whitelisted = true,	banned = false,	muted = false},
 	["group:admin"] =		{level = 10,whitelisted = true,	banned = false,	muted = false},
 	["group:owner"] =		{level = 11,whitelisted = true,	banned = false,	muted = false}
