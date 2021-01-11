@@ -22,6 +22,7 @@ function startRCON(port, path, cpath)
 
 	socket = require("socket")
 
+	utils = require("CobaltUtils")
 
 	server = socket.udp()
 	server:settimeout(0.1)
@@ -32,7 +33,7 @@ function startRCON(port, path, cpath)
 	RegisterEvent("RCONreply","RCONreply")
 	CreateThread("listenRCON",500)
 
-	print("RCON open on port " .. port)
+	CElog("RCON open on port " .. port,"RCON")
 
 end
 
@@ -83,7 +84,7 @@ function RCONsend(rconID, message)
 			splitMes[1] = splitMes[1] .. "..."
 	end
 
-	print("RCON > " .. rconID .. ": " .. splitMes[1])
+	CElog("RCON > " .. rconID .. ": " .. splitMes[1],"RCON")
 
 	if rconID == "R-1" then
 		for k,v in pairs(rconClients) do
@@ -141,7 +142,7 @@ function RCONreply(reply)
 			splitReply[1] = splitReply[1] .. "..."
 		end
 		
-		print("RCON REPLY: " .. splitReply[1])
+		CElog("RCON REPLY: " .. splitReply[1],"RCON")
 	end
 
 	server:sendto(magicChar .. "print" .. reply , ip, port)

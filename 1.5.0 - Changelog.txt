@@ -32,10 +32,17 @@ Implemented optional command arguments
 Added the ability to use a + symbol to represent a space in a player's name when using commands.
 Fixed false values not saving to json configs.
 
-
-
-TODO:
-Fix setting nil values to a table corrupting the table in normal people json
+-------Cobalt Essentials 1.5.3 Changelog-------
+Reworked how groups function in code
+Added getGroup method to players
+Implemented support for using a playerID in a command by using {<ID>} instead of the username
+Overhauled Console output with new `CElog()` function.
+Added show debug option to config
+Added the ability to color text in the console, assuming the console you are using is compliant with ANSI escape sequences.
+Applied the aforementioned colors in a bunch of places.
+Fixed bug that caused json files to be corrupted upon shrinking
+Added more error-trapping for setgroup and setperm
+Implemented security measures to setgroup and setperm to disallow them from granting a permission level higher than the sender's
 
 
 

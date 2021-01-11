@@ -31,8 +31,6 @@ RegisterEvent("HandleSyncEvent","HandleSyncEvent")
 
 RegisterEvent("set","set")
 
-print("CobaltDB Open")
-
 ----------------------------------------------------------EVENTS-----------------------------------------------------------
 --give the CobaltDBconnector all the information it needs without having to re-calculate it all
 function initDB(path, cpath, dbpath, config)
@@ -55,6 +53,7 @@ function initDB(path, cpath, dbpath, config)
 		jsonFile:close()
 	end
 
+	CElog("CobaltDB Initiated","CobaltDB")
 	TriggerLocalEvent("onCobaltDBhandshake",CobaltDBport)
 
 	connector = socket.udp()
@@ -65,14 +64,14 @@ function openDatabase(DBname)
 	local jsonPath = dbpath .. DBname .. ".json"
 
 	local jsonFile, error = io.open(jsonPath,"r")
-	--print(jsonFile, error)
+	--CElog(jsonFile, error)
 
 	local databaseLoaderInfo = "loaded" -- defines if the DB was created just now or if it was pre-existing.
 
 	if jsonFile == nil then
 		databaseLoaderInfo = "new"
-		--print("CobaltDB: json file does not exist, creating one now.")
-		--print(jsonFile, error)
+		CElog("JSON file does not exist, creating a new one.","CobaltDB")
+		--CElog(jsonFile, error)
 		jsonFile, error = io.open(jsonPath, "w")
 		local openAttempts = 1
 		if error then
@@ -122,9 +121,13 @@ function updateDatabase(DBname)
 	loadedJson[DBname] = json.stringify(loadedDatabases[DBname])
 
 	--write table
-	local jsonFile, error = io.open(dbpath .. DBname .. ".json","r+")
+	local filePath = dbpath .. DBname
+	local jsonFile, error = io.open(filePath .. ".temp","w")
 	jsonFile:write(loadedJson[DBname])
 	jsonFile:close()
+	os.remove(filePath .. ".json")
+	os.rename(filePath .. ".temp", filePath .. ".json")
+	CElog("Updated: '" .. dbpath .. DBname .. ".json'","DEBUG")
 end
 
 

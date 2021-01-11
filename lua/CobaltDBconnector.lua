@@ -53,7 +53,7 @@ databaseTemplate.metatable =
 				k, v = next(indexTable, k)
 	
 				v = database[k]
-				--print(k, v ,database[k])
+				--CElog(k, v ,database[k])
 				
 				if v ~= nil then
 						return k, v
@@ -116,10 +116,10 @@ local function newDatabase(DBname)
 	databaseLoaderInfo = server:receive()
 	if databaseLoaderInfo ~= nil then
 		if databaseLoaderInfo:sub(1,2) == "E:" then
-			print("CobaltDB: " .. DBname .. " could not be opened after 5 tries due to: " .. databaseLoaderInfo:sub(3))
+			CElog(DBname .. " could not be opened after 5 tries due to: " .. databaseLoaderInfo:sub(3),"CobaltDB")
 			return nil, "CobaltDB failed to load " .. DBname .. "after 5 tries due to : " .. databaseLoaderInfo:sub(3)
 		else
-			print("CobaltDB: " .. DBname .. " sucessfully opened.")
+			CElog(DBname .. " sucessfully opened.","CobaltDB")
 
 			newDatabase = 
 			{
@@ -289,7 +289,7 @@ local function openDatabase(DBname)
 	
 	TriggerLocalEvent("openDatabase", DBname)
 	if server:receive() == DBname then
-		print("CobaltDB: " .. DBname .. " sucessfully opened.")
+		CElog(DBname .. " sucessfully opened.","CobaltDB")
 		
 		--server:close()
 		return true

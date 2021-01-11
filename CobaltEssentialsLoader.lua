@@ -5,7 +5,7 @@
 
 RegisterEvent("onCobaltDBhandshake","onCobaltDBhandshake") --to make sure cobaltDB loads first
 
-cobaltVersion = "1.5.2"
+cobaltVersion = "1.5.3"
 
 pluginName = debug.getinfo(1).source:sub(2)
 local s,e
@@ -28,39 +28,39 @@ package.cpath = package.cpath .. ";;" .. resources .. "/Server/" .. pluginName .
 
 
 --local neededFiles = {"lua/socket.lua","lua/mime.lua","lua/ltn12.lua","socket/core.dll","mime/core.dll"}
+utils = require("CobaltUtils")
 print("\n\n\n\n")
-print("-------------Loading Cobalt Essentials v" .. cobaltVersion .. "-------------")
+CElog("-------------Loading Cobalt Essentials v" .. cobaltVersion .. "-------------")
 	CE = require("CobaltEssentials")
 
-	print("Loading CobaltCommands")
-		CC = require("CobaltCommands")
+	CElog("Utils Loaded")
 
-	utils = require("CobaltUtils")
-		print("Utils Loaded")
+	CElog("Loading CobaltCommands")
+		CC = require("CobaltCommands")
 
 	--TODO: WRITE A WAY TO LOAD THESE CONFIG OPTIONS AS AN OVERRIDE TO MAKE SERVER UPDATES/PORTS EASIER?
 	--CobaltConfigOld = require("CobaltConfig")
 		--print("CobaltConfig Loaded")
 
 	json = require("json")
-		print("json Lib Loaded")
+		CElog("json Lib Loaded")
 
 	CobaltDB = require("CobaltDBconnector")
-		print("CobaltDB Connector Loaded")
+		CElog("CobaltDB Connector Loaded")
 
 --FOR WHEN COBALTDB REPORTS BACK
 function onCobaltDBhandshake(port)
 	CobaltDB.init(port)
 
 	players = require("CobaltPlayerMngr")
-		print("Cobalt Player Manager Loaded")
+		CElog("Cobalt Player Manager Loaded")
 
 	configMngr = require("CobaltConfigMngr")
-		print("Config Manager Loaded")
+		CElog("Config Manager Loaded")
 
 		--Load CobaltExtensions & any of it's extensions
 	extensions = require("CobaltExtensions")
-		print("CobaltExtensions Loaded")
+		CElog("CobaltExtensions Loaded")
 
 
 	--See if CobaltConfig needs to be loaded for compatability
@@ -69,13 +69,13 @@ function onCobaltDBhandshake(port)
 	end
 
 	if config.RCONenabled.value == true then
-		print("opening RCON on port " .. config.RCONport.value)
+		CElog("opening RCON on port " .. config.RCONport.value)
 		TriggerLocalEvent("startRCON", config.RCONport.value, package.path, package.cpath)
 	end
 	
 	--WARNING for not having enough players in the config.
 	if beamMPconfig.MaxPlayers < config.maxActivePlayers.value then
-		print("/!\\ ---THE SERVER'S MAX PLAYER COUNT IS GREATER THAN THE MAX ACTIVE PLAYERS IN THE COBALT CONFIG--- /!\\")
+		CElog("/!\\ ---THE SERVER'S MAX PLAYER COUNT IS GREATER THAN THE MAX ACTIVE PLAYERS IN THE COBALT CONFIG--- /!\\","WARN")
 		--Sleep(2000)
 	end
 
@@ -88,19 +88,19 @@ function onCobaltDBhandshake(port)
 	end
 		
 	if tonumber(highestCap) > tonumber(beamMPconfig.Cars) then
-		print("/!\\ -------------------------------SERVERSIDE-VEHICLE-CAP-FOR-CARS-TOO-LOW------------------------------- /!\\")
-		print("		The serverside vehicle cap (Cars) in the config is too low.")
-		print("		If you do not turn it up, dynamic vehicle caps based on permission level will not work!")
-		print("		Please adjust the serverside vehicle cap to " .. highestCap .. " or greater to avoid any problems.")
-		print("/!\\ -------------------------------SERVERSIDE-VEHICLE-CAP-FOR-CARS-TOO-LOW------------------------------- /!\\")
+		CElog("/!\\ -------------------------------SERVERSIDE-VEHICLE-CAP-FOR-CARS-TOO-LOW------------------------------- /!\\","WARN")
+		CElog("		The serverside vehicle cap (Cars) in the config is too low.","WARN")
+		CElog("		If you do not turn it up, dynamic vehicle caps based on permission level will not work!","WARN")
+		CElog("		Please adjust the serverside vehicle cap to " .. highestCap .. " or greater to avoid any problems.","WARN")
+		CElog("/!\\ -------------------------------SERVERSIDE-VEHICLE-CAP-FOR-CARS-TOO-LOW------------------------------- /!\\","WARN")
 		beamMPcfg.Cars = highestCap
 		--Sleep(5000)
 	end
 end
 
 --
-print("-------------CobaltEssentials Config-------------")
+CElog("-------------CobaltEssentials Config-------------")
 	--CobaltConfigOld.loadConfig()
 	--for k,v in pairs(config.beamMP) do print(tostring(k) .. ": " .. tostring(v)) end
 
-print("-------------Cobalt Essentials v" .. cobaltVersion .. " Loaded-------------")
+CElog("-------------Cobalt Essentials v" .. cobaltVersion .. " Loaded-------------")

@@ -111,20 +111,18 @@ playerTemplate.permissions.metatable =
 {
 	__index = function(table, key)
 		if key == "group" then
-			if table.CobaltPlayerMgnr_playerObject.guest == true then
-				return "guest"
-			else
-				return table.CobaltPlayerMgnr_database.group or "default"
-			end
-		end
-
-		if table.CobaltPlayerMgnr_playerObject and rawget(table.CobaltPlayerMgnr_playerObject, "gamemode") and table.CobaltPlayerMgnr_playerObject.gamemode.mode > 0 then
-			-- Mode-Map [-1:undefined 0:active, 1:inQueue 2:spectator]
-			return inactivePermissions[key] or defaultPermissions[key]
+			local group, groupName = table.CobaltPlayerMgnr_playerObject:getGroup()
+			return groupName
 		else
-			return (table.CobaltPlayerMgnr_database:exists() and table.CobaltPlayerMgnr_database[key]) or (table.group and players.database["group:" .. table.group]:exists() and players.database["group:" .. table.group][key]) or defaultPermissions[key]
-			--return (table.CobaltPlayerMgnr_database:exists() and table.CobaltPlayerMgnr_database[key]) or defaultPermissions[key]
+			return (table.CobaltPlayerMgnr_database:exists() and table.CobaltPlayerMgnr_database[key]) or players.database["group:" .. table.group][key] or defaultPermissions[key]
 		end
+		--if table.CobaltPlayerMgnr_playerObject and rawget(table.CobaltPlayerMgnr_playerObject, "gamemode") and table.CobaltPlayerMgnr_playerObject.gamemode.mode > 0 then
+			-- Mode-Map [-1:undefined 0:active, 1:inQueue 2:spectator]
+			--return inactivePermissions[key] or defaultPermissions[key]
+		--else
+			--return (table.CobaltPlayerMgnr_database:exists() and table.CobaltPlayerMgnr_database[key]) or (table.group and players.database["group:" .. table.group]:exists() and players.database["group:" .. table.group][key]) or defaultPermissions[key]
+			--return (table.CobaltPlayerMgnr_database:exists() and table.CobaltPlayerMgnr_database[key]) or defaultPermissions[key]
+		--end
 	end,
 
 	__newindex = function(table, key, value)
@@ -135,21 +133,17 @@ playerTemplate.permissions.metatable =
 		
 		local newTable = {}
 
-		if table.CobaltPlayerMgnr_playerObject.guest == true then
-			newTable.group = "guest"
-		end
-
 		if table.CobaltPlayerMgnr_database:exists() then
 			for k,v in pairs(table.CobaltPlayerMgnr_database) do
 				newTable[k] = v
 			end
 		end
 
-		if table.group then
-			for k,v in pairs(players.database["group:" .. table.group]) do
-				if newTable[k] == nil then
-					newTable[k] = players.database["group:" .. table.group][k]
-				end
+		local group, groupName = table.CobaltPlayerMgnr_playerObject:getGroup()
+		newTable.group = groupName
+		for k,v in pairs(group) do
+			if newTable[k] == nil then
+				newTable[k] = group[k]
 			end
 		end
 
@@ -223,9 +217,9 @@ local function new(name, role, isGuest)
 	setmetatable(newPlayer, playerTemplate.metatable)
 
 	--RECORD NAME
-	if newPlayer.permissions.CobaltPlayerMgnr_database:exists() then
-		newPlayer.permissions.lastName = newPlayer.name
-	end
+	--if newPlayer.permissions.CobaltPlayerMgnr_database:exists() then
+		--newPlayer.permissions.lastName = newPlayer.name
+	--end
 
 	--CAN THE PLAYER JOIN?
 	if newPlayer.permissions.whitelisted == false and config.enableWhitelist.value == true then
@@ -286,12 +280,12 @@ local function bindPlayerToID(name, playerID)
 	end
 	unboundAuthenticated[name] = nil
 
-	print(tostring(player))
+	CElog(tostring(player))
 	
 end
 
 local function cancelBind(name, reason)
-	print(name .. " was blocked from joining due to: " .. reason)
+	CElog(name .. " was blocked from joining due to: " .. reason)
 	unboundAuthenticated[name] = nil
 	return reason
 end
@@ -388,7 +382,7 @@ local function hasPermission(player, permission)
 	local highestLevel
 	
 	if permissions[permission]:exists() then
-		print(permission)
+		--CElog(permission)
 
 		for level, value in pairs(permissions[permission]) do
 			if level ~= "description" and (player.permissions.level >= tonumber(level) and (highestLevel == nil or (tonumber(level) > tonumber(highestLevel)))) and permissions[permission][level] ~= nil then
@@ -425,7 +419,7 @@ local function canSpawn(player, vehID,  data)
 						for slot, part2 in pairs(data.vcf.parts) do
 							if part == part2 then
 								if value > player.permissions.level then
-									print('Insufficent Permissions for the part: "' .. part .. "' Spawn Blocked" )
+									CElog('Insufficent Permissions for the part: "' .. part .. "' Spawn Blocked" )
 									return false, "Insufficent permissions for the part " .. part
 								
 								end
@@ -437,27 +431,65 @@ local function canSpawn(player, vehID,  data)
 				end
 				
 				if #player.vehicles - ((player.vehicles[vehID] == nil and 0) or 1) >= player:hasPermission("vehicleCap") then
-						print("Vehicle Cap Reached, Spawn Blocked")
+						CElog("Vehicle Cap Reached, Spawn Blocked")
 						return false, "Vehicle Cap Reached"
 				end
 			else
-				print("Insufficent Permissions for this Vehicle, Spawn Blocked")
+				CElog("Insufficent Permissions for this Vehicle, Spawn Blocked")
 				return false, "Insufficent permissions to spawn '" .. data.name .. "'"
 			end
 		else
-			print("Insufficent Permissions, Spawn Blocked")
+			CElog("Insufficent Permissions, Spawn Blocked")
 			return false, "Insufficent Spawn Permissions"
 		end
 	
 		return true
 	else
-		print("Vehicle JSON could not be read for some reason, Try again.")
+		CElog("Vehicle JSON could not be read for some reason, Try again.")
 		return false, "There was an error processing your car, please try again."
 	end
 end
 	
 local function canExecute(player, command)
 	return player.permissions.level >= command.level and command.sourceLimited ~= 2
+end
+
+--returns the group object and group name that the player belongs to.
+local function getGroup(player)
+	--Mode-Map [-1:undefined 0:active, 1:inQueue 2:spectator]
+	if player.gamemode ~= nil and player.gamemode.mode > 0 then
+		--player is inactive/spectator
+		--CElog(player.name .. " joined group 'inactive'")
+		return players.database["group:inactive"], "inactive"
+	else
+		--player is active
+		if player.guest == true then
+			--guest
+			--CElog(player.name .. " joined group 'guest'")
+			return players.database["group:guest"], "guest"
+		else
+			--no guest
+			if player.permissions.CobaltPlayerMgnr_database.group == nil then
+				--default
+				--CElog(player.name .. " joined group 'default'")
+				return players.database["group:default"], "default"
+			else
+				--has a group assigned
+				local assignedGroup = player.permissions.CobaltPlayerMgnr_database.group
+
+				if players.database["group:" .. assignedGroup] ~= nil then
+					--group exists
+					--CElog(player.name .. " joined group '".. assignedGroup .."'")
+					return players.database["group:" .. assignedGroup], assignedGroup
+				else
+					--group doesn't exist, to default
+					--CElog("WARNING: " .. player.name .. " could not join non-existent group:'".. assignedGroup .. "' so their group was set to default")
+					return players.database["group:default"], "default"
+				end
+			end
+		end
+	end
+	--return group, groupName
 end
 
 --DEPRECATED
@@ -509,6 +541,7 @@ playerTemplate.methods.setGamemode = setGamemode
 playerTemplate.methods.hasPermission = hasPermission
 playerTemplate.methods.canSpawn = canSpawn
 playerTemplate.methods.canExecute = canExecute
+playerTemplate.methods.getGroup = getGroup
 
 players.getPlayerByName = getPlayerByName
 ----FUNCTIONS----

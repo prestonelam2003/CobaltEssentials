@@ -73,6 +73,11 @@ local function applyDefaults(targetDatabase, tables)
 				targetDatabase[tableName][key] = value
 			end
 			appliedTables[tableName] = tableName
+		else
+			--database exists, temporary fix for CE 1.5.2 to fix commands.
+			if targetDatabase.CobaltDB_databaseName == "commands" and type(targetDatabase[tableName].arguments) ~= type(table.arguments) then
+				targetDatabase[tableName].arguments = table.arguments
+			end
 		end
 	end
 	return appliedTables
@@ -91,8 +96,10 @@ local defaultConfig =
 	commandPrefix =		{value = "/",			description = "The character placed at the beginning of a chat message when using a command"},
 	maxActivePlayers =	{value = 5,				description = "max amount of active/nonspectator players allowed on a server, any further players will be spectator and placed on a queue."},
 	enableWhitelist =	{value = false,			description = "weather or not the whitelist is enabled"},
+	enableDebug =		{value = false,			description = "weather or not the server will output debug messages."},
+	enableColors =		{value = true,			description = "weather or not console outputs can utilize colors. Causes problems with environments missing ANSI escape sequence support. Requires Restart"},
 
-	RCONenabled =		{value = true,			description = "weather or not the server should run a q3 compliant rcon server for remote acess to the server"},
+	RCONenabled =		{value = true,			description = "weather or not the server runs a q3 compliant rcon server for remote acess to the server. Requires Restart"},
 	RCONport =			{value = 20814,			description = "The port used to host the server. Since CE is external to beamMP make sure to not place this on the same port as the server."},
 	RCONpassword =		{value = "password",	description = "The password required to connect to the RCON"},
 	RCONkeepAliveTick = {value = 30,			description = "The amount of seconds between ticks sent to RCONclients to keep the connections alive, false to disable, This may not work?"},

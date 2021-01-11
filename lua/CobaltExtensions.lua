@@ -14,15 +14,15 @@ loaded = {}
 local eventAllowed = true
 
 local function init()
-	print("-------------Loading Extensions-------------")
+	CElog("-------------Loading Extensions-------------")
 
 	local extensionsToLoad = utils.readCfg(resources .. "/server/" .. pluginName .. "/LoadExtensions.cfg")
 
 	for extensionName,extensionPath in pairs(extensionsToLoad) do
-		--print(tostring(extensionName) .. ": " .. tostring(extensionPath))
+		--CElog(tostring(extensionName) .. ": " .. tostring(extensionPath))
 		M.load(extensionName, extensionPath)
 	end
-	print("-------------Extensions Loaded-------------")
+	CElog("-------------Extensions Loaded-------------")
 end
 
 ----------------------------------------------------------EVENTS-----------------------------------------------------------
@@ -42,7 +42,7 @@ local function load(extension, extensionPath)
 
 		module.onInit()
 
-		print("Loaded Extension " .. extension)
+		CElog("Loaded Extension " .. extension)
 	end
 end
 

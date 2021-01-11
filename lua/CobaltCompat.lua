@@ -9,13 +9,13 @@
 
 local M = {}
 
-print("/!\\ ------------------------------------------------COBALT-COMPAT------------------------------------------------ /!\\")
-print("    It appears you are still using CobaltConfig.lua, CobaltConfig.lua is deprecated.")
-print("    You should be using CobaltDB instead.")
-print("    All of your settings from CobaltConfig.lua will be transfered over to CobaltDB.")
-print("    When after this session, please delete CobaltConfig as all of your settings have been transfered to CobaltDB")
-print("    If you do not switch from CobaltConfig, various features may act up between sessions.")
-print("/!\\ ------------------------------------------------COBALT-COMPAT------------------------------------------------ /!\\")
+CElog("/!\\ ------------------------------------------------COBALT-COMPAT------------------------------------------------ /!\\","WARN")
+CElog("    It appears you are still using CobaltConfig.lua, CobaltConfig.lua is deprecated.","WARN")
+CElog("    You should be using CobaltDB instead.","WARN")
+CElog("    All of your settings from CobaltConfig.lua will be transfered over to CobaltDB.","WARN")
+CElog("    When after this session, please delete CobaltConfig as all of your settings have been transfered to CobaltDB","WARN")
+CElog("    If you do not switch from CobaltConfig, various features may act up between sessions.","WARN")
+CElog("/!\\ ------------------------------------------------COBALT-COMPAT------------------------------------------------ /!\\","WARN")
 Sleep(10000)
 
 local function init()
@@ -83,12 +83,12 @@ end
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 local function registerUser(identifier, IDtype, permissionLevel, specialPerms) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
 	--print("CE.setPermission() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
-	print("Registered " .. identifier .. " as ID Type " .. IDtype .. " @" .. permissionLevel)
+	CElog("Registered " .. identifier .. " as ID Type " .. IDtype .. " @" .. permissionLevel)
 
 	if IDtype == 1 then
 		players.database[identifier].level = permissionLevel
 	else
-		print("ALL PLAYERS MUST USE IDTYPE = 1 (DISCORD ID)")
+		CElog("ALL PLAYERS MUST USE IDTYPE = 1 (DISCORD ID)")
 	end
 end
 
@@ -105,7 +105,7 @@ end
 --POST: the command is added to the commands table.
 local function registerCommand(command, func, reqPerm, desc, argCount, RCONonly) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
 	--print("CE.registerCommand() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'commands' database to edit it directly.")
-	print("Registered " .. command .. " Command @" .. reqPerm)
+	CElog("Registered " .. command .. " Command @" .. reqPerm)
 
 	commands[command].level = reqPerm
 	commands[command].arguments = argCount
@@ -122,7 +122,7 @@ end
 
 local function registerVehicle(name, reqPerm) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
 	--print("CE.registerVehicle() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'vehicles' database to edit it directly.")
-	print("Set " .. name .. " @" .. reqPerm)
+	CElog("Set " .. name .. " @" .. reqPerm)
 
 	vehiclePermissions[name].level = reqPerm
 end
@@ -130,23 +130,23 @@ end
 --POST: adds a player to the whitelist for this session
 local function addWhitelist(identifier, IDtype) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
 	--print("CE.addWhitelist() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
-	print("Added " .. identifier .. " as ID Type " .. IDtype .. " to the whitelist" )
+	CElog("Added " .. identifier .. " as ID Type " .. IDtype .. " to the whitelist" )
 	
 	if IDtype == 1 then
 		players.database[identifier].whitelisted = true
 	else
-		print("ALL PLAYERS MUST USE IDTYPE = 1 (DISCORD ID)")
+		CElog("ALL PLAYERS MUST USE IDTYPE = 1 (DISCORD ID)")
 	end
 end
 
 local function ban(identifier, IDtype) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
 	--print("CE.ban() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
-	print("Banned " .. identifier .. " as ID Type " .. IDtype .. " from the server" )
+	CElog("Banned " .. identifier .. " as ID Type " .. IDtype .. " from the server" )
 	
 	if IDtype == 1 then
 		players.database[identifier].banned = true
 	else
-		print("ALL PLAYERS MUST USE IDTYPE = 1 (DISCORD ID)")
+		CElog("ALL PLAYERS MUST USE IDTYPE = 1 (DISCORD ID)")
 	end
 end
 

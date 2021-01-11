@@ -42,18 +42,18 @@ local function ban(sender, name, reason, ...)
 		players.database[name].banReason = reason
 	end
 
-	print("Banned " .. name .. " for: " .. reason)
+	CElog("Banned " .. name .. " for: " .. reason)
 	return "Banned " .. name .. " for: " .. reason
 end
 
 local function unban(sender, name)
-	print("unbanned " .. name)
+	CElog("Unbanned " .. name)
 	players.database[name].banned = false
 	return "Unbanned " .. name
 end
 
 local function mute(sender, name, reason, ...)
-	reason = reason or "No reason"
+	reason = reason or "Reason not specified."
 	local player = players.getPlayerByName(name)
 	if player then
 		player:setMuted(true, reason)
@@ -62,7 +62,7 @@ local function mute(sender, name, reason, ...)
 		players.database[name].muteReason = reason
 	end
 
-	print("Muted " .. name .. " for: " .. reason)
+	CElog("Muted " .. name .. " for: " .. reason)
 	return "You have muted " .. name .. " for: " .. reason
 end
 
@@ -74,7 +74,7 @@ local function unmute(sender, name, ...)
 		players.database[name].muted = false
 	end
 
-	print("unmuted " .. name)
+	CElog("unmuted " .. name)
 	return "You have unmuted " .. name
 end
 
@@ -150,28 +150,46 @@ end
 
 local function setperm(sender, name, permLvl, ...)
 	--local players = CE.getPlayers()
-	local reply = "Set level of " .. name .. " to " .. permLvl
-
+	local reply
 
 	--security measure.
-	--if type(sender) == "string" or sender.permissions.level >= tonumber(permLvl) then
+	if sender.ip ~= nil or sender.permissions.level >= tonumber(permLvl) then
 		players.database[name].level = tonumber(permLvl)
-	--end
+		reply = "Set level of " .. name .. " to " .. permLvl
+	else
+		reply = "Unable to set level of " .. name .. " to " .. permLvl .. " because it exceeds your own level."
+	end
 
-	print(reply)
+	CElog(reply)
 	return reply
 end
 local function setgroup(sender, name, group, ...)
 	--local players = CE.getPlayers()
-	local reply = "Set group of " .. name .. " to " .. group
+	local reply = ""
+
+	if group == "none" then
+		reply = "Cleared the groups of " .. name
+		players.database[name].group = nil
+	elseif players.database["group:".. group]:exists() then
+		--security measure.
+		if sender.ip ~= nil or sender.permissions.level >= (players.database["group:".. group].level or 0) then
+			reply = "Set group of " .. name .. " to " .. group
+			players.database[name].group = group
+		else
+			reply = "Unable to set group of " .. name .. " to " .. group .. " because the permission level of the group (".. (players.database["group:".. group].level or 0) ..") exceeds yours. (".. sender.permissions.level .. ")"
+		end
+	else
+		reply = "Unable to set " .. name .. " group, " .. group .. " does not exist"
+	end
+
 
 
 	--security measure.
 	--if type(sender) == "string" or sender.permissions.level >= tonumber(permLvl) then
-		players.database[name].group = group
+		--players.database[name].group = group
 	--end
 
-	print(reply)
+	CElog(reply)
 	return reply
 end
 local function whitelist(sender, arguments)
@@ -244,12 +262,12 @@ end
 
 local function lua(sender, toExecute, ...)
 	
-	print(sender.ID .. " executed: " .. toExecute .. "\n")
+	CElog(sender.ID .. " executed: " .. toExecute .. "\n")
 	return load(toExecute)()
 end
 
 local function testCommand(sender, ...)
-	print("Test Command Executed")
+	CElog("Test Command Executed")
 	return "Test Sucessful"
 end
 

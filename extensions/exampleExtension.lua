@@ -16,7 +16,7 @@ local function onTick(age)
 	if age > lastAnnounce + announceStep then
 		local output = "Uptime: " .. (lastAnnounce + announceStep)/60000 .. " Minutes"
 		
-		print(output)
+		CElog(output)
 
 		lastAnnounce = lastAnnounce + announceStep
 	end

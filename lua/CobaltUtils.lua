@@ -35,8 +35,46 @@ function DropPlayer(playerID, reason)
 	end
 	DropPlayerV(playerID, reason)
 end
+---------------------------------------------------------------------------------------------------------------------------
+
+function CElog(string, heading, debug)
+	heading = heading or "Cobalt"
+	debug = debug or false
+
+	local out = ("[" .. color(90) .. os.date("%d/%m/%Y %X", os.time()) .. color(0) ..  "]"):gsub("/0","/")
+
+	if heading == "WARN" then
+		out =  out .. " [" .. color(31) .. "WARN" .. color(0) .. "] " .. color(31) .. string
+	elseif heading == "RCON" then
+		out = out .. " [" .. color(33) .. "RCON" .. color(0) .. "] " .. color(0) .. string
+	elseif heading == "CobaltDB" then
+		out = out .. " [" .. color(35) .. "CobaltDB" .. color(0) .. "] " .. color(0) .. string
+	elseif heading == "CHAT" then
+		out = out .. " [" .. color(32) .. "CHAT" .. color(0) .. "] " .. color(0) .. string
+	elseif heading == "DEBUG" and ((config == nil or config.enableDebug.value == true) or (query and query("config","enableDebug","value") == true)) then
+		out = out .. " [" .. color(97) .. "DEBUG" .. color(0) .. "] " .. color(0) .. string
+	else
+		out = out .. " [" .. color(94) .. heading .. color(0) .. "] " .. color(0) .. string
+	end
 
 
+	out = out .. color(0)
+	print(out)
+	return out
+end
+
+--changes the color of the console.
+function color(fg,bg)
+	if (config == nil or config.enableColors.value == true) and true then
+		if bg then
+			return string.char(27) .. '[' .. tostring(fg) .. ';' .. tostring(bg) .. 'm'
+		else
+			return string.char(27) .. '[' .. tostring(fg) .. 'm'
+		end
+	else
+		return ""
+	end
+end
 
 function split(s, sep)
 	local fields = {}
@@ -63,7 +101,7 @@ function output(ID, message)
 	if type(ID) == "string" then
 
 		if ID == "C" then
-			print(message)
+			CElog(message)
 		elseif ID:sub(1,1) == "R" then
 			TriggerGlobalEvent("RCONsend", ID, message)
 		end

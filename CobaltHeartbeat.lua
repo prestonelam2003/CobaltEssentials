@@ -4,9 +4,6 @@
 
 CreateThread("heartbeat", 250)
 
-
-print("Started Heartbeat")
-
 function heartbeat()
 	
 	TriggerLocalEvent("onTick")

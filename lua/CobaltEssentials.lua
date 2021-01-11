@@ -39,7 +39,7 @@ RegisterEvent("onVehicleDeleted","onVehicleDeleted")
 RegisterEvent("onRconCommand","onRconCommand")
 RegisterEvent("onNewRconClient","onNewRconClient")
 
-print("CobaltEssentials Initiated")
+CElog("CobaltEssentials Initiated")
 
 ----------------------------------------------------------EVENTS-----------------------------------------------------------
 
@@ -76,7 +76,7 @@ end
 
 --The first time a player has began connecting to the server, this is called.
 function onPlayerFirstAuth(name)
-	print("onPlayerFirstAuth: " .. name)
+	CElog("onPlayerFirstAuth: " .. name)
 
 	if extensions.triggerEvent("onPlayerFirstAuth", players[ID]) == false then
 		--return("You were blocked from joining by an extension")
@@ -102,12 +102,12 @@ function onPlayerAuth(name, role, isGuest)
 		authenticatedMessage = authenticatedMessage .. " authenticated as a " .. role
 	end
 	authenticatedMessage = authenticatedMessage .. " @" .. player.permissions.level
-	print(authenticatedMessage)
+	CElog(authenticatedMessage)
 
 end
 
 function onPlayerConnecting(ID)
-	print("On Player Connecting: " .. ID)
+	CElog("On Player Connecting: " .. ID)
 
 	local name = GetPlayerName(ID)
 
@@ -118,7 +118,7 @@ end
 
 function onPlayerJoining(ID)
 
-	print("On Player Joining: " .. ID)
+	CElog("On Player Joining: " .. ID)
 
 	if extensions.triggerEvent("onPlayerJoining", players[ID]) == false then
 		DropPlayer(ID,"You've been kicked from the server!")
@@ -129,7 +129,7 @@ function onPlayerJoining(ID)
 end
 
 function onPlayerJoin(ID)
-	print("On Player Join: " .. ID)
+	CElog("On Player Join: " .. ID)
 	
 	if extensions.triggerEvent("onPlayerJoin", players[ID]) == false then
 		DropPlayer(ID,"You've been kicked from the server!")
@@ -145,14 +145,14 @@ function onPlayerDisconnect(ID)
 
 	if players[ID] then
 		if players[ID].dropReason then
-			print("On Player Disconnect: " .. ID .. " | Dropped for " .. players[ID].dropReason)
+			CElog("On Player Disconnect: " .. ID .. " | Dropped for " .. players[ID].dropReason)
 		else
-			print("On Player Disconnect: " .. ID .. " | Disconnected")
+			CElog("On Player Disconnect: " .. ID .. " | Disconnected")
 		end
 
 		players[ID] = nil
 	else
-		print("On Player Disconnect: " .. ID .. " | Left while Loading.")
+		CElog("On Player Disconnect: " .. ID .. " | Left while Loading.")
 	end
 
 	players.updateQueue()
@@ -168,7 +168,7 @@ function onChatMessage(playerID, name ,chatMessage)
 
 
 	if chatMessage:sub(1,1) == config.commandPrefix.value then
-		print("Command")
+		--CElog("Command")
 
 		local command = split(chatMessage:sub(2)," ")[1]
 
@@ -184,7 +184,6 @@ function onChatMessage(playerID, name ,chatMessage)
 		--args[0] = playerID
 
 		--run the command and react accordingly
-		print("trying to execute command")
 		
 		local reply = M.command(players[playerID], command, args)
 		if reply ~= nil then
@@ -198,9 +197,9 @@ function onChatMessage(playerID, name ,chatMessage)
 	end
 	
 	if players[playerID].permissions.muted ~= true and players[playerID]:hasPermission("sendMessage") == true then
-		print("[".. playerID .. "]" .. name .. " : " .. chatMessage)
+		CElog("[".. playerID .. "]" .. name .. " : " .. chatMessage,"CHAT")
 	else
-		print("MUTED:[".. playerID .. "]" .. name .. " : " .. chatMessage)
+		CElog("MUTED:[".. playerID .. "]" .. name .. " : " .. chatMessage,"CHAT")
 		return 1
 	end
 
@@ -227,9 +226,9 @@ function onVehicleSpawn(ID, vehID,  data)
 	reason = reason or "Spawn blocked by extension"
 
 	if canSpawn then
-		print(players[ID].name .. " Spawned a '" .. data.name .. "' (".. ID .."-".. vehID ..")")
+		CElog(players[ID].name .. " Spawned a '" .. data.name .. "' (".. ID .."-".. vehID ..")")
 	else
-		print(players[ID].name .. " Tried to spawn '" .. data.name .. "' (".. ID .."-".. vehID ..") The spawn was blocked due to '" .. reason .. "'")
+		CElog(players[ID].name .. " Tried to spawn '" .. data.name .. "' (".. ID .."-".. vehID ..") The spawn was blocked due to '" .. reason .. "'")
 		players[ID]:tell("Unable to spawn vehicle: " .. reason)
 		TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
@@ -249,9 +248,9 @@ function onVehicleEdited(ID, vehID,  data)
 	reason = reason or "Spawn blocked by extension"
 
 	if canSpawn then
-		print(players[ID].name .. " edited their '" .. data.name .. "' (".. ID .."-".. vehID ..")")
+		CElog(players[ID].name .. " edited their '" .. data.name .. "' (".. ID .."-".. vehID ..")")
 	else
-		print(players[ID].name .. "tried to edit their '" .. data.name .. "' (".. ID .."-".. vehID ..") The edit has been blocked, and the vehicle deleted due to " .. reason)
+		CElog(players[ID].name .. "tried to edit their '" .. data.name .. "' (".. ID .."-".. vehID ..") The edit has been blocked, and the vehicle deleted due to " .. reason)
 		TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
 	end
@@ -269,7 +268,7 @@ function onVehicleDeleted(ID, vehID)
 	end
 
 	if players[ID].vehicles[vehID] then
-		print(players[ID].name .. " deleted their '" .. players[ID].vehicles[vehID].name .. "' (".. ID .."-".. vehID ..")")
+		CElog(players[ID].name .. " deleted their '" .. players[ID].vehicles[vehID].name .. "' (".. ID .."-".. vehID ..")")
 		players[ID].vehicles[vehID] = nil
 	end
 end
@@ -279,7 +278,7 @@ function onRconCommand(ID, message, password, prefix)
 	local reply
 
 
-	print(rconClients[ID].ip .. " : " ..prefix .. " " .. password .. " " .. message)
+	CElog(rconClients[ID].ip .. " : " ..prefix .. " " .. password .. " " .. message,"RCON")
 
 	rconClients[ID].lastContact = age
 
@@ -300,16 +299,16 @@ function onRconCommand(ID, message, password, prefix)
 			
 			local reply = M.command(rconClients[ID], command, args)
 
-			--print("RCON REPLIES WITH COMMAND REPLY")
+			--CElog("RCON REPLIES WITH COMMAND REPLY")
 			if reply ~= nil then
 				TriggerGlobalEvent("RCONsend", ID, reply)
 			end
 		else
-			--print("RCON REPLIES WITH BAD COMMAND")
+			--CElog("RCON REPLIES WITH BAD COMMAND")
 			TriggerGlobalEvent("RCONsend", ID, "Unrecognized Command")
 		end
 	else
-		--print("RCON REPLIES WITH BAD PASSWORD")
+		--CElog("RCON REPLIES WITH BAD PASSWORD")
 		TriggerGlobalEvent("RCONsend", ID, "Bad Password")
 	end
 end
@@ -322,6 +321,7 @@ function onNewRconClient(ID, ip, port)
 	client.port = port
 	client.chat = false
 	client.lastContact = age
+	client.type = "RCON"
 
 	client.canExecute = function(client, command)
 		return command.sourceLimited ~= 1
@@ -392,7 +392,7 @@ local function getArguments(sender, command, unhandledArgs)
 		end
 		if argCount < commandArgs then
 			error = "Not enough arguments (" .. commandName .. " takes " .. command.arguments .. ")"
-			print("Not enough arguments")
+			CElog("Not enough arguments")
 		end
 	--loop through the command's requested args
 	elseif type(commandArgs) == "table" then
@@ -432,8 +432,21 @@ local function getArguments(sender, command, unhandledArgs)
 					break --why keep looping through if the rest are empty.
 				end
 			else
+				--switch statement for different types of values
 				if argumentType == "player" then
-					args[index] = args[index]:gsub("+"," ")
+					if args[index]:sub(1,1) == "{" then
+						--local s, e = args[index]:find("}")
+						args[index] = tonumber(args[index]:sub(2,args[index]:find("}")-1))
+						--print(args[index] .. " - id")
+						if players[args[index]] then
+							args[index] = players[args[index]].name
+							--print(args[index] .. " - name")
+						else
+							error = "Bad argument in position " .. index .. ", ID ".. args[index] .. " does not belong to a player!"
+						end
+					else
+						args[index] = args[index]:gsub("+"," ")
+					end
 				end
 			end
 
@@ -454,7 +467,11 @@ end
 -- PRE: a valid command is passed in along with args
 --POST: the command is ran, any return info is passed back from the original function
 local function command(sender, command, args)
+	local message = ""
 	if CobaltDB.tableExists("commands",command) then
+		if sender.playerID then
+			message = message .. sender.name .. ": " .. command .. " " .. args
+		end
 		local commandName = command
 		command = commands[command]
 
@@ -465,7 +482,9 @@ local function command(sender, command, args)
 
 		if sender:canExecute(command) then
 			
-			print((sender.ID or sender.playerID) .. " is Executing " .. commandName)
+			if sender.playerID then
+				CElog(message)
+			end
 
 			if args == nil then
 				return _G[command.orginModule][commandName](sender)
@@ -474,7 +493,7 @@ local function command(sender, command, args)
 			end
 
 		else
-			print("Insufficent Perms")
+			CElog("Insufficent Perms")
 			return "You do not have permission to use this command."
 		end
 
@@ -521,7 +540,7 @@ local function command(sender, command, args)
 		--end
 
 	else
-		print("Command does not exist")
+		CElog("Command does not exist")
 		return "This command does not exist type /help for a list of commands"
 
 	end
