@@ -168,10 +168,10 @@ end
 
 --changes the a value in the table in
 local function set(DBname, tableName, key, value)
-	if value then
-		value = json.stringify(value)
+	if value == nil then
+		value = "null"
 	else
-		value = "nil"
+		value = json.stringify(value)
 	end
 
 	TriggerLocalEvent("set", DBname, tableName, key, value)

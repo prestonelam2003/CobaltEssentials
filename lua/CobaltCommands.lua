@@ -24,6 +24,7 @@ end
 ---------------------------------------------------------FUNCTIONS---------------------------------------------------------
 
 local function kick(sender, name, reason, ...)
+	reason = reason or "You've been kicked from the server!"
 	local player = players.getPlayerByName(name)
 	if player then
 		player:kick(reason)
@@ -32,6 +33,7 @@ local function kick(sender, name, reason, ...)
 end
 
 local function ban(sender, name, reason, ...)
+	reason = reason or "You've been banned from this server."
 	local player = players.getPlayerByName(name)
 	if player then
 		player:ban(reason)
@@ -51,6 +53,7 @@ local function unban(sender, name)
 end
 
 local function mute(sender, name, reason, ...)
+	reason = reason or "No reason"
 	local player = players.getPlayerByName(name)
 	if player then
 		player:setMuted(true, reason)

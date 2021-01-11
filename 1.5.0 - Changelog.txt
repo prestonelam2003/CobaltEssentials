@@ -25,4 +25,17 @@ Fixed setperm because im a dumb idiot
 hotfix to mute/chat, did not fix underlying problem.
 Credit to @Dudekahedron for help with both of these problems.
 
+-------Cobalt Essentials 1.5.2 Changelog-------
+Extensions now have a version
+Reworked command arguments
+Implemented optional command arguments
+Added the ability to use a + symbol to represent a space in a player's name when using commands.
+Fixed false values not saving to json configs.
+
+
+
+TODO:
+Fix setting nil values to a table corrupting the table in normal people json
+
+
 

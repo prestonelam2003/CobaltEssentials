@@ -130,7 +130,7 @@ end
 
 --changes the table
 function set(DBname, tableName, key, value)
-	
+
 	if loadedDatabases[DBname] ~= nil then
 		
 		if loadedDatabases[DBname][tableName] == nil then
@@ -138,7 +138,7 @@ function set(DBname, tableName, key, value)
 		end
 		
 		if key ~= nil then
-			if value == "nil" then
+			if value == "null" then
 				loadedDatabases[DBname][tableName][key] = nil
 			else
 				loadedDatabases[DBname][tableName][key] = json.parse(value)

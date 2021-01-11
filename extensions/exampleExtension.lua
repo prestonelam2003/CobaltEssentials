@@ -1,7 +1,10 @@
 local M = {}
+M.COBALT_VERSION = "1.5.2"
+
 
 local lastAnnounce = 0
 local announceStep = 300000
+
 
 --called whenever the extension is loaded
 local function onInit()

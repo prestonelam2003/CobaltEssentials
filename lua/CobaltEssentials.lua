@@ -365,6 +365,90 @@ local function getRconClients()
 	return rconClients
 end
 
+-- PRE: the sender object, command object, the arguments after the commmand as a string are passed in.
+--POST: the unhandledArgs string is divided up into distinct arguments for the command.
+local function getArguments(sender, command, unhandledArgs)
+	local args = {}
+	local error
+	local commandName = command
+	command = commands[command]
+	local commandArgs = command.arguments
+	--old system/also used for commands with 0 arguments
+	if type(commandArgs) == "number" then
+		args = unhandledArgs
+		--count the arguments
+		local argCount = 0
+		if args ~= nil then
+			args = split(args, " ")
+		
+			for k,v in pairs(args) do
+				if argCount < command.arguments then
+					argCount = argCount + 1
+				else
+					args[argCount] = args[argCount] .. " " .. v
+					args[k] = nil
+				end
+			end
+		end
+		if argCount < commandArgs then
+			error = "Not enough arguments (" .. commandName .. " takes " .. command.arguments .. ")"
+			print("Not enough arguments")
+		end
+	--loop through the command's requested args
+	elseif type(commandArgs) == "table" then
+		args[0] = " " .. unhandledArgs
+		
+		local argString = ""
+		--loop through and get all the args.
+		for index, argumentType in pairs(commandArgs) do
+			argString = argString .. "<" .. argumentType .. ">"
+			local lastArg = args[index - 1]
+			local s, e = lastArg:find(" ")
+			
+			--see if there are even more spaces
+			if s == nil then
+				break
+			end
+			args[index-1] = lastArg:sub(1,s-1)
+			args[index] = lastArg:sub(s+1)
+			--print("'" .. args[index-1] .. "'")
+			--print("'" .. lastArg .. "'")
+			--print("'" .. args[index] .. "'" )
+		end
+		args[0] = nil
+
+		--loop back through again and clean up the final args.
+		for index, argumentType in pairs(commandArgs) do
+			local required = true
+			if argumentType:sub(1,1) == "*" then
+				argumentType = argumentType:sub(2)
+				required = false
+			end
+			--see if the argument is nil
+			if args[index] == nil then
+				if required then
+					error = "Incorrect arguments," .. commandName .. " takes " .. #command.arguments .. "(" .. argString .. ")"
+				else
+					break --why keep looping through if the rest are empty.
+				end
+			else
+				if argumentType == "player" then
+					args[index] = args[index]:gsub("+"," ")
+				end
+			end
+
+		end
+	end
+
+	
+	--clear args if it's an empty table
+	if args == {} then
+		args = nil
+	end
+
+	return args, error
+end
+
 ---------------------------------------------------------FUNCTIONS---------------------------------------------------------
 
 -- PRE: a valid command is passed in along with args
@@ -374,26 +458,13 @@ local function command(sender, command, args)
 		local commandName = command
 		command = commands[command]
 
+		args, error = M.getArguments(sender, commandName, args)
+		if error then
+			return error
+		end
+
 		if sender:canExecute(command) then
-			--count the arguments
-			local argCount = 0
-			if args ~= nil then
-				args = split(args, " ")
-
-				for k,v in pairs(args) do
-					if argCount < command.arguments then
-						argCount = argCount + 1
-					else
-						args[argCount] = args[argCount] .. " " .. v
-						args[k] = nil
-					end
-				end
-			end
-			if argCount < command.arguments then
-				print("Not enough arguments")
-				return "Not enough arguments (" .. commandName .. " takes " .. command.arguments .. ")"
-			end
-
+			
 			print((sender.ID or sender.playerID) .. " is Executing " .. commandName)
 
 			if args == nil then
@@ -464,6 +535,7 @@ M.delayExec = delayExec
 
 ----ACCESSORS----
 M.getRconClients = getRconClients
+M.getArguments = getArguments
 
 ----FUNCTIONS----
 M.command = command

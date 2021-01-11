@@ -3,9 +3,9 @@
 
 --This is to fix BeamMP's apparently dysfunctional modules, it unfortunately breaks hotswapping
 
-RegisterEvent("onCobaltDBhandshake","onCobaltDBhandshake")
+RegisterEvent("onCobaltDBhandshake","onCobaltDBhandshake") --to make sure cobaltDB loads first
 
-cobaltVersion = "1.5.1"
+cobaltVersion = "1.5.2"
 
 pluginName = debug.getinfo(1).source:sub(2)
 local s,e
@@ -28,7 +28,7 @@ package.cpath = package.cpath .. ";;" .. resources .. "/Server/" .. pluginName .
 
 
 --local neededFiles = {"lua/socket.lua","lua/mime.lua","lua/ltn12.lua","socket/core.dll","mime/core.dll"}
-
+print("\n\n\n\n")
 print("-------------Loading Cobalt Essentials v" .. cobaltVersion .. "-------------")
 	CE = require("CobaltEssentials")
 
@@ -59,7 +59,7 @@ function onCobaltDBhandshake(port)
 		print("Config Manager Loaded")
 
 		--Load CobaltExtensions & any of it's extensions
-	extensions = require("Cobaltextensions")
+	extensions = require("CobaltExtensions")
 		print("CobaltExtensions Loaded")
 
 
