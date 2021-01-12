@@ -29,8 +29,8 @@ package.cpath = package.cpath .. ";;" .. resources .. "/Server/" .. pluginName .
 
 --local neededFiles = {"lua/socket.lua","lua/mime.lua","lua/ltn12.lua","socket/core.dll","mime/core.dll"}
 utils = require("CobaltUtils")
-print("\n\n\n\n")
-CElog("-------------Loading Cobalt Essentials v" .. cobaltVersion .. "-------------")
+print("\n\n")
+CElog(color(107,94) .. "-------------Loading Cobalt Essentials v" .. cobaltVersion .. "-------------")
 	CE = require("CobaltEssentials")
 
 	CElog("Utils Loaded")

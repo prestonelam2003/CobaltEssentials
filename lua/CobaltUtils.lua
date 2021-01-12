@@ -41,7 +41,7 @@ function CElog(string, heading, debug)
 	heading = heading or "Cobalt"
 	debug = debug or false
 
-	local out = ("[" .. color(90) .. os.date("%d/%m/%Y %X", os.time()) .. color(0) ..  "]"):gsub("/0","/")
+	local out = ("[" .. color(90) .. os.date("%d/%m/%Y %X", os.time()) .. color(0) ..  "]"):gsub("/0","/"):gsub("%[0","[")
 
 	if heading == "WARN" then
 		out =  out .. " [" .. color(31) .. "WARN" .. color(0) .. "] " .. color(31) .. string

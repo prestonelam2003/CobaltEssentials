@@ -470,7 +470,7 @@ local function command(sender, command, args)
 	local message = ""
 	if CobaltDB.tableExists("commands",command) then
 		if sender.playerID then
-			message = message .. sender.name .. ": " .. command .. " " .. args
+			message = message .. sender.name .. ": " .. command .. " " .. (args or "")
 		end
 		local commandName = command
 		command = commands[command]
