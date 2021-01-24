@@ -40,7 +40,7 @@ local function load(extension, extensionPath)
 		_G[extension] = module
 		loaded[extension] = module
 
-		module.onInit()
+		if module.onInit then module.onInit() end
 
 		CElog("Loaded Extension " .. extension)
 	end
