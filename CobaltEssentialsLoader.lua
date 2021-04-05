@@ -5,17 +5,22 @@
 
 RegisterEvent("onCobaltDBhandshake","onCobaltDBhandshake") --to make sure cobaltDB loads first
 
-cobaltVersion = "1.5.3A"
+cobaltVersion = "1.6.0 [BETA 1]"
 
 pluginName = debug.getinfo(1).source:sub(2)
 local s,e
 
 resources = debug.getinfo(1).source:sub(2)
 
+print("1: '" .. resources .. "'")
 local s, e = resources:find("\\")
+print(s .."," .. e)
 resources = resources:sub(0,e-1)
+print("1: '" .. resources .. "'")
 local s, e = resources:find("Server")
+print(s .."," .. e)
 resources = resources:sub(1,s-2)
+print("1: '" .. resources .. "'")
 
 s, e = pluginName:find("\\")
 pluginName = pluginName:sub(s+1)
@@ -29,6 +34,7 @@ package.cpath = package.cpath .. ";;" .. resources .. "/Server/" .. pluginName .
 
 --local neededFiles = {"lua/socket.lua","lua/mime.lua","lua/ltn12.lua","socket/core.dll","mime/core.dll"}
 utils = require("CobaltUtils")
+
 print("\n\n")
 CElog(color(107,94) .. "-------------Loading Cobalt Essentials v" .. cobaltVersion .. "-------------")
 	CE = require("CobaltEssentials")
@@ -47,6 +53,7 @@ CElog(color(107,94) .. "-------------Loading Cobalt Essentials v" .. cobaltVersi
 
 	CobaltDB = require("CobaltDBconnector")
 		CElog("CobaltDB Connector Loaded")
+		utils.setLogType("DEBUG",97,function() return config.enableDebug.value == true end)
 
 --FOR WHEN COBALTDB REPORTS BACK
 function onCobaltDBhandshake(port)

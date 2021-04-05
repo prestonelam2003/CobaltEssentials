@@ -3,3 +3,4 @@ lua/*.old
 CobaltDB*
 lua/CobaltConfig.lua
 extensions/CobaltMotorsports.lua
+extensions/extCommands.lua

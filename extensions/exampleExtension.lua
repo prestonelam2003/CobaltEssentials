@@ -70,6 +70,11 @@ local function onVehicleEdited(player, vehID,  data)
 	
 end
 
+--called whenever a player resets their vehicle, holding insert spams this function.
+local function onVehicleReset(player, vehID, data)
+	
+end
+
 --called whenever a vehicle is deleted
 local function onVehicleDeleted(player, vehID,  source)
 	
@@ -100,6 +105,7 @@ M.onChatMessage = onChatMessage
 
 M.onVehicleSpawn = onVehicleSpawn
 M.onVehicleEdited = onVehicleEdited
+M.onVehicleReset = onVehicleReset
 M.onVehicleDeleted = onVehicleDeleted
 
 M.onRconCommand = onRconCommand

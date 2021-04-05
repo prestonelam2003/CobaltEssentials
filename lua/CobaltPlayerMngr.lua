@@ -176,6 +176,7 @@ local function new(name, role, isGuest)
 	newPlayer.guest = isGuest
 	newPlayer.name = name
 	newPlayer.joinTime = age
+	newPlayer.connectStage = 0
 
 
 	--PERMISSIONS

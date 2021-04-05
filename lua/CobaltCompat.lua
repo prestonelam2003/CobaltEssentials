@@ -32,7 +32,7 @@ local function init()
 	local existingConfigOptions = {"commandPrefix", "maxActivePlayers", "RCONport", "RCONpassword", "RCONkeepAliveTick", "enableWhitelist","RCONenabled"}
 	
 	for option, value in pairs(deprecatedConfig) do
-		print(tostring(option) .. ":" .. tostring(value))
+		CElog(tostring(option) .. ":" .. tostring(value))
 		for index, existingOption in pairs(existingConfigOptions) do
 			local optionSet = false
 			--easy 1 to 1 option translations
@@ -64,7 +64,7 @@ local function init()
 		end
 	end	
 
-	print("")
+	CElog("")
 
 	CobaltConfig.loadConfig()
 		
@@ -82,7 +82,7 @@ end
 
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 local function registerUser(identifier, IDtype, permissionLevel, specialPerms) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
-	--print("CE.setPermission() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
+	--CElog("CE.setPermission() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
 	CElog("Registered " .. identifier .. " as ID Type " .. IDtype .. " @" .. permissionLevel)
 
 	if IDtype == 1 then
@@ -96,7 +96,7 @@ end
 
 --POST: set the permission requirement for the "flag" optional value for things like car count
 local function setPermission(permission, reqPerm, value) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
-	--print("CE.setPermission() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'permissions' database to edit it directly.")
+	--CElog("CE.setPermission() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'permissions' database to edit it directly.")
 	
 	permissions[permission][reqPerm] = value
 end 
@@ -104,7 +104,7 @@ end
 -- PRE: a command name, function and the required permission level is passed in.
 --POST: the command is added to the commands table.
 local function registerCommand(command, func, reqPerm, desc, argCount, RCONonly) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
-	--print("CE.registerCommand() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'commands' database to edit it directly.")
+	--CElog("CE.registerCommand() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'commands' database to edit it directly.")
 	CElog("Registered " .. command .. " Command @" .. reqPerm)
 
 	commands[command].level = reqPerm
@@ -121,7 +121,7 @@ local function registerCommand(command, func, reqPerm, desc, argCount, RCONonly)
 end
 
 local function registerVehicle(name, reqPerm) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
-	--print("CE.registerVehicle() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'vehicles' database to edit it directly.")
+	--CElog("CE.registerVehicle() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'vehicles' database to edit it directly.")
 	CElog("Set " .. name .. " @" .. reqPerm)
 
 	vehiclePermissions[name].level = reqPerm
@@ -129,7 +129,7 @@ end
 
 --POST: adds a player to the whitelist for this session
 local function addWhitelist(identifier, IDtype) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
-	--print("CE.addWhitelist() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
+	--CElog("CE.addWhitelist() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
 	CElog("Added " .. identifier .. " as ID Type " .. IDtype .. " to the whitelist" )
 	
 	if IDtype == 1 then
@@ -140,7 +140,7 @@ local function addWhitelist(identifier, IDtype) --DEPRECATED DUE TO CobaltDB, Co
 end
 
 local function ban(identifier, IDtype) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
-	--print("CE.ban() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
+	--CElog("CE.ban() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
 	CElog("Banned " .. identifier .. " as ID Type " .. IDtype .. " from the server" )
 	
 	if IDtype == 1 then

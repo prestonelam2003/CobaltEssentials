@@ -16,10 +16,13 @@ local cobaltSysChar = string.char(0x99, 0x99, 0x99, 0x99)
 
 local CobaltDBport = 58933
 
+local lastSent
+
 RegisterEvent("initDB","initDB")
 RegisterEvent("openDatabase","openDatabase")
 RegisterEvent("closeDatabase","closeDatabase")
 RegisterEvent("setCobaltDBport","setCobaltDBport")
+RegisterEvent("dataMissing","dataMissing")
 
 RegisterEvent("query","query")
 RegisterEvent("getTable","getTable")
@@ -100,7 +103,9 @@ function openDatabase(DBname)
 		jsonFile:close()
 	end
 
+
 	connector:sendto(databaseLoaderInfo ,"127.0.0.1", CobaltDBport)
+	lastSent = databaseLoaderInfo
 end
 
 function closeDatabase(DBname)
@@ -113,6 +118,12 @@ end
 function setCobaltDBport(port)
 	CobaltDBport = tonumber(port)
 	connector:sendto(CobaltDBport ,"127.0.0.1", CobaltDBport)
+	lastSent = CobaltDBport
+end
+
+--tells CobaltDB that the data was not recieved.
+function dataMissing()
+	connector:sendto(lastSent ,"127.0.0.1", CobaltDBport)
 end
 
 --saves the table's changes to a file
@@ -127,7 +138,7 @@ function updateDatabase(DBname)
 	jsonFile:close()
 	os.remove(filePath .. ".json")
 	os.rename(filePath .. ".temp", filePath .. ".json")
-	CElog("Updated: '" .. dbpath .. DBname .. ".json'","DEBUG")
+	--CElog("Updated: '" .. dbpath .. DBname .. ".json'","DEBUG")
 end
 
 
@@ -156,13 +167,11 @@ function set(DBname, tableName, key, value)
 end
 
 
-
-
-
 ---------------------------------------------------------ACCESSORS---------------------------------------------------------
 
 --returns a specific value from the table
 function query(DBname, tableName, key)
+	local data
 
 	if loadedDatabases[DBname] == nil then
 		--error here, database isn't open
@@ -182,6 +191,7 @@ function query(DBname, tableName, key)
 	end
 
 	connector:sendto(data ,"127.0.0.1", CobaltDBport)
+	lastSent = data
 end
 
 --returns a read-only version of the table as json.
@@ -203,6 +213,7 @@ function getTable(DBname, tableName)
 
 
 	connector:sendto(data ,"127.0.0.1", CobaltDBport)
+	lastSent = data
 end
 
 --returns a read-only list of all table names within the database
@@ -215,6 +226,7 @@ function getTables(DBname)
 	data = json.stringify(data)
 
 	connector:sendto(data ,"127.0.0.1", CobaltDBport)
+	lastSent = data
 end
 
 function getKeys(DBname, tableName)
@@ -226,6 +238,7 @@ function getKeys(DBname, tableName)
 	data = json.stringify(data)
 
 	connector:sendto(data ,"127.0.0.1", CobaltDBport)
+	lastSent = data
 end
 
 function tableExists(DBname, tableName)
@@ -236,8 +249,8 @@ function tableExists(DBname, tableName)
 	end
 
 	connector:sendto(data ,"127.0.0.1", CobaltDBport)
+	lastSent = data
 end
-
 
 ---------------------------------------------------------FUNCTIONS---------------------------------------------------------
 

@@ -6,6 +6,7 @@ _G.SendChatMessageV = _G.SendChatMessage
 _G.RemoveVehicleV = _G.RemoveVehicle
 _G.GetPlayerVehiclesV = _G.GetPlayerVehicles
 _G.DropPlayerV = _G.DropPlayer
+lastRandomNumber = os.time()
 
 -------------------------------------------------REPLACED-GLOBAL-FUNCTIONS-------------------------------------------------
 --Trigger the on VehicleDeleted event
@@ -37,35 +38,68 @@ function DropPlayer(playerID, reason)
 end
 ---------------------------------------------------------------------------------------------------------------------------
 
+local logTypes = {}
+
 function CElog(string, heading, debug)
 	heading = heading or "Cobalt"
 	debug = debug or false
 
-	local out = ("[" .. color(90) .. os.date("%d/%m/%Y %X", os.time()) .. color(0) ..  "]"):gsub("/0","/"):gsub("%[0","[")
+	--local out = ("[" .. os.date("%d/%m/%Y %X", os.time())):gsub("/0","/"):gsub("%[0","["):gsub("%[","[" .. color(90)) .. color(0) ..  "]"
+	local out = ""
 
-	if heading == "WARN" then
-		out =  out .. " [" .. color(31) .. "WARN" .. color(0) .. "] " .. color(31) .. string
-	elseif heading == "RCON" then
-		out = out .. " [" .. color(33) .. "RCON" .. color(0) .. "] " .. color(0) .. string
-	elseif heading == "CobaltDB" then
-		out = out .. " [" .. color(35) .. "CobaltDB" .. color(0) .. "] " .. color(0) .. string
-	elseif heading == "CHAT" then
-		out = out .. " [" .. color(32) .. "CHAT" .. color(0) .. "] " .. color(0) .. string
-	elseif heading == "DEBUG" and ((config == nil or config.enableDebug.value == true) or (query and query("config","enableDebug","value") == true)) then
-		out = out .. " [" .. color(97) .. "DEBUG" .. color(0) .. "] " .. color(0) .. string
+	if logTypes[heading] then
+		if logTypes[heading].conditonFunc == nil or logTypes[heading].conditonFunc() then
+			out = out .. " [" .. logTypes[heading].headingColor .. heading .. color(0) .. "] " .. logTypes[heading].stringColor
+		end
 	else
-		out = out .. " [" .. color(94) .. heading .. color(0) .. "] " .. color(0) .. string
+		out = out .. " [" .. color(94) .. heading .. color(0) .. "] "
 	end
 
+	out = out .. string .. color(0)
 
-	out = out .. color(0)
+	--if heading == "WARN" then
+	--	out =  out .. " [" .. color(31) .. "WARN" .. color(0) .. "] " .. color(31) .. string
+	--elseif heading == "RCON" then
+	--	out = out .. " [" .. color(33) .. "RCON" .. color(0) .. "] " .. color(0) .. string
+	--elseif heading == "CobaltDB" then
+	--	out = out .. " [" .. color(35) .. "CobaltDB" .. color(0) .. "] " .. color(0) .. string
+	--elseif heading == "CHAT" then
+	--	out = out .. " [" .. color(32) .. "CHAT" .. color(0) .. "] " .. color(0) .. string
+	----elseif heading == "DEBUG" and ((config == nil or config.enableDebug.value == true) or (query and CobaltDB.query("config","enableDebug","value") == true)) or true then
+	--elseif heading == "DEBUG" then
+	--	if config == nil or config.enableDebug.value == true) or (query and CobaltDB.query("config","enableDebug","value") == true)) or true then
+	--		out = out .. " [" .. color(97) .. "DEBUG" .. color(0) .. "] " .. color(0) .. string
+	--	end
+	--else
+	--	out = out .. " [" .. color(94) .. heading .. color(0) .. "] " .. color(0) .. string
+	--end
+
+
 	print(out)
 	return out
 end
 
+local function setLogType(heading, headingColor, conditonFunc, stringColor)
+	headingColor = headingColor or 94
+	stringColor = stringColor or 0
+	logTypes[heading] = {}
+	
+	logTypes[heading].headingColor = color(headingColor)
+	logTypes[heading].stringColor = color(stringColor)
+
+	if conditonFunc then
+		logTypes[heading].conditonFunc = conditonFunc
+	end
+end
+
+local function getLogTypes()
+	return logTypes
+end
+
 --changes the color of the console.
 function color(fg,bg)
-	if (config == nil or config.enableColors.value == true) and true then
+	--if (config == nil or config.enableColors.value == true) and true then
+	if true then
 		if bg then
 			return string.char(27) .. '[' .. tostring(fg) .. ';' .. tostring(bg) .. 'm'
 		else
@@ -245,9 +279,35 @@ function formatTime(time)
 	return  time ..":".. seconds .. ":" .. milliseconds
 end
 
+--linear congruential generator
+randomNumberGeneratorA = 1103515245
+randomNumberGeneratorC = 12345
+randomNumberGeneratorM = 2^31
+local function random(upper,lower)
+	upper = upper or 1
+	lower = lower or 0
+	lastRandomNumber = ((lastRandomNumber * randomNumberGeneratorA + randomNumberGeneratorC) % randomNumberGeneratorM)
+	--CElog("Random Number:" .. (lastRandomNumber/ randomNumberGeneratorM),"DEBUG")
+
+	local randomOutput = lastRandomNumber / randomNumberGeneratorM --This shouldn't actually be used for upper and lowers, this is just a correction on the 0-1 value
+	--if randomOutput < lower then randomOutput = lower end
+	--if randomOutput > upper then randomOutput = upper end
+
+	return randomOutput
+end
+
+setLogType("WARN",31,false,31)
+setLogType("RCON",33)
+setLogType("CobaltDB",35)
+setLogType("CHAT",32)
+
+M.random = random
 M.copyFile = copyFile
 M.exists = exists
 M.parseVehData = parseVehData
+
+M.setLogType = setLogType
+M.getLogTypes = getLogTypes
 
 M.readCfg = readCfg
 

@@ -35,9 +35,13 @@ RegisterEvent("onChatMessage","onChatMessage")
 RegisterEvent("onVehicleSpawn","onVehicleSpawn")
 RegisterEvent("onVehicleEdited","onVehicleEdited")
 RegisterEvent("onVehicleDeleted","onVehicleDeleted")
+RegisterEvent("onVehicleReset","onVehicleReset")
 
 RegisterEvent("onRconCommand","onRconCommand")
 RegisterEvent("onNewRconClient","onNewRconClient")
+
+RegisterEvent("stop","stopServer")
+RegisterEvent("Cobaltstop","stopServer")
 
 CElog("CobaltEssentials Initiated")
 
@@ -66,8 +70,10 @@ function onTick()
 		end
 	end
 
-	if extensions.triggerEvent("onTick", age) == false then
-		return -1
+	if extensions then
+		if extensions.triggerEvent("onTick", age) == false then
+			return -1
+		end
 	end
 
 	--ticks = ticks + 1
@@ -110,14 +116,14 @@ function onPlayerConnecting(ID)
 	CElog("On Player Connecting: " .. ID)
 
 	local name = GetPlayerName(ID)
-
 	players.bindPlayerToID(name, ID)
-
 	players.updateQueue()
+
+	players[ID].connectStage = 1
 end
 
 function onPlayerJoining(ID)
-
+	players[ID].connectStage = 2
 	CElog("On Player Joining: " .. ID)
 
 	if extensions.triggerEvent("onPlayerJoining", players[ID]) == false then
@@ -129,6 +135,7 @@ function onPlayerJoining(ID)
 end
 
 function onPlayerJoin(ID)
+	players[ID].connectStage = nil
 	CElog("On Player Join: " .. ID)
 	
 	if extensions.triggerEvent("onPlayerJoin", players[ID]) == false then
@@ -259,6 +266,16 @@ function onVehicleEdited(ID, vehID,  data)
 
 end
 
+
+function onVehicleReset(ID, vehID, data)
+	data = json.parse(data)
+
+	if extensions.triggerEvent("onVehicleReset", players[ID], vehID, data) == false then
+		return 1
+	end
+end
+
+
 function onVehicleDeleted(ID, vehID)
 	ID = tonumber(ID)
 	vehID = tonumber(vehID)
@@ -272,6 +289,7 @@ function onVehicleDeleted(ID, vehID)
 		players[ID].vehicles[vehID] = nil
 	end
 end
+
 
 
 function onRconCommand(ID, message, password, prefix)
@@ -336,7 +354,7 @@ end
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 
 --Stop server safely make sure anything that needs to be is backed up.
-local function stopServer()
+function stopServer()
 	--TODO: make this command back things up if required.
 	exit()
 end

@@ -19,9 +19,9 @@ local currentcfg = {}
 local beamMPcfg = utils.readCfg("server.cfg")
 
 
---for key,value in pairs(beamMPcfg) do
-	--beamMPconfig[key] = value
---end
+for key,value in pairs(beamMPcfg) do
+	beamMPconfig[key] = value
+end
 
 local beamMPconfigMetatable = {
 	
@@ -94,7 +94,7 @@ end
 local defaultConfig = 
 {
 	commandPrefix =		{value = "/",			description = "The character placed at the beginning of a chat message when using a command"},
-	maxActivePlayers =	{value = 5,				description = "max amount of active/nonspectator players allowed on a server, any further players will be spectator and placed on a queue."},
+	maxActivePlayers =	{value = 20,			description = "max amount of active/nonspectator players allowed on a server, any further players will be spectator and placed on a queue."},
 	enableWhitelist =	{value = false,			description = "weather or not the whitelist is enabled"},
 	enableDebug =		{value = false,			description = "weather or not the server will output debug messages."},
 	enableColors =		{value = true,			description = "weather or not console outputs can utilize colors. Causes problems with environments missing ANSI escape sequence support. Requires Restart"},
@@ -102,7 +102,7 @@ local defaultConfig =
 	RCONenabled =		{value = true,			description = "weather or not the server runs a q3 compliant rcon server for remote acess to the server. Requires Restart"},
 	RCONport =			{value = 20814,			description = "The port used to host the server. Since CE is external to beamMP make sure to not place this on the same port as the server."},
 	RCONpassword =		{value = "password",	description = "The password required to connect to the RCON"},
-	RCONkeepAliveTick = {value = 30,			description = "The amount of seconds between ticks sent to RCONclients to keep the connections alive, false to disable, This may not work?"},
+	RCONkeepAliveTick = {value = false,			description = "The amount of seconds between ticks sent to RCONclients to keep the connections alive, false to disable, This may not work?"},
 
 	CobaltDBport =		{value = 10814,			description = "The port used for internal CobaltDB communications, please keep it unique to each server or there may be interference."}
 }

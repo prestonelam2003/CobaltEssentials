@@ -191,7 +191,13 @@ local function query(DBname, tableName, key)
 	
 	TriggerLocalEvent("query", DBname, tableName, key)
 	
+
 	local data = server:receive()
+	
+	--if DBname ~= "config" then
+		--CElog(DBname .. "." .. tableName .. "." .. key .. " = " .. data,"DEBUG")
+	--end
+
 	local error
 
 	if type(data) == "string" then
@@ -209,6 +215,8 @@ local function query(DBname, tableName, key)
 	end
 		
 	--server:close()
+	--if type(data) ~= "table" then
+	--end
 	return data, error
 end
 
