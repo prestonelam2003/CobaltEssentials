@@ -5,7 +5,7 @@
 
 RegisterEvent("onCobaltDBhandshake","onCobaltDBhandshake") --to make sure cobaltDB loads first
 
-cobaltVersion = "1.6.0 [BETA 1]"
+cobaltVersion = "1.6.0 [BETA 1B]"
 
 pluginName = debug.getinfo(1).source:sub(2)
 local s,e

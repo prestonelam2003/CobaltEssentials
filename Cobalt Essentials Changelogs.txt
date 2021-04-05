@@ -46,7 +46,7 @@ Implemented security measures to setgroup and setperm to disallow them from gran
 Groups may now be removed from a player by using setgroup and setting the group to "none"
 Moved the default ban reason off default and to guest, where it was supposed to be.
 
--------Cobalt Essentials 1.6.0 BETA 1 Changelog-------
+-------Cobalt Essentials 1.6.0 [BETA 1B] Changelog-------
 Changed out the Lua DLLs to support the new server version.
 Added psudeo random number generator, it currently operates off a linear congruential generator, though in the future i want to add some entropy by stacking multiple generators under one master generator.
 Started fix for CobaltDB disconnects.
@@ -55,7 +55,7 @@ Added the ability to set new log types to be used with CElog(output,heading) wit
 You may also get the aforementioned log types with getLogTypes()
 Implemented on Vehicle reset support.
 Temporarily removed date and time from CElog() since the new server version has it, negotiating a rawPrint() function as we speak.
-
+BETA 1B: Fix for onInit() requirement in extensions from Deer Boi
 
 TODO:
 Fix for CobaltDB disconnects
