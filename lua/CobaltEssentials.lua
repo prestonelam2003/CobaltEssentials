@@ -119,11 +119,11 @@ function onPlayerConnecting(ID)
 	players.bindPlayerToID(name, ID)
 	players.updateQueue()
 
-	players[ID].connectStage = 1
+	players[ID].connectStage = "downloading"
 end
 
 function onPlayerJoining(ID)
-	players[ID].connectStage = 2
+	players[ID].connectStage = "loading"
 	CElog("On Player Joining: " .. ID)
 
 	if extensions.triggerEvent("onPlayerJoining", players[ID]) == false then
@@ -135,7 +135,7 @@ function onPlayerJoining(ID)
 end
 
 function onPlayerJoin(ID)
-	players[ID].connectStage = nil
+	players[ID].connectStage = "connected"
 	CElog("On Player Join: " .. ID)
 	
 	if extensions.triggerEvent("onPlayerJoin", players[ID]) == false then

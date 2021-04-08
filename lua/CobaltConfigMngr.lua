@@ -15,21 +15,20 @@ vehiclePermissions = CobaltDB.new("vehicles")
 config = CobaltDB.new("config")
 
 beamMPconfig = {}
-local currentcfg = {}
-local beamMPcfg = utils.readCfg("server.cfg")
+currentcfg = {}
+beamMPcfg = utils.readCfg("server.cfg")
 
 
-for key,value in pairs(beamMPcfg) do
-	beamMPconfig[key] = value
-end
+--for key,value in pairs(beamMPcfg) do
+	--beamMPconfig[key] = value
+--end
 
 local beamMPconfigMetatable = {
-	
 	__index = function(table, key)
 		return currentcfg[key] or beamMPcfg[key]
 	end,
-	
 	__newindex = function(table, key, value)
+		print("I AM EXECUTE?")
 		if key == "Debug" then
 			Set(0, value)
 		elseif key == "Private" then
@@ -123,6 +122,7 @@ local defaultCommands =
 	help =			{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Lists all commands accessible by the player"},
 	status =		{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Lists all the players on the server with their ids and basic information on the server"},
 	statusdetail =	{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Lists all the players on the server in detail along with basic server information"},
+	connected =		{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Get the connect stage of all players on the server"},
 	about =			{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Displays the license, version, and copyright notice assosiated with Cobalt Essentials."},
 	uptime =		{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Get the uptime of the server"},
 	countdown =		{orginModule = "CC",	level = 1,	sourceLimited = 0,	arguments = 0,						description = "Start a countdown in chat"},

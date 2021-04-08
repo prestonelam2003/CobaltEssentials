@@ -136,6 +136,42 @@ local function statusdetail(sender, ...)
 	return playersList
 end
 
+local function connected(sender,...)
+	local playersConnected = ""
+	local playersLoading = ""
+	local playersDownloading = ""
+	local currentPlayer
+	playerCount = 0
+
+
+	connectedCount = 0
+	loadingCount = 0
+	downloadingCount = 0
+
+	for playerID, player in pairs(players) do
+		if type(playerID) == "number" then
+			playerCount = playerCount + 1
+
+			currentPlayer = tostring(playerID) .. ": " .. tostring(player.name) .. "\n"
+
+			if player.connectStage == "connected" then 
+				playersConnected = playersConnected .. "[C] " .. currentPlayer
+				connectedCount = connectedCount + 1
+			elseif player.connectStage == "loading" then 
+				playersLoading = playersLoading .. "[L] " .. currentPlayer
+				loadingCount = loadingCount + 1
+			elseif player.connectStage == "downloading" then 
+				playersDownloading = playersDownloading .. "[D] " .. currentPlayer
+				downloadingCount = downloadingCount + 1
+			end
+		end
+	end
+
+	playersList = "Connected: " .. connectedCount .. " | Loading: " .. loadingCount .. " | Downloading: " .. downloadingCount .. " \n" .. playersConnected .. playersLoading .. playersDownloading
+
+	return playersList
+end
+
 local function help(sender, ...)
 	local commandList = ""
 	
@@ -312,6 +348,7 @@ local function togglechat(sender, ...)
 	end
 end
 
+
 local function stop(sender, ...)
 	CE.stopServer()
 end
@@ -353,6 +390,7 @@ M.mute = mute
 M.unmute = unmute
 M.status = status
 M.statusdetail = statusdetail
+M.connected = connected
 M.help = help
 M.setgroup = setgroup
 M.setperm = setperm
