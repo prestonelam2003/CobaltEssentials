@@ -49,10 +49,10 @@ function CElog(string, heading, debug)
 
 	if logTypes[heading] then
 		if logTypes[heading].conditonFunc == nil or logTypes[heading].conditonFunc() then
-			out = out .. " [" .. logTypes[heading].headingColor .. heading .. color(0) .. "] " .. logTypes[heading].stringColor
+			out = out .. "[" .. logTypes[heading].headingColor .. heading .. color(0) .. "] " .. logTypes[heading].stringColor
 		end
 	else
-		out = out .. " [" .. color(94) .. heading .. color(0) .. "] "
+		out = out .. "[" .. color(94) .. heading .. color(0) .. "] "
 	end
 
 	out = out .. string .. color(0)
@@ -294,6 +294,11 @@ local function random(upper,lower)
 	--if randomOutput > upper then randomOutput = upper end
 
 	return randomOutput
+end
+
+--RETURNS TRUE IF VER1 IS NEWER THAN vER2
+function compareCobaltVersion(ver1,ver2)
+	print("compareCobaltVersion not implemented yet")
 end
 
 setLogType("WARN",31,false,31)

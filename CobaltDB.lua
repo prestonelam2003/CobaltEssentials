@@ -16,13 +16,14 @@ local cobaltSysChar = string.char(0x99, 0x99, 0x99, 0x99)
 
 local CobaltDBport = 58933
 
-local lastSent
-
 RegisterEvent("initDB","initDB")
 RegisterEvent("openDatabase","openDatabase")
 RegisterEvent("closeDatabase","closeDatabase")
 RegisterEvent("setCobaltDBport","setCobaltDBport")
-RegisterEvent("dataMissing","dataMissing")
+RegisterEvent("DBresend","resend")
+RegisterEvent("repairDBconnection","repairDBconnection")
+
+RegisterEvent("testCobaltDBconnection","testConnection")
 
 RegisterEvent("query","query")
 RegisterEvent("getTable","getTable")
@@ -63,7 +64,7 @@ function initDB(path, cpath, dbpath, config)
 end
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 
-function openDatabase(DBname)
+function openDatabase(DBname, requestID)
 	local jsonPath = dbpath .. DBname .. ".json"
 
 	local jsonFile, error = io.open(jsonPath,"r")
@@ -102,8 +103,7 @@ function openDatabase(DBname)
 
 		jsonFile:close()
 	end
-
-
+	databaseLoaderInfo = requestID .. "[requestIDsplitter]" .. databaseLoaderInfo
 	connector:sendto(databaseLoaderInfo ,"127.0.0.1", CobaltDBport)
 	lastSent = databaseLoaderInfo
 end
@@ -122,8 +122,12 @@ function setCobaltDBport(port)
 end
 
 --tells CobaltDB that the data was not recieved.
-function dataMissing()
+function resend()
 	connector:sendto(lastSent ,"127.0.0.1", CobaltDBport)
+end
+
+function testConnection()
+	connector:sendto(CobaltDBport ,"127.0.0.1", CobaltDBport)
 end
 
 --saves the table's changes to a file
@@ -140,6 +144,7 @@ function updateDatabase(DBname)
 	os.rename(filePath .. ".temp", filePath .. ".json")
 	--CElog("Updated: '" .. dbpath .. DBname .. ".json'","DEBUG")
 end
+
 
 
 --changes the table
@@ -170,7 +175,7 @@ end
 ---------------------------------------------------------ACCESSORS---------------------------------------------------------
 
 --returns a specific value from the table
-function query(DBname, tableName, key)
+function query(DBname, tableName, key, requestID)
 	local data
 
 	if loadedDatabases[DBname] == nil then
@@ -190,12 +195,13 @@ function query(DBname, tableName, key)
 		end
 	end
 
+	data = requestID .. "[requestIDsplitter]" .. data
 	connector:sendto(data ,"127.0.0.1", CobaltDBport)
 	lastSent = data
 end
 
 --returns a read-only version of the table as json.
-function getTable(DBname, tableName)
+function getTable(DBname, tableName, requestID)
 	local data
 
 	if loadedDatabases[DBname] == nil then
@@ -211,13 +217,13 @@ function getTable(DBname, tableName)
 		end
 	end
 
-
+	data = requestID .. "[requestIDsplitter]" .. data
 	connector:sendto(data ,"127.0.0.1", CobaltDBport)
 	lastSent = data
 end
 
 --returns a read-only list of all table names within the database
-function getTables(DBname)
+function getTables(DBname, requestID)
 	local data = {}
 	for id, _ in pairs(loadedDatabases[DBname]) do
 		data[id] = id
@@ -225,11 +231,12 @@ function getTables(DBname)
 	
 	data = json.stringify(data)
 
+	data = requestID .. "[requestIDsplitter]" .. data
 	connector:sendto(data ,"127.0.0.1", CobaltDBport)
 	lastSent = data
 end
 
-function getKeys(DBname, tableName)
+function getKeys(DBname, tableName, requestID)
 	local data = {}
 	for id, _ in pairs(loadedDatabases[DBname][tableName]) do
 		data[id] = id
@@ -237,17 +244,19 @@ function getKeys(DBname, tableName)
 	
 	data = json.stringify(data)
 
+	data = requestID .. "[requestIDsplitter]" .. data
 	connector:sendto(data ,"127.0.0.1", CobaltDBport)
 	lastSent = data
 end
 
-function tableExists(DBname, tableName)
+function tableExists(DBname, tableName, requestID)
 	local data = "E: database not open"
 
 	if loadedDatabases[DBname] ~= nil and loadedDatabases[DBname][tableName] ~= nil then
 		data = tableName
 	end
 
+	data = requestID .. "[requestIDsplitter]" .. data
 	connector:sendto(data ,"127.0.0.1", CobaltDBport)
 	lastSent = data
 end

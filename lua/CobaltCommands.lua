@@ -367,7 +367,7 @@ end
 local function about(sender, ...)
 	return	"This server is running Cobalt Essentials version " .. cobaltVersion .. " developed by Preston Elam (Cobalt)"			--Line 1
 	..		"\n Cobalt Essentials is released under a GPLv3 license."																--Line 2
-	..		"\n Copyright (C) 2020, Preston Elam (Cobalt) ALL RIGHTS RESERVED"
+	..		"\n Copyright (C) 2021, Preston Elam (Cobalt) ALL RIGHTS RESERVED"
 end
 
 

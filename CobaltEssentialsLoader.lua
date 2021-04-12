@@ -5,22 +5,22 @@
 
 RegisterEvent("onCobaltDBhandshake","onCobaltDBhandshake") --to make sure cobaltDB loads first
 
-cobaltVersion = "1.6.0 [BETA 2]"
+cobaltVersion = "1.6.0 [BETA 3]"
 
 pluginName = debug.getinfo(1).source:sub(2)
 local s,e
 
 resources = debug.getinfo(1).source:sub(2)
 
-print("1: '" .. resources .. "'")
+--print("1: '" .. resources .. "'")
 local s, e = resources:find("\\")
-print(s .."," .. e)
+--print(s .."," .. e)
 resources = resources:sub(0,e-1)
-print("1: '" .. resources .. "'")
+--print("1: '" .. resources .. "'")
 local s, e = resources:find("Server")
-print(s .."," .. e)
+--print(s .."," .. e)
 resources = resources:sub(1,s-2)
-print("1: '" .. resources .. "'")
+--print("1: '" .. resources .. "'")
 
 s, e = pluginName:find("\\")
 pluginName = pluginName:sub(s+1)

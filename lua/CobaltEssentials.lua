@@ -63,12 +63,12 @@ function onTick()
 		end
 	end
 
-	for ID, client in pairs(rconClients) do
-		if config.RCONkeepAliveTick.value ~= false and age > client.lastContact + config.RCONkeepAliveTick.value * 1000 then
-			TriggerGlobalEvent("keepAlive", ID)
-			client.lastContact = age
-		end
-	end
+	--for ID, client in pairs(rconClients) do
+		--if config.RCONkeepAliveTick.value ~= false and age > client.lastContact + config.RCONkeepAliveTick.value * 1000 then
+			--TriggerGlobalEvent("keepAlive", ID)
+			--client.lastContact = age
+		--end
+	--end
 
 	if extensions then
 		if extensions.triggerEvent("onTick", age) == false then
@@ -300,6 +300,10 @@ function onRconCommand(ID, message, password, prefix)
 
 	rconClients[ID].lastContact = age
 
+	--correctPassword = config.RCONpassword.value
+	--print(password)
+	--print(correctPassword)
+	--if password == correctPassword then
 	if password == config.RCONpassword.value then
 		
 		if extensions.triggerEvent("onRconCommand", ID, message, password, prefix) == false then
@@ -354,8 +358,14 @@ end
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 
 --Stop server safely make sure anything that needs to be is backed up.
-function stopServer()
+function stopServer(source)
 	--TODO: make this command back things up if required.
+	TriggerGlobalEvent("onServerStop")
+	CElog("Closing server, sending stop server event to all extensions.")
+	if extensions.triggerEvent("onStopServer") == false then
+		return 1
+	end
+
 	exit()
 end
 

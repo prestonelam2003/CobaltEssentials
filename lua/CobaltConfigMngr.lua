@@ -28,7 +28,6 @@ local beamMPconfigMetatable = {
 		return currentcfg[key] or beamMPcfg[key]
 	end,
 	__newindex = function(table, key, value)
-		print("I AM EXECUTE?")
 		if key == "Debug" then
 			Set(0, value)
 		elseif key == "Private" then

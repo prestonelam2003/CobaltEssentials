@@ -16,17 +16,20 @@ local cobaltSysChar = string.char(0x99, 0x99, 0x99, 0x99)
 
 TriggerLocalEvent("initDB", package.path, package.cpath, dbPath, json.stringify(config))
 
-local port = 10814
+local requestID = 0 --The ID of the request, increments by 1 each request. Only increments on REQUESTS ( functions that use receiveDB() )
+local port = 10814 --Default port used before a connection has been established
+local timeout = 3 --Maximum timeout is 3 seconds, anything higher BeamMP will time out the entire function.
 socket = require("socket")
 local server = socket.udp()
-server:settimeout(3)
+server:settimeout(timeout)
 
 local function init(configPort)
-
 	port = configPort
 	server:setsockname('0.0.0.0', tonumber(port))
-
 end
+
+local requestTag = "" .. color(43) .. "[Request]" .. color(0) .. ""
+local receiveTag = "" .. color(42) .. "[Receive]" .. color(0) .. "" 
 
 
 --Set up metatable so that CobaltDB is intuitive to work with.
@@ -111,9 +114,9 @@ tableTemplate.metatable =
 
 
 local function newDatabase(DBname)
-	TriggerLocalEvent("openDatabase", DBname)
+	TriggerLocalEvent("openDatabase", DBname,requestID)
 	
-	databaseLoaderInfo = server:receive()
+	databaseLoaderInfo = M.receiveDB(requestID)
 	if databaseLoaderInfo ~= nil then
 		if databaseLoaderInfo:sub(1,2) == "E:" then
 			CElog(DBname .. " could not be opened after 5 tries due to: " .. databaseLoaderInfo:sub(3),"CobaltDB")
@@ -159,13 +162,6 @@ end
 
 
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
-
---used to make sure the socket is connected
-local function reconnectSocket()
-	server:setsockname('0.0.0.0', tonumber(port))
-end
-
-
 --changes the a value in the table in
 local function set(DBname, tableName, key, value)
 	if value == nil then
@@ -188,11 +184,12 @@ end
 --returns a specific value from the table
 local function query(DBname, tableName, key)
 	--reconnectSocket()
-	
-	TriggerLocalEvent("query", DBname, tableName, key)
+	--CElog(requestTag .. " #"    .. requestID .. ": query - " ..DBname .. ">" .. tableName .. ">" .. key,"CobaltDB")
+
+	TriggerLocalEvent("query", DBname, tableName, key, requestID)
 	
 
-	local data = server:receive()
+	local data = M.receiveDB(requestID)
 	
 	--if DBname ~= "config" then
 		--CElog(DBname .. "." .. tableName .. "." .. key .. " = " .. data,"DEBUG")
@@ -223,10 +220,11 @@ end
 --returns a read-only version of the table, or sub-table as json.
 local function getTable(DBname, tableName)
 	--reconnectSocket()
+	--CElog(requestTag .. " #"    .. requestID .. ": getTable - " ..DBname .. ">" .. tableName,"CobaltDB" )
+
+	TriggerLocalEvent("getTable", DBname, tableName, requestID)
 	
-	TriggerLocalEvent("getTable", DBname, tableName)
-	
-	local data = server:receive()
+	local data = M.receiveDB(requestID)
 	local error
 
 	if data:sub(1,4) == cobaltSysChar then
@@ -243,10 +241,11 @@ end
 --returns a read-only list of all tables within the database
 local function getTables(DBname)
 	--reconnectSocket()
+	--CElog(requestTag .. " #"    .. requestID .. ": getTables - " ..DBname,"CobaltDB")
 	
-	TriggerLocalEvent("getTables", DBname)
+	TriggerLocalEvent("getTables", DBname, requestID)
 	
-	local data = server:receive()
+	local data = M.receiveDB(requestID)
 	local error
 
 	if data:sub(1,4) == cobaltSysChar then
@@ -262,10 +261,11 @@ end
 
 local function getKeys(DBname, tableName)
 	--reconnectSocket()
+	--CElog(requestTag .. " #"    .. requestID .. ": getKeys - " ..DBname .. ">" .. tableName,"CobaltDB")
 
-	TriggerLocalEvent("getKeys", DBname, tableName)
+	TriggerLocalEvent("getKeys", DBname, tableName, requestID)
 		
-	local data = server:receive()
+	local data = M.receiveDB(requestID)
 	local error
 
 	if data:sub(1,4) == cobaltSysChar then
@@ -281,23 +281,28 @@ end
 
 local function tableExists(DBname, tableName)
 	--reconnectSocket()	
+	--CElog(requestTag .. " #"    .. requestID .. ": tableExists - " ..DBname .. ">" .. tableName,"CobaltDB")
 
-	TriggerLocalEvent("tableExists", DBname, tableName)
+	TriggerLocalEvent("tableExists", DBname, tableName, requestID)
 	
-	exists = server:receive() == tableName
+	exists = M.receiveDB(requestID) == tableName
 
 	--server:close()
 	return exists
 end
 
+local function getCurrentRequestID()
+	return requestID
+end
 
 ---------------------------------------------------------FUNCTIONS---------------------------------------------------------
+--This, err isn't used at all not sure why it exists, please don't use it
 local function openDatabase(DBname)
 	--reconnectSocket()
 	
 	TriggerLocalEvent("openDatabase", DBname)
-	if server:receive() == DBname then
-		CElog(DBname .. " sucessfully opened.","CobaltDB")
+	if M.receiveDB(requestID) == DBname then
+		--CElog(DBname .. " sucessfully opened.","CobaltDB")
 		
 		--server:close()
 		return true
@@ -308,6 +313,76 @@ local function openDatabase(DBname)
 	end
 end
 
+--repair the connection to CobaltDB in the event of a disconnect.
+--note: BeamMP functions time out after 6ish seconds, so since this is almost always a socket timeout problem, we have to factor in that there will be 2 seconds already gone to work with.
+local function repairCobaltDBconnection(reason)
+	
+	CElog("/!\\ --------------------------COBALT-DB-CONNECTION-REPAIR-------------------------- /!\\\n","WARN")
+	CElog("Cobalt Essentials has detected an error in your connection to CobaltDB","WARN")
+	CElog("Please stand by while CE attempts to repair the connection.","WARN")
+	
+	--server = socket.udp()
+	--server:settimeout(timeout)
+	server:close()
+	server:setsockname('0.0.0.0', tonumber(port))
+
+	CElog("Socket has been reset, running a connection test.\n","WARN")
+	
+	local startTime = os.clock() * 1000
+	TriggerLocalEvent("testCobaltDBconnection")--request test
+	
+	local data, error = server:receive()--wait  for test
+	local recTime = os.clock() * 1000
+
+	if data == port then
+		CElog(color(32) .. "CobaltDB Connection sucessfully repaired with a propagation delay of " .. math.floor(recTime - startTime) .. "ms","WARN")
+		--CElog(color(32) .. "CobaltDB Connection sucessfully repaired with a propagation delay of " .. (startTime - recTime) .. "ms","CobaltDB")
+		CElog("/!\\ --------------------------COBALT-DB-CONNECTION-REPAIR-------------------------- /!\\","WARN")
+		return true
+	else
+		CElog("CobaltDB Connection repair was unsucessful, please try restarting your server.","WARN")
+		CElog("If you are running multiple servers, make sure each server has a unique CobaltDBport","WARN")
+		CElog("If the problem persists, please reach out to Cobalt Essentials support in our discord.","WARN")
+		CElog("/!\\ --------------------------COBALT-DB-CONNECTION-REPAIR-------------------------- /!\\","WARN")
+		return false
+	end
+end
+
+local function receiveDB(expectedRequestID)
+	requestID = requestID + 1 --increment requestID because 
+	--CElog(receiveTag .. " #" expectedRequestID ..": requested.","CobaltDB")
+	local data,error = server:receive()
+	--CElog((data or "nil") .. " was received.","CobaltDB")
+
+	local s, e = data:find("%[requestIDsplitter%]")--find the index of the splitter
+	local recRequestID
+	
+	if s ~= nil then
+		recRequestID = data:sub(1,s-1)
+		data = data:sub(e+1)
+		--CElog(receiveTag .. " #" .. recRequestID .. ":" .. data,"CobaltDB")
+	end
+
+	if data == nil or expectedRequestID ~= tonumber(recRequestID) or s == nil then
+		if repairCobaltDBconnection(error) == true then
+			
+			CElog("Requesting resend of last CobaltDB request","CobaltDB")
+			TriggerLocalEvent("DBresend")
+			data, error = server:receive()
+
+
+			s, e = data:find("%[requestIDsplitter%]")--find the index of the splitter
+			recRequestID = data:sub(1,s-1)
+			data = data:sub(e+1)
+
+			if expectedRequestID ~= tonumber(recRequestID) then
+				return nil
+			end
+		end
+	end
+
+	return data
+end
 
 ------------------------------------------------------PUBLICINTERFACE------------------------------------------------------
 
@@ -328,7 +403,12 @@ M.getTable = getTable
 M.getTables = getTables
 M.getKeys = getKeys
 M.tableExists = tableExists
+
+M.getCurrentRequestID = getCurrentRequestID
 ----FUNCTIONS----
-M.openDatabase = openDatabase
+M.openDatabase = openDatabase--This, err isn't used at all not sure why it exists, please don't use it
+M.reconnectSocket = reconnectSocket
+M.socket = server
+M.receiveDB = receiveDB
 
 return M
