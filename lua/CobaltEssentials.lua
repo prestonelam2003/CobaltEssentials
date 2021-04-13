@@ -169,7 +169,7 @@ end
 function onChatMessage(playerID, name ,chatMessage)
 	chatMessage = chatMessage:sub(2)
 
-	if extensions.triggerEvent("onChatMessage", players[ID], chatMessage) == false then
+	if extensions.triggerEvent("onChatMessage", players[playerID], chatMessage) == false then
 		return -1
 	end
 
