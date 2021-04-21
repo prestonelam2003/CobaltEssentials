@@ -366,6 +366,7 @@ function stopServer(source)
 		return 1
 	end
 
+	local temp = config.CobaltDBport.value
 	exit()
 end
 

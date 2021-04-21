@@ -91,8 +91,8 @@ local function onNewRconClient(client)
 end
 
 --called when the server is stopped through the stopServer() function
-local function onServerStop()
-
+local function onStopServer()
+	
 end
 
 
@@ -117,6 +117,6 @@ M.onVehicleDeleted = onVehicleDeleted
 M.onRconCommand = onRconCommand
 M.onNewRconClient = onNewRconClient
 
-M.onServerStop = onServerStop
+M.onStopServer = onStopServer
 
 return M

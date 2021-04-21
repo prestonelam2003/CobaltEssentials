@@ -51,7 +51,6 @@ CobaltDB can now auto-detect errors and will repair itself accordingly.
 Fixed CobaltDB "disconnect" that many server/network owners were reporting.
 Changed out the Lua DLLs to support the new server version.
 Added psudeo random number generator, it currently operates off a linear congruential generator, though in the future i want to add some entropy by stacking multiple generators under one master generator.
-
 Fixed BeamMPconfig bug that may or may not be fixed and may or may not have existed on the live build
 Added the ability to set new log types to be used with CElog(output,heading) with setLogType(heading,headingColor,conditionFunc,stringColor) the colors use 3 and 4 bit ANSI color codes, the conditionFunc is ran when the log type is executed, if it returns false, the message will not be displayed.
 You may also get the aforementioned log types with getLogTypes()
@@ -60,3 +59,6 @@ Temporarily removed date and time from CElog() since the new server version has 
 Fix for onInit() requirement in extensions from @Deer Boi
 Implemented new connected command which will list players based on their connectStage
 Fix for a dumb bug with beamMPconfig metatable/object in lua which was causing problems with certain extensions and the setcfg command.
+Added support for onServerStop() in extensions, a global event will now also be called, though most forigen plugins likely won't be able to react in time.
+OnChatMessage event now passes in the correct player object (Thanks to @Deer Boi)
+
