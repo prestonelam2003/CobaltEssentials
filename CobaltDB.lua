@@ -79,7 +79,19 @@ function openDatabase(DBname, requestID)
 		jsonFile, error = io.open(jsonPath, "w")
 		local openAttempts = 1
 		if error then
-			os.execute("mkdir " .. dbpath:gsub("/","\\") .. "\\playersDB")
+			print(error)
+			--os.execute("mkdir " .. dbpath:gsub("/","\\") .. "\\playersDB")
+			local subfolders = split(DBname,"/")
+
+			local path = ""
+			for index,subfolder in pairs(subfolders) do
+					if index < #subfolders then
+					path = path .. "/" ..  subfolder
+					os.execute("mkdir " .. dbpath:gsub("/","\\") .. path:gsub("/","\\"))
+
+					CElog('Folder created at: "' .. path ..'"')
+				end
+			end
 			--while error and openAttempts < 5 do
 				jsonFile, error = io.open(jsonPath, "w")
 				--openAttempts = openAttempts + 1
@@ -121,7 +133,7 @@ function setCobaltDBport(port)
 	lastSent = CobaltDBport
 end
 
---tells CobaltDB that the data was not recieved.
+--tells CobaltDB that the data was not received.
 function resend()
 	connector:sendto(lastSent ,"127.0.0.1", CobaltDBport)
 end

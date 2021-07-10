@@ -224,10 +224,15 @@ end
 
 function onVehicleSpawn(ID, vehID,  data)
 	
+	--local vehicle = vehicles.new(ID, vehID, data)
+	
+	
+
 	data = utils.parseVehData(data)
 
 	--for k,v in pairs(data) do print(tostring(k) .. ": " .. tostring(v)) end
 	--for k,v in pairs(data.parts) do print(tostring(k) .. ": " .. tostring(v)) end
+
 	local canSpawn, reason = players[ID]:canSpawn(vehID, data)
 	canSpawn = canSpawn and extensions.triggerEvent("onVehicleSpawn", players[ID], vehID, data)
 	reason = reason or "Spawn blocked by extension"

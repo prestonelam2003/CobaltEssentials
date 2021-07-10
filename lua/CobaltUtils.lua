@@ -202,8 +202,9 @@ local function parseVehData(data)
 	return data
 end
 
+--DEPRECATED
 --read a .cfg file and return a table containing it's files
-local function readCfg(path)
+local function readOldCfg(path)
 
 	local cfg = {}
 	
@@ -256,6 +257,96 @@ local function readCfg(path)
 	return cfg
 end
 
+--read a TOML file and return a table containing it's files
+--doSubtables is a boolean that dictates if the section titles used in TOML should contribute to their own subtable or if everything should go in one table.
+	--doSubtables = false: contents of TOML catagories are not placed into their own subtable
+	--doSubtables = true: contents of TOML catagories are placed into their own subtable
+--includeComments: Dictates how comments are dealt with.
+	--includeComments = -1: Comments are entirely ignored
+	--includeComments = 0: Comments not placed in the main table
+	--includeComments = 1: Comments are placed in a comments subtable.
+local function readCfg(path,doSubtables, includeComments)
+	--set default values
+	doSubtables = doSubtables or false
+	includeComments = (includeComments and includeComments >= -1 and includeComments <= 1) or 0
+
+	local cfg = {}
+	local comments = {}
+	local lineNumber = 1
+	local catagory = nil
+	local currentTable = cfg
+
+	local file = io.open(path,"r")
+
+	--loop through all the lines
+	local line = file:read("*l") --get first value for line
+	while line ~= nil do
+		
+		--Comments
+		local c = line:find("#")
+		if c ~= nil then
+			if includeComments ~= -1 then
+				local comment = line:sub(c+1)
+				if includeComments == 1 then
+					currentTable.comments = currentTable.comments or {} --set default
+
+					currentTable.comments[lineNumber] = comment --add to comments subtable
+				end
+
+				comments[lineNumber] = comment --add to main comments table
+			end
+			line = line:sub(1,c-1)
+		end
+
+		--Catagories/Subtables
+		local tempCatagory = line:find("%[")
+		if tempCatagory ~= nil then
+			if doSubtables then
+				catagory = line:sub(tempCatagory + 1, line:len() - 1)
+
+				cfg[catagory] = cfg[catagory] or {} -- set default
+
+				currentTable = cfg[catagory]
+			end
+		end
+
+		--see if this line even contians a value
+		local equalSignIndex = line:find("=")
+		if equalSignIndex ~= nil then
+			
+			local k = line:sub(1, equalSignIndex - 1)
+			k = k:gsub(" ", "") --remove spaces in the key, they aren't required and will serve to make thigns more confusing.
+
+			local v = line:sub(equalSignIndex + 1)
+
+			v = load("return " ..  v)()
+			
+			currentTable[k] = v
+		end
+
+
+		--get next line ready
+		line = file:read("*line")
+		lineNumber = lineNumber + 1 --increment lineNumber
+	end
+
+
+	if currentTable.Name then
+		cfg.rawName = cfg.Name
+		local s,e = cfg.Name:find("%^")
+		while s ~= nil do
+
+			if s ~= nil then
+				cfg.Name = cfg.Name:sub(0,s-1) .. cfg.Name:sub(s+2)
+			end
+		
+			s,e = cfg.Name:find("%^")
+		end
+	end
+
+	return cfg, comments
+end
+
 -- PRE: number, time in seconds is passed in, followed by boolean hours, boolean minutes, boolean seconds, boolean milliseconds.
 --POST: the formatted time is output as a string.
 function formatTime(time)
@@ -296,9 +387,53 @@ local function random(upper,lower)
 	return randomOutput
 end
 
+function formatVersionAsTable(versionString)
+	local version = {}
+	local tag = "[Release]"
+
+	local s, e = versionString:find("%[")
+	if s then
+		tag = versionString:sub(s)
+		versionString = versionString:sub(1,s-2)
+		s, e = versionString:find("%]")
+		tag = tag:sub(1,s)
+
+	end
+	
+	print("'".. tag .."'")
+	version = split(versionString,".")
+	
+	return version, tag
+end
+
 --RETURNS TRUE IF VER1 IS NEWER THAN vER2
 function compareCobaltVersion(ver1,ver2)
-	print("compareCobaltVersion not implemented yet")
+	
+	local ver1strength = 0
+	local ver2strength = 0
+	
+	if type(ver1) == "string" then
+		ver1 = formatVersionAsTable(ver1)
+	end
+	if type(ver2) == "string" then
+		ver2 = formatVersionAsTable(ver2)
+	end
+
+	for key,version in pairs(ver1) do
+		local strengthChange = 1/(key^10) * tonumber(version)
+		ver1strength = ver1strength + strengthChange
+		--print(version .. ":" .. strengthChange)
+	end
+	--print("------------" .. ver1strength)
+	for key,version in pairs(ver2) do
+		local strengthChange = 1/(key^10) * tonumber(version)
+		ver2strength = ver2strength + strengthChange
+		--print(version .. ":" .. strengthChange)
+	end
+	--print("------------" .. ver2strength)
+	--print(ver1strength > ver2strength)
+	--print("------------")
+	return ver1strength > ver2strength
 end
 
 setLogType("WARN",31,false,31)
@@ -314,6 +449,7 @@ M.parseVehData = parseVehData
 M.setLogType = setLogType
 M.getLogTypes = getLogTypes
 
+M.readOldCfg = readOldCfg
 M.readCfg = readCfg
 
 return M

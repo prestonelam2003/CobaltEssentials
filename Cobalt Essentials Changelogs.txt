@@ -61,4 +61,9 @@ Implemented new connected command which will list players based on their connect
 Fix for a dumb bug with beamMPconfig metatable/object in lua which was causing problems with certain extensions and the setcfg command.
 Added support for onServerStop() in extensions, a global event will now also be called, though most forigen plugins likely won't be able to react in time.
 OnChatMessage event now passes in the correct player object (Thanks to @Deer Boi)
+Cobalt Essentials now supports the TOML config file used by BeamMP servers
+Began Vehicle Rework
+
+TODO:
+Vehicles are now proper objects
 
