@@ -11,22 +11,12 @@
 ------------------------------------------------------------INIT-----------------------------------------------------------
 local M = {}
 
-local cobaltSysChar = string.char(0x99, 0x99, 0x99, 0x99)
-
-local requestID = 0 --The ID of the request, increments by 1 each request. Only increments on REQUESTS ( functions that use receiveDB() )
-local port = 10814 --Default port used before a connection has been established
-local timeout = 3 --Maximum timeout is 3 seconds, anything higher BeamMP will time out the entire function.
-socket = require("socket")
-local server = socket.udp()
-server:settimeout(timeout)
-
-local function init(configPort)
-	port = configPort
-	server:setsockname('0.0.0.0', tonumber(port))
-end
-
 local requestTag = "" .. color(43) .. "[Request]" .. color(0) .. ""
 local receiveTag = "" .. color(42) .. "[Receive]" .. color(0) .. "" 
+
+function init()
+	dontusesocket = true
+end
 
 
 --Set up metatable so that CobaltDB is intuitive to work with.
@@ -111,9 +101,9 @@ tableTemplate.metatable =
 
 
 local function newDatabase(DBname)
-	MP.TriggerLocalEvent("openDatabase", DBname,requestID)
-	
-	databaseLoaderInfo = M.receiveDB(requestID)
+	local res = MP.TriggerLocalEvent("openDatabase", DBname)
+
+	local databaseLoaderInfo = res[1]
 	if databaseLoaderInfo ~= nil then
 		if databaseLoaderInfo:sub(1,2) == "E:" then
 			CElog(DBname .. " could not be opened after 5 tries due to: " .. databaseLoaderInfo:sub(3),"CobaltDB")
@@ -180,17 +170,11 @@ end
 ---------------------------------------------------------ACCESSORS---------------------------------------------------------
 --returns a specific value from the table
 local function query(DBname, tableName, key)
-	--reconnectSocket()
-	--CElog(requestTag .. " #"    .. requestID .. ": query - " ..DBname .. ">" .. tableName .. ">" .. key,"CobaltDB")
+	--CElog(requestTag .. " query - " ..DBname .. ">" .. tableName .. ">" .. key,"CobaltDB")
 
-	MP.TriggerLocalEvent("query", DBname, tableName, key, requestID)
-	
+	local res = MP.TriggerLocalEvent("query", DBname, tableName, key)
 
-	local data = M.receiveDB(requestID)
-	
-	--if DBname ~= "config" then
-		--CElog(DBname .. "." .. tableName .. "." .. key .. " = " .. data,"DEBUG")
-	--end
+	local data = res[1]
 
 	local error
 
@@ -219,9 +203,9 @@ local function getTable(DBname, tableName)
 	--reconnectSocket()
 	--CElog(requestTag .. " #"    .. requestID .. ": getTable - " ..DBname .. ">" .. tableName,"CobaltDB" )
 
-	MP.TriggerLocalEvent("getTable", DBname, tableName, requestID)
-	
-	local data = M.receiveDB(requestID)
+	local res = MP.TriggerLocalEvent("getTable", DBname, tableName, requestID)
+
+	local data = res[1]
 	local error
 
 	if data:sub(1,4) == cobaltSysChar then
@@ -231,18 +215,16 @@ local function getTable(DBname, tableName)
 		data = json.parse(data)
 	end
 
-	--server:close()
 	return data, error
 end
 
 --returns a read-only list of all tables within the database
 local function getTables(DBname)
-	--reconnectSocket()
 	--CElog(requestTag .. " #"    .. requestID .. ": getTables - " ..DBname,"CobaltDB")
 	
-	MP.TriggerLocalEvent("getTables", DBname, requestID)
+	local res = MP.TriggerLocalEvent("getTables", DBname, requestID)
 	
-	local data = M.receiveDB(requestID)
+	local data = res[1]
 	local error
 
 	if data:sub(1,4) == cobaltSysChar then
@@ -252,17 +234,15 @@ local function getTables(DBname)
 		data = json.parse(data)
 	end
 
-	--server:close()
 	return data, error
 end
 
 local function getKeys(DBname, tableName)
-	--reconnectSocket()
 	--CElog(requestTag .. " #"    .. requestID .. ": getKeys - " ..DBname .. ">" .. tableName,"CobaltDB")
 
-	MP.TriggerLocalEvent("getKeys", DBname, tableName, requestID)
-		
-	local data = M.receiveDB(requestID)
+	local res = MP.TriggerLocalEvent("getKeys", DBname, tableName, requestID)
+
+	local data = res[1]
 	local error
 
 	if data:sub(1,4) == cobaltSysChar then
@@ -272,19 +252,16 @@ local function getKeys(DBname, tableName)
 		data = json.parse(data)
 	end
 
-	--server:close()
 	return data, error
 end
 
 local function tableExists(DBname, tableName)
-	--reconnectSocket()	
 	--CElog(requestTag .. " #"    .. requestID .. ": tableExists - " ..DBname .. ">" .. tableName,"CobaltDB")
 
-	MP.TriggerLocalEvent("tableExists", DBname, tableName, requestID)
+	local res = MP.TriggerLocalEvent("tableExists", DBname, tableName, requestID)
 	
-	exists = M.receiveDB(requestID) == tableName
+	exists = res[1] == tableName
 
-	--server:close()
 	return exists
 end
 
@@ -295,17 +272,12 @@ end
 ---------------------------------------------------------FUNCTIONS---------------------------------------------------------
 --This, err isn't used at all not sure why it exists, please don't use it
 local function openDatabase(DBname)
-	--reconnectSocket()
-	
-	MP.TriggerLocalEvent("openDatabase", DBname)
-	if M.receiveDB(requestID) == DBname then
-		--CElog(DBname .. " sucessfully opened.","CobaltDB")
-		
-		--server:close()
+	local res = MP.TriggerLocalEvent("openDatabase", DBname)
+
+	if res[1] == DBname then
+		--CElog(DBname .. " sucessfully opened.","CobaltDB")	
 		return true
 	else
-		
-		--server:close()
 		return false
 	end
 end

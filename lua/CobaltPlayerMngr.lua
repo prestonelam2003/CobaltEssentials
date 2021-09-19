@@ -237,7 +237,7 @@ local function new(name, role, isGuest)
 	--players[playerID] = newPlayer
 
 	--if databaseLoaderInfo == "new" then
-		--TriggerGlobalEvent("onPlayerFirstConnecting", playerID)
+		--MP.TriggerGlobalEvent("onPlayerFirstConnecting", playerID)
 	--end
 
 	--print(tostring(newPlayer))
@@ -277,7 +277,7 @@ local function bindPlayerToID(name, playerID)
 	players[playerID] = player
 
 	if databaseLoaderInfo == "new" then
-		TriggerGlobalEvent("onPlayerFirstAuth", playerID)
+		MP.TriggerGlobalEvent("onPlayerFirstAuth", playerID)
 	end
 	unboundAuthenticated[name] = nil
 
@@ -508,7 +508,7 @@ end
 
 ---------------------------------------------------------FUNCTIONS---------------------------------------------------------
 local function tell(player, message)
-	SendChatMessage(player.playerID, message)
+	MP.SendChatMessage(player.playerID, message)
 end
 
 local function kick(player, reason)

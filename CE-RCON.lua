@@ -12,12 +12,9 @@ local waitingForReply = false
 local rconClients = {}
 local clientCount = 0
 
-RegisterEvent("startRCON","startRCON")
+MP.RegisterEvent("startRCON","startRCON")
 
-function startRCON(port, path, cpath)
-	package.path = path
-	package.cpath = cpath
-
+function startRCON(port)
 	local rconClients = {}
 
 	socket = require("socket")
@@ -28,10 +25,10 @@ function startRCON(port, path, cpath)
 	server:settimeout(0.1)
 	server:setsockname('0.0.0.0', port)
 
-	RegisterEvent("keepAlive","keepAlive")
-	RegisterEvent("RCONsend","RCONsend")
-	RegisterEvent("RCONreply","RCONreply")
-	CreateThread("listenRCON",500)
+	MP.RegisterEvent("keepAlive","keepAlive")
+	MP.RegisterEvent("RCONsend","RCONsend")
+	MP.RegisterEvent("RCONreply","RCONreply")
+	--CreateThread("listenRCON",500)
 
 	CElog("RCON open on port " .. port,"RCON")
 
@@ -70,7 +67,7 @@ function listenRCON()
 --			print("'".. password .. "'")
 --			print("'".. message .. "'")
 			
-			TriggerGlobalEvent("onRconCommand", ID, message, password, prefix)
+			MP.TriggerGlobalEvent("onRconCommand", ID, message, password, prefix)
 			waitingForReply = true
 		end
 	--end
@@ -125,7 +122,7 @@ function checkClient(ip, port)
 
 		--add the client to it's respective tables.
 		rconClients[client.ID] = client
-		TriggerGlobalEvent("onNewRconClient", client.ID, client.ip, client.port)
+		MP.TriggerGlobalEvent("onNewRconClient", client.ID, client.ip, client.port)
 		return client.ID
 	end
 end
