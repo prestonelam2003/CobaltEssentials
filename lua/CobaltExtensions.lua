@@ -16,7 +16,7 @@ local eventAllowed = true
 local function init()
 	CElog("-------------Loading Extensions-------------")
 
-	local extensionsToLoad = utils.readCfg(pluginPath .. "/LoadExtensions.cfg")
+	local extensionsToLoad = utils.readCfg(resources .. "/server/" .. pluginName .. "/LoadExtensions.cfg")
 
 	for extensionName,extensionPath in pairs(extensionsToLoad) do
 		--CElog(tostring(extensionName) .. ": " .. tostring(extensionPath))

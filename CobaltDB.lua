@@ -16,33 +16,40 @@ local cobaltSysChar = string.char(0x99, 0x99, 0x99, 0x99)
 
 local CobaltDBport = 58933
 
-MP.RegisterEvent("initDB","initDB")
-MP.RegisterEvent("openDatabase","openDatabase")
-MP.RegisterEvent("closeDatabase","closeDatabase")
-MP.RegisterEvent("setCobaltDBport","setCobaltDBport")
-MP.RegisterEvent("DBresend","resend")
-MP.RegisterEvent("repairDBconnection","repairDBconnection")
+RegisterEvent("initDB","initDB")
+RegisterEvent("openDatabase","openDatabase")
+RegisterEvent("closeDatabase","closeDatabase")
+RegisterEvent("setCobaltDBport","setCobaltDBport")
+RegisterEvent("DBresend","resend")
+RegisterEvent("repairDBconnection","repairDBconnection")
 
-MP.RegisterEvent("testCobaltDBconnection","testConnection")
+RegisterEvent("testCobaltDBconnection","testConnection")
 
-MP.RegisterEvent("query","query")
-MP.RegisterEvent("getTable","getTable")
-MP.RegisterEvent("getTables","getTables")
-MP.RegisterEvent("getKeys","getKeys")
-MP.RegisterEvent("tableExists","tableExists")
+RegisterEvent("query","query")
+RegisterEvent("getTable","getTable")
+RegisterEvent("getTables","getTables")
+RegisterEvent("getKeys","getKeys")
+RegisterEvent("tableExists","tableExists")
 
-MP.RegisterEvent("HandleSyncEvent","HandleSyncEvent")
+RegisterEvent("HandleSyncEvent","HandleSyncEvent")
 
-MP.RegisterEvent("set","set")
+RegisterEvent("set","set")
 
 ----------------------------------------------------------EVENTS-----------------------------------------------------------
 --give the CobaltDBconnector all the information it needs without having to re-calculate it all
-function initDB()
+function initDB(path, cpath, dbpath, config)
+	
+	package.cpath = cpath
+	package.path = path
+
 	json = require("json")
 	socket = require("socket")
 	utils = require("CobaltUtils")
 
-	_G.dbpath = pluginPath .. "/CobaltDB/"
+	config = json.parse(config)
+	
+
+	_G.dbpath = dbpath
 
 	local jsonFile, error = io.open(dbpath .."config.json")
 	if error == nil then
@@ -51,7 +58,7 @@ function initDB()
 	end
 
 	CElog("CobaltDB Initiated","CobaltDB")
-	MP.TriggerLocalEvent("onCobaltDBhandshake",CobaltDBport)
+	TriggerLocalEvent("onCobaltDBhandshake",CobaltDBport)
 
 	connector = socket.udp()
 end
@@ -108,9 +115,6 @@ function openDatabase(DBname, requestID)
 
 		jsonFile:close()
 	end
-
-	if dontusesocket then return databaseLoaderInfo end
-
 	databaseLoaderInfo = requestID .. "[requestIDsplitter]" .. databaseLoaderInfo
 	connector:sendto(databaseLoaderInfo ,"127.0.0.1", CobaltDBport)
 	lastSent = databaseLoaderInfo
@@ -203,8 +207,6 @@ function query(DBname, tableName, key, requestID)
 		end
 	end
 
-	if dontusesocket then return data end
-
 	data = requestID .. "[requestIDsplitter]" .. data
 	connector:sendto(data ,"127.0.0.1", CobaltDBport)
 	lastSent = data
@@ -227,8 +229,6 @@ function getTable(DBname, tableName, requestID)
 		end
 	end
 
-	if dontusesocket then return data end
-
 	data = requestID .. "[requestIDsplitter]" .. data
 	connector:sendto(data ,"127.0.0.1", CobaltDBport)
 	lastSent = data
@@ -243,8 +243,6 @@ function getTables(DBname, requestID)
 	
 	data = json.stringify(data)
 
-	if dontusesocket then return data end
-
 	data = requestID .. "[requestIDsplitter]" .. data
 	connector:sendto(data ,"127.0.0.1", CobaltDBport)
 	lastSent = data
@@ -258,8 +256,6 @@ function getKeys(DBname, tableName, requestID)
 	
 	data = json.stringify(data)
 
-	if dontusesocket then return data end
-
 	data = requestID .. "[requestIDsplitter]" .. data
 	connector:sendto(data ,"127.0.0.1", CobaltDBport)
 	lastSent = data
@@ -271,8 +267,6 @@ function tableExists(DBname, tableName, requestID)
 	if loadedDatabases[DBname] ~= nil and loadedDatabases[DBname][tableName] ~= nil then
 		data = tableName
 	end
-
-	if dontusesocket then return data end
 
 	data = requestID .. "[requestIDsplitter]" .. data
 	connector:sendto(data ,"127.0.0.1", CobaltDBport)

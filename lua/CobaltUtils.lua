@@ -2,7 +2,7 @@
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 local M = {}
-_G.MP.SendChatMessageV = _G.MP.SendChatMessage
+_G.SendChatMessageV = _G.SendChatMessage
 _G.RemoveVehicleV = _G.RemoveVehicle
 _G.GetPlayerVehiclesV = _G.GetPlayerVehicles
 _G.DropPlayerV = _G.DropPlayer
@@ -12,15 +12,15 @@ lastRandomNumber = os.time()
 --Trigger the on VehicleDeleted event
 function RemoveVehicle(playerID, vehID)
 	RemoveVehicleV(playerID,vehID)
-	MP.TriggerGlobalEvent("onVehicleDeleted", playerID, vehID)
+	TriggerGlobalEvent("onVehicleDeleted", playerID, vehID)
 end
 
 --Make sending multi-line chat messages with \n possible.
-function MP.SendChatMessage(playerID, message)
+function SendChatMessage(playerID, message)
 	message = split(message ,"\n")
 
 	for k,v in ipairs(message) do
-		MP.SendChatMessageV(playerID, v)
+		SendChatMessageV(playerID, v)
 		Sleep(10)
 	end
 end
@@ -137,11 +137,11 @@ function output(ID, message)
 		if ID == "C" then
 			CElog(message)
 		elseif ID:sub(1,1) == "R" then
-			MP.TriggerGlobalEvent("RCONsend", ID, message)
+			TriggerGlobalEvent("RCONsend", ID, message)
 		end
 	
 	elseif type(ID) == "number" then
-		MP.SendChatMessage(ID, message)
+		SendChatMessage(ID, message)
 	else
 		error("Invalid ID")
 	end

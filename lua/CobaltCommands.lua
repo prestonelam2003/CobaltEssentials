@@ -288,12 +288,12 @@ local function setcfg(sender, option, value)
 end
 
 local function countdown(sender, ...)
-	MP.SendChatMessage( -1 , "Starting race in 5..." )
-	CE.delayExec( 1000 , MP.SendChatMessage , { -1 , "4..."} )
-	CE.delayExec( 2000 , MP.SendChatMessage , { -1 , "3..."} )
-	CE.delayExec( 3000 , MP.SendChatMessage , { -1 , "2..."} )
-	CE.delayExec( 4000 , MP.SendChatMessage , { -1 , "1..."} )
-	CE.delayExec( 5000 , MP.SendChatMessage , { -1 , "Go!!"} )
+	SendChatMessage( -1 , "Starting race in 5..." )
+	CE.delayExec( 1000 , SendChatMessage , { -1 , "4..."} )
+	CE.delayExec( 2000 , SendChatMessage , { -1 , "3..."} )
+	CE.delayExec( 3000 , SendChatMessage , { -1 , "2..."} )
+	CE.delayExec( 4000 , SendChatMessage , { -1 , "1..."} )
+	CE.delayExec( 5000 , SendChatMessage , { -1 , "Go!!"} )
 end
 
 local function lua(sender, toExecute, ...)
@@ -308,7 +308,7 @@ local function testCommand(sender, ...)
 end
 
 local function say(sender, message, ...)
-	MP.SendChatMessage(-1, message)
+	SendChatMessage(-1, message)
 end
 
 local function uptime(sender, ...)

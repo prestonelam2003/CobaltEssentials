@@ -11,7 +11,10 @@
 ------------------------------------------------------------INIT-----------------------------------------------------------
 local M = {}
 
+local dbPath = resources .. "/server/" .. pluginName .. "/CobaltDB/"
 local cobaltSysChar = string.char(0x99, 0x99, 0x99, 0x99)
+
+TriggerLocalEvent("initDB", package.path, package.cpath, dbPath, json.stringify(config))
 
 local requestID = 0 --The ID of the request, increments by 1 each request. Only increments on REQUESTS ( functions that use receiveDB() )
 local port = 10814 --Default port used before a connection has been established
@@ -111,7 +114,7 @@ tableTemplate.metatable =
 
 
 local function newDatabase(DBname)
-	MP.TriggerLocalEvent("openDatabase", DBname,requestID)
+	TriggerLocalEvent("openDatabase", DBname,requestID)
 	
 	databaseLoaderInfo = M.receiveDB(requestID)
 	if databaseLoaderInfo ~= nil then
@@ -126,7 +129,7 @@ local function newDatabase(DBname)
 				CobaltDB_databaseName = DBname,
 				CobaltDB_newTable = M.newTable,
 				close = function(table)
-					MP.TriggerLocalEvent("closeDatabase",DBname)
+					TriggerLocalEvent("closeDatabase",DBname)
 				end
 
 			}
@@ -167,13 +170,13 @@ local function set(DBname, tableName, key, value)
 		value = json.stringify(value)
 	end
 
-	MP.TriggerLocalEvent("set", DBname, tableName, key, value)
+	TriggerLocalEvent("set", DBname, tableName, key, value)
 end
 
 local function setPort(port)
 	server:close()
 	server:setsockname('0.0.0.0', port)
-	MP.TriggerLocalEvent("setCobaltDBport",port)
+	TriggerLocalEvent("setCobaltDBport",port)
 	return tonumber(server:receive()) == port
 end
 
@@ -183,7 +186,7 @@ local function query(DBname, tableName, key)
 	--reconnectSocket()
 	--CElog(requestTag .. " #"    .. requestID .. ": query - " ..DBname .. ">" .. tableName .. ">" .. key,"CobaltDB")
 
-	MP.TriggerLocalEvent("query", DBname, tableName, key, requestID)
+	TriggerLocalEvent("query", DBname, tableName, key, requestID)
 	
 
 	local data = M.receiveDB(requestID)
@@ -219,7 +222,7 @@ local function getTable(DBname, tableName)
 	--reconnectSocket()
 	--CElog(requestTag .. " #"    .. requestID .. ": getTable - " ..DBname .. ">" .. tableName,"CobaltDB" )
 
-	MP.TriggerLocalEvent("getTable", DBname, tableName, requestID)
+	TriggerLocalEvent("getTable", DBname, tableName, requestID)
 	
 	local data = M.receiveDB(requestID)
 	local error
@@ -240,7 +243,7 @@ local function getTables(DBname)
 	--reconnectSocket()
 	--CElog(requestTag .. " #"    .. requestID .. ": getTables - " ..DBname,"CobaltDB")
 	
-	MP.TriggerLocalEvent("getTables", DBname, requestID)
+	TriggerLocalEvent("getTables", DBname, requestID)
 	
 	local data = M.receiveDB(requestID)
 	local error
@@ -260,7 +263,7 @@ local function getKeys(DBname, tableName)
 	--reconnectSocket()
 	--CElog(requestTag .. " #"    .. requestID .. ": getKeys - " ..DBname .. ">" .. tableName,"CobaltDB")
 
-	MP.TriggerLocalEvent("getKeys", DBname, tableName, requestID)
+	TriggerLocalEvent("getKeys", DBname, tableName, requestID)
 		
 	local data = M.receiveDB(requestID)
 	local error
@@ -280,7 +283,7 @@ local function tableExists(DBname, tableName)
 	--reconnectSocket()	
 	--CElog(requestTag .. " #"    .. requestID .. ": tableExists - " ..DBname .. ">" .. tableName,"CobaltDB")
 
-	MP.TriggerLocalEvent("tableExists", DBname, tableName, requestID)
+	TriggerLocalEvent("tableExists", DBname, tableName, requestID)
 	
 	exists = M.receiveDB(requestID) == tableName
 
@@ -297,7 +300,7 @@ end
 local function openDatabase(DBname)
 	--reconnectSocket()
 	
-	MP.TriggerLocalEvent("openDatabase", DBname)
+	TriggerLocalEvent("openDatabase", DBname)
 	if M.receiveDB(requestID) == DBname then
 		--CElog(DBname .. " sucessfully opened.","CobaltDB")
 		
@@ -326,7 +329,7 @@ local function repairCobaltDBconnection(reason)
 	CElog("Socket has been reset, running a connection test.\n","WARN")
 	
 	local startTime = os.clock() * 1000
-	MP.TriggerLocalEvent("testCobaltDBconnection")--request test
+	TriggerLocalEvent("testCobaltDBconnection")--request test
 	
 	local data, error = server:receive()--wait  for test
 	local recTime = os.clock() * 1000
@@ -364,7 +367,7 @@ local function receiveDB(expectedRequestID)
 		if repairCobaltDBconnection(error) == true then
 			
 			CElog("Requesting resend of last CobaltDB request","CobaltDB")
-			MP.TriggerLocalEvent("DBresend")
+			TriggerLocalEvent("DBresend")
 			data, error = server:receive()
 
 
