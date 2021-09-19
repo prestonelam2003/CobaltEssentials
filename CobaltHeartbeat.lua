@@ -2,7 +2,7 @@
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 
-CreateThread("heartbeat", 250)
+--CreateThread("heartbeat", 250)
 
 function heartbeat()
 	

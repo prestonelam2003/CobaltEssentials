@@ -1,62 +1,42 @@
 --Copyright (C) 2020, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
---This is to fix BeamMP's apparently dysfunctional modules, it unfortunately breaks hotswapping
-
-RegisterEvent("onCobaltDBhandshake","onCobaltDBhandshake") --to make sure cobaltDB loads first
+MP.RegisterEvent("onCobaltDBhandshake","onCobaltDBhandshake") --to make sure cobaltDB loads first
 
 cobaltVersion = "1.6.0 [BETA 5]"
 
-pluginName = debug.getinfo(1).source:sub(2)
-local s,e
+pluginPath = "Resources/Server/CobaltEssentials"
 
-resources = debug.getinfo(1).source:sub(2)
-
---print("1: '" .. resources .. "'")
-local s, e = resources:find("\\")
---print(s .."," .. e)
-resources = resources:sub(0,e-1)
---print("1: '" .. resources .. "'")
-local s, e = resources:find("Server")
---print(s .."," .. e)
-resources = resources:sub(1,s-2)
---print("1: '" .. resources .. "'")
-
-s, e = pluginName:find("\\")
-pluginName = pluginName:sub(s+1)
-s, e = pluginName:find("\\")
-pluginName = pluginName:sub(1,s-1)
-
-
-package.path = package.path .. ";;" .. resources .. "/Server/" .. pluginName .. "/?.lua;;".. resources .. "/Server/" .. pluginName .. "/lua/?.lua"
-package.cpath = package.cpath .. ";;" .. resources .. "/Server/" .. pluginName .. "/?.dll;;" .. resources .. "/Server/" .. pluginName .. "/lib/?.dll"
-
-
---local neededFiles = {"lua/socket.lua","lua/mime.lua","lua/ltn12.lua","socket/core.dll","mime/core.dll"}
 utils = require("CobaltUtils")
 
-print("\n\n")
-CElog(color(107,94) .. "-------------Loading Cobalt Essentials v" .. cobaltVersion .. "-------------")
-	CE = require("CobaltEssentials")
+function onInit()
+	print("\n\n")
+	CElog(color(107,94) .. "-------------Loading Cobalt Essentials v" .. cobaltVersion .. "------------")
+		CE = require("CobaltEssentials")
 
-	CElog("Utils Loaded")
+		CElog("Utils Loaded")
 
-	CElog("Loading CobaltCommands")
-		CC = require("CobaltCommands")
+		CElog("Loading CobaltCommands")
+			CC = require("CobaltCommands")
 
-	--TODO: WRITE A WAY TO LOAD THESE CONFIG OPTIONS AS AN OVERRIDE TO MAKE SERVER UPDATES/PORTS EASIER?
-	--CobaltConfigOld = require("CobaltConfig")
-		--print("CobaltConfig Loaded")
+		--TODO: WRITE A WAY TO LOAD THESE CONFIG OPTIONS AS AN OVERRIDE TO MAKE SERVER UPDATES/PORTS EASIER?
+		--CobaltConfigOld = require("CobaltConfig")
+			--print("CobaltConfig Loaded")
 
-	json = require("json")
-		CElog("json Lib Loaded")
+		json = require("json")
+			CElog("json Lib Loaded")
 
-	CobaltDB = require("CobaltDBconnector")
-		CElog("CobaltDB Connector Loaded")
-		utils.setLogType("DEBUG",97,function() return config.enableDebug.value == true end)
+		--CobaltDB = require("CobaltDBconnector")
+		CobaltDB = require("EventDBconnector")
+			CElog("CobaltDB Connector Loaded")
+			utils.setLogType("DEBUG",97,function() return config.enableDebug.value == true end)
+
+		MP.TriggerLocalEvent("initDB")
+end
 
 --FOR WHEN COBALTDB REPORTS BACK
 function onCobaltDBhandshake(port)
+
 	CobaltDB.init(port)
 
 	players = require("CobaltPlayerMngr")
@@ -74,13 +54,13 @@ function onCobaltDBhandshake(port)
 
 
 	--See if CobaltConfig needs to be loaded for compatability
-	if utils.exists(resources .. "/Server/" .. pluginName .. "/lua/CobaltConfig.lua") then
+	if utils.exists(pluginPath .. "/lua/CobaltConfig.lua") then
 		CobaltCompat = require("CobaltCompat")
 	end
 
 	if config.RCONenabled.value == true then
 		CElog("opening RCON on port " .. config.RCONport.value)
-		TriggerLocalEvent("startRCON", config.RCONport.value, package.path, package.cpath)
+		MP.TriggerLocalEvent("startRCON", config.RCONport.value)
 	end
 	
 	--WARNING for not having enough players in the config.
@@ -106,11 +86,12 @@ function onCobaltDBhandshake(port)
 		beamMPcfg.MaxCars = highestCap
 		--Sleep(5000)
 	end
+
+	CElog("-------------Cobalt Essentials v" .. cobaltVersion .. " Loaded-------------")
+
+
+	while true do
+		listenRCON()
+	end
 end
 
---
-CElog("-------------CobaltEssentials Config-------------")
-	--CobaltConfigOld.loadConfig()
-	--for k,v in pairs(config.beamMP) do print(tostring(k) .. ": " .. tostring(v)) end
-
-CElog("-------------Cobalt Essentials v" .. cobaltVersion .. " Loaded-------------")

@@ -21,27 +21,27 @@ age = 0 --age of the server in milliseconds
 --local ticks = 0
 delayedQueue = {n = 0}
 
-RegisterEvent("onTick","onTick")
+MP.RegisterEvent("onTick","onTick")
 
-RegisterEvent("onPlayerAuth","onPlayerAuth")
-RegisterEvent("onPlayerFirstAuth","onPlayerFirstAuth")
-RegisterEvent("onPlayerConnecting","onPlayerConnecting")
-RegisterEvent("onPlayerJoining","onPlayerJoining")
-RegisterEvent("onPlayerJoin","onPlayerJoin")
-RegisterEvent("onPlayerDisconnect","onPlayerDisconnect")
+MP.RegisterEvent("onPlayerAuth","onPlayerAuth")
+MP.RegisterEvent("onPlayerFirstAuth","onPlayerFirstAuth")
+MP.RegisterEvent("onPlayerConnecting","onPlayerConnecting")
+MP.RegisterEvent("onPlayerJoining","onPlayerJoining")
+MP.RegisterEvent("onPlayerJoin","onPlayerJoin")
+MP.RegisterEvent("onPlayerDisconnect","onPlayerDisconnect")
 	
-RegisterEvent("onChatMessage","onChatMessage")
+MP.RegisterEvent("onChatMessage","onChatMessage")
 
-RegisterEvent("onVehicleSpawn","onVehicleSpawn")
-RegisterEvent("onVehicleEdited","onVehicleEdited")
-RegisterEvent("onVehicleDeleted","onVehicleDeleted")
-RegisterEvent("onVehicleReset","onVehicleReset")
+MP.RegisterEvent("onVehicleSpawn","onVehicleSpawn")
+MP.RegisterEvent("onVehicleEdited","onVehicleEdited")
+MP.RegisterEvent("onVehicleDeleted","onVehicleDeleted")
+MP.RegisterEvent("onVehicleReset","onVehicleReset")
 
-RegisterEvent("onRconCommand","onRconCommand")
-RegisterEvent("onNewRconClient","onNewRconClient")
+MP.RegisterEvent("onRconCommand","onRconCommand")
+MP.RegisterEvent("onNewRconClient","onNewRconClient")
 
-RegisterEvent("stop","stopServer")
-RegisterEvent("Cobaltstop","stopServer")
+MP.RegisterEvent("stop","stopServer")
+MP.RegisterEvent("Cobaltstop","stopServer")
 
 CElog("CobaltEssentials Initiated")
 
@@ -65,7 +65,7 @@ function onTick()
 
 	--for ID, client in pairs(rconClients) do
 		--if config.RCONkeepAliveTick.value ~= false and age > client.lastContact + config.RCONkeepAliveTick.value * 1000 then
-			--TriggerGlobalEvent("keepAlive", ID)
+			--MP.TriggerGlobalEvent("keepAlive", ID)
 			--client.lastContact = age
 		--end
 	--end
@@ -141,7 +141,7 @@ function onPlayerJoin(ID)
 	if extensions.triggerEvent("onPlayerJoin", players[ID]) == false then
 		DropPlayer(ID,"You've been kicked from the server!")
 	else
-		SendChatMessage(-1, players[ID].name .. " joined the game")
+		MP.SendChatMessage(-1, players[ID].name .. " joined the game")
 	end
 
 end
@@ -194,7 +194,7 @@ function onChatMessage(playerID, name ,chatMessage)
 		
 		local reply = M.command(players[playerID], command, args)
 		if reply ~= nil then
-			SendChatMessage(playerID, reply)
+			MP.SendChatMessage(playerID, reply)
 		end
 
 		--make the chat message not appear in chat. 
@@ -214,7 +214,7 @@ function onChatMessage(playerID, name ,chatMessage)
 
 	for rconID, rconClient in pairs(rconClients) do
 		if rconClient.chat == true then
-			TriggerGlobalEvent("RCONsend", rconID, formattedMessage) 
+			MP.TriggerGlobalEvent("RCONsend", rconID, formattedMessage) 
 			rconClients[rconID].lastContact = age
 		end
 	end
@@ -242,7 +242,7 @@ function onVehicleSpawn(ID, vehID,  data)
 	else
 		CElog(players[ID].name .. " Tried to spawn '" .. data.name .. "' (".. ID .."-".. vehID ..") The spawn was blocked due to '" .. reason .. "'")
 		players[ID]:tell("Unable to spawn vehicle: " .. reason)
-		TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
+		MP.TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
 	end
 
@@ -263,7 +263,7 @@ function onVehicleEdited(ID, vehID,  data)
 		CElog(players[ID].name .. " edited their '" .. data.name .. "' (".. ID .."-".. vehID ..")")
 	else
 		CElog(players[ID].name .. "tried to edit their '" .. data.name .. "' (".. ID .."-".. vehID ..") The edit has been blocked, and the vehicle deleted due to " .. reason)
-		TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
+		MP.TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
 	end
 
@@ -328,15 +328,15 @@ function onRconCommand(ID, message, password, prefix)
 
 			--CElog("RCON REPLIES WITH COMMAND REPLY")
 			if reply ~= nil then
-				TriggerGlobalEvent("RCONsend", ID, reply)
+				MP.TriggerGlobalEvent("RCONsend", ID, reply)
 			end
 		else
 			--CElog("RCON REPLIES WITH BAD COMMAND")
-			TriggerGlobalEvent("RCONsend", ID, "Unrecognized Command")
+			MP.TriggerGlobalEvent("RCONsend", ID, "Unrecognized Command")
 		end
 	else
 		--CElog("RCON REPLIES WITH BAD PASSWORD")
-		TriggerGlobalEvent("RCONsend", ID, "Bad Password")
+		MP.TriggerGlobalEvent("RCONsend", ID, "Bad Password")
 	end
 end
 
@@ -365,7 +365,7 @@ end
 --Stop server safely make sure anything that needs to be is backed up.
 function stopServer(source)
 	--TODO: make this command back things up if required.
-	TriggerGlobalEvent("onServerStop")
+	MP.TriggerGlobalEvent("onServerStop")
 	CElog("Closing server, sending stop server event to all extensions.")
 	if extensions.triggerEvent("onStopServer") == false then
 		return 1

@@ -23,7 +23,7 @@ local function init()
 	ConfigMngrConfig = _G.config
 	config = nil
 	
-	local CobaltConfig = require("CobaltConfig")
+	--local CobaltConfig = require("CobaltConfig")
 	
 	deprecatedConfig = config
 	
