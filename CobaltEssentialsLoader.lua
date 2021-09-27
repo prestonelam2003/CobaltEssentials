@@ -54,7 +54,7 @@ function onCobaltDBhandshake(port)
 
 
 	--See if CobaltConfig needs to be loaded for compatability
-	if utils.exists(pluginPath .. "/lua/CobaltConfig.lua") then
+	if FS.Exists(pluginPath .. "/lua/CobaltConfig.lua") then
 		CobaltCompat = require("CobaltCompat")
 	end
 
@@ -64,7 +64,7 @@ function onCobaltDBhandshake(port)
 	end
 	
 	--WARNING for not having enough players in the config.
-	if beamMPconfig.MaxPlayers < config.maxActivePlayers.value then
+	if beamMPconfig.MaxPlayers > config.maxActivePlayers.value then
 		CElog("/!\\ ---THE SERVER'S MAX PLAYER COUNT IS GREATER THAN THE MAX ACTIVE PLAYERS IN THE COBALT CONFIG--- /!\\","WARN")
 		--Sleep(2000)
 	end
@@ -88,10 +88,5 @@ function onCobaltDBhandshake(port)
 	end
 
 	CElog("-------------Cobalt Essentials v" .. cobaltVersion .. " Loaded-------------")
-
-
-	while true do
-		listenRCON()
-	end
 end
 

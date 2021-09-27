@@ -175,7 +175,7 @@ local function new(name, role, isGuest)
 	--newPlayer.hardwareID = GetPlayerHWID(playerID)
 	newPlayer.guest = isGuest
 	newPlayer.name = name
-	newPlayer.joinTime = age
+	newPlayer.joinTime = ageTimer:GetCurrent()*1000
 	newPlayer.connectStage = 0
 
 

@@ -10,7 +10,7 @@
 local M = {}
 
 local loadedDatabases = {}
-local loadedJson = {}
+--local loadedJson = {}
 
 local cobaltSysChar = string.char(0x99, 0x99, 0x99, 0x99)
 
@@ -58,55 +58,29 @@ end
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 
 function openDatabase(DBname, requestID)
+
 	local jsonPath = dbpath .. DBname .. ".json"
 
-	local jsonFile, error = io.open(jsonPath,"r")
-	--CElog(jsonFile, error)
+	local databaseLoaderInfo = "error" -- defines if the DB was created just now or if it was pre-existing.
 
-	local databaseLoaderInfo = "loaded" -- defines if the DB was created just now or if it was pre-existing.
+	local contents, error = utils.readJson(jsonPath)
 
-	if jsonFile == nil then
-		databaseLoaderInfo = "new"
-		CElog("JSON file does not exist, creating a new one.","CobaltDB")
-		--CElog(jsonFile, error)
-		jsonFile, error = io.open(jsonPath, "w")
-		local openAttempts = 1
-		if error then
-			print(error)
-			--os.execute("mkdir " .. dbpath:gsub("/","\\") .. "\\playersDB")
-			local subfolders = split(DBname,"/")
+	if error then
+		if error == "File does not exist" then
+			CElog("JSON file does not exist, creating a new one.","CobaltDB")
+			databaseLoaderInfo = "new"
 
-			local path = ""
-			for index,subfolder in pairs(subfolders) do
-					if index < #subfolders then
-					path = path .. "/" ..  subfolder
-					os.execute("mkdir " .. dbpath:gsub("/","\\") .. path:gsub("/","\\"))
+			local success, error = utils.writeJson(jsonPath, nil)
 
-					CElog('Folder created at: "' .. path ..'"')
-				end
+			if not success then
+				CElog('failed to write file "' .. tostring(jsonPath) .. '", error: ' .. tostring(error),"WARN")
 			end
-			--while error and openAttempts < 5 do
-				jsonFile, error = io.open(jsonPath, "w")
-				--openAttempts = openAttempts + 1
-			--end
+
+			loadedDatabases[DBname] = {}
 		end
-		--if error then
-			--connector:sendto("E:" .. error ,"127.0.0.1", CobaltDBport)
-			--return false
-		--end
-
-		jsonFile:write("{}")
-		jsonFile:close()
-		jsonFile, error = io.open(jsonPath,"r")
-		loadedJson[DBname] = "{}"
-		loadedDatabases[DBname] = {}
 	else
-		local jsonText = jsonFile:read("*a")
-
-		loadedJson[DBname] = jsonText
-		loadedDatabases[DBname] = json.parse(jsonText)
-
-		jsonFile:close()
+		databaseLoaderInfo = "loaded"
+		loadedDatabases[DBname] = contents
 	end
 
 	if dontusesocket then return databaseLoaderInfo end
@@ -119,7 +93,7 @@ end
 function closeDatabase(DBname)
 	updateDatabase(DBname)
 
-	loadedJson[DBname] = nil
+	--loadedJson[DBname] = nil
 	loadedDatabases[DBname] = nil
 end
 
@@ -140,17 +114,23 @@ end
 
 --saves the table's changes to a file
 function updateDatabase(DBname)
-	--update current json
-	loadedJson[DBname] = json.stringify(loadedDatabases[DBname])
 
-	--write table
 	local filePath = dbpath .. DBname
-	local jsonFile, error = io.open(filePath .. ".temp","w")
-	jsonFile:write(loadedJson[DBname])
-	jsonFile:close()
-	os.remove(filePath .. ".json")
-	os.rename(filePath .. ".temp", filePath .. ".json")
-	--CElog("Updated: '" .. dbpath .. DBname .. ".json'","DEBUG")
+
+	local success, error = utils.writeJson(filePath..".temp", loadedDatabases[DBname])
+
+	if success then
+		success, error = FS.Remove(filePath .. ".json")
+		if success then
+			success, error = FS.Rename(filePath .. ".temp", filePath .. ".json")
+		end
+	end
+
+	if not success then
+		CElog('Failed to update database "'..DBname..'"on disk: '..tostring(error), "WARN")
+	end
+
+	----CElog("Updated: '" .. dbpath .. DBname .. ".json'","DEBUG")
 end
 
 
@@ -159,11 +139,11 @@ end
 function set(DBname, tableName, key, value)
 
 	if loadedDatabases[DBname] ~= nil then
-		
+
 		if loadedDatabases[DBname][tableName] == nil then
 			loadedDatabases[DBname][tableName] = {}
 		end
-		
+
 		if key ~= nil then
 			if value == "null" then
 				loadedDatabases[DBname][tableName][key] = nil
@@ -188,14 +168,14 @@ function query(DBname, tableName, key, requestID)
 
 	if loadedDatabases[DBname] == nil then
 		--error here, database isn't open
-		data = cobaltSysChar .. "E:" .. DBname .. "not found." 
+		data = cobaltSysChar .. "E:" .. DBname .. "not found."
 	else
 		if loadedDatabases[DBname][tableName] == nil then
 			--error here, table doesn't exist
-			data = cobaltSysChar .. "E:" .. DBname .. " > " .. tableName .. " not found." 
+			data = cobaltSysChar .. "E:" .. DBname .. " > " .. tableName .. " not found."
 		else
 			if loadedDatabases[DBname][tableName][key] == nil then
-				data = cobaltSysChar .. "E:" .. DBname .. " > " .. tableName .. " > " .. key .. " not found." 
+				data = cobaltSysChar .. "E:" .. DBname .. " > " .. tableName .. " > " .. key .. " not found."
 			else
 				--send the value as json
 				data = json.stringify(loadedDatabases[DBname][tableName][key])
@@ -216,7 +196,7 @@ function getTable(DBname, tableName, requestID)
 
 	if loadedDatabases[DBname] == nil then
 		--error here, database isn't open
-		data = cobaltSysChar .. "E:" .. DBname .. "not found." 
+		data = cobaltSysChar .. "E:" .. DBname .. "not found."
 	else
 		if loadedDatabases[DBname][tableName] == nil then
 			--error here, tableName doesn't exist
@@ -240,7 +220,7 @@ function getTables(DBname, requestID)
 	for id, _ in pairs(loadedDatabases[DBname]) do
 		data[id] = id
 	end
-	
+
 	data = json.stringify(data)
 
 	if dontusesocket then return data end
@@ -255,7 +235,7 @@ function getKeys(DBname, tableName, requestID)
 	for id, _ in pairs(loadedDatabases[DBname][tableName]) do
 		data[id] = id
 	end
-	
+
 	data = json.stringify(data)
 
 	if dontusesocket then return data end

@@ -147,30 +147,6 @@ function output(ID, message)
 	end
 end
 
-local function exists(file)
-   local ok, err, code = os.rename(file, file)
-   if not ok then
-	  if code == 13 then
-		 -- Permission denied, but it exists
-		 return true
-	  end
-   end
-   return ok, err
-end
-
-local function createDirectory(path)
-	os.execute("mkdir " .. dbpath:gsub("/","\\"))
-end
-
-local function copyFile(path_src, path_dst)
-	local ltn12 = require("Resources/server/CobaltEssentials/socket/lua/ltn12")
-
-	ltn12.pump.all(
-		ltn12.source.file(assert(io.open(path_src, "rb"))),
-		ltn12.sink.file(assert(io.open(path_dst, "wb")))
-	)
-end
-
 local function parseVehData(data)
 	local s, e = data:find('%{')
 
@@ -436,14 +412,67 @@ function compareCobaltVersion(ver1,ver2)
 	return ver1strength > ver2strength
 end
 
+
+-- FS related functions
+local function readJson(path)
+	if not FS.Exists(path) then
+		return nil, "File does not exist"
+	end
+
+	local jsonFile, error = io.open(path,"r")
+	if not jsonFile or error then
+		return nil, error
+	end
+
+	local jsonText = jsonFile:read("*a")
+	jsonFile:close()
+	local success, data = pcall(json.parse, jsonText)
+
+	if not success then
+		print("Error while parsing file", path, data)
+		return nil, "Error while parsing JSON"
+	end
+
+	return data, nil
+end
+
+local function writeJson(path, data)
+	local success, error = FS.CreateDirectory(FS.GetParentFolder(path))
+
+	if not success then
+		CElog('failed to create directory for file "' .. tostring(path) .. '", error: ' .. tostring(error),"WARN")
+		return false, error
+	end
+
+	local jsonFile, error = io.open(path,"w")
+	if not jsonFile or error then
+		return nil, error
+	end
+
+	jsonFile:write(json.stringify(data or {}))
+	jsonFile:close()
+
+	return true, nil
+end
+
+local function copyFile(path_src, path_dst)
+	local ltn12 = require("Resources/server/CobaltEssentials/socket/lua/ltn12")
+
+	ltn12.pump.all(
+		ltn12.source.file(assert(io.open(path_src, "rb"))),
+		ltn12.sink.file(assert(io.open(path_dst, "wb")))
+	)
+end
+-- FS related functions
+
+
+
 setLogType("WARN",31,false,31)
 setLogType("RCON",33)
 setLogType("CobaltDB",35)
 setLogType("CHAT",32)
 
 M.random = random
-M.copyFile = copyFile
-M.exists = exists
 M.parseVehData = parseVehData
 
 M.setLogType = setLogType
@@ -451,5 +480,10 @@ M.getLogTypes = getLogTypes
 
 M.readOldCfg = readOldCfg
 M.readCfg = readCfg
+
+M.readJson = readJson
+M.writeJson = writeJson
+
+M.copyFile = copyFile
 
 return M

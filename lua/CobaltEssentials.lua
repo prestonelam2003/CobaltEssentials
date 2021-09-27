@@ -16,8 +16,9 @@ local M = {}
 rconClients = {} --RCON clients start with an R[ID]
 --local lastContact = 0
 
-
-age = 0 --age of the server in milliseconds
+MP.CreateEventTimer("onTick", 100)
+ageTimer = MP.CreateTimer()
+--age = 0 --age of the server in milliseconds
 --local ticks = 0
 delayedQueue = {n = 0}
 
@@ -48,8 +49,7 @@ CElog("CobaltEssentials Initiated")
 ----------------------------------------------------------EVENTS-----------------------------------------------------------
 
 function onTick()
-
-	age = os.clock() * 1000
+	local age = ageTimer:GetCurrent()*1000
 
 	for k,v in pairs(delayedQueue) do
 		if k ~= "n" and v.complete == false and age >= v.execTime then
@@ -215,7 +215,7 @@ function onChatMessage(playerID, name ,chatMessage)
 	for rconID, rconClient in pairs(rconClients) do
 		if rconClient.chat == true then
 			MP.TriggerGlobalEvent("RCONsend", rconID, formattedMessage) 
-			rconClients[rconID].lastContact = age
+			rconClients[rconID].lastContact = ageTimer:GetCurrent()*1000
 		end
 	end
 
@@ -303,7 +303,8 @@ function onRconCommand(ID, message, password, prefix)
 
 	CElog(rconClients[ID].ip .. " : " ..prefix .. " " .. password .. " " .. message,"RCON")
 
-	rconClients[ID].lastContact = age
+	rconClients[ID].lastContact = ageTimer:GetCurrent()*1000 
+
 
 	--correctPassword = config.RCONpassword.value
 	--print(password)
@@ -347,7 +348,7 @@ function onNewRconClient(ID, ip, port)
 	client.ip = ip
 	client.port = port
 	client.chat = false
-	client.lastContact = age
+	client.lastContact = ageTimer:GetCurrent()*1000
 	client.type = "RCON"
 
 	client.canExecute = function(client, command)
@@ -358,7 +359,14 @@ function onNewRconClient(ID, ip, port)
 		return 1
 	end
 
+
+
 	rconClients[ID] = client
+
+
+	MP.TriggerGlobalEvent("RCONsend", ID, "BLEAT")
+
+
 end
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 
@@ -381,6 +389,8 @@ end
 local function delayExec(delay, func, args)
 
 	local delayedItem = {}
+
+	local age = ageTimer:GetCurrent()*1000 
 
 	delayedItem.execTime = age + delay --the time at which the func is called with args args
 	delayedItem.func = func --the function that is executed
