@@ -44,12 +44,14 @@ function initDB()
 
 	_G.dbpath = pluginPath .. "/CobaltDB/"
 
-	local jsonFile, error = io.open(dbpath .."config.json")
-	if error == nil then
-		CobaltDBport = tonumber(json.parse(jsonFile:read("*a")).CobaltDBport.value)
-		jsonFile:close()
-	end
+	if not dontusesocket then
 
+		local jsonFile, error = io.open(dbpath .."config.json")
+		if error == nil then
+			CobaltDBport = tonumber(json.parse(jsonFile:read("*a")).CobaltDBport.value)
+			jsonFile:close()
+		end
+	end
 	CElog("CobaltDB Initiated","CobaltDB")
 	MP.TriggerLocalEvent("onCobaltDBhandshake",CobaltDBport)
 
