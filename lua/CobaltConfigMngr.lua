@@ -16,7 +16,7 @@ config = CobaltDB.new("config")
 
 beamMPconfig = {}
 currentcfg = {}
-beamMPcfg = utils.readCfg("ServerConfig.toml")
+beamMPcfg = utils.readCfg("ServerConfig.toml").General
 
 
 
