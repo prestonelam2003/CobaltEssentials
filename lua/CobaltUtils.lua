@@ -21,7 +21,7 @@ function MP.SendChatMessage(playerID, message)
 
 	for k,v in ipairs(message) do
 		MP.SendChatMessageV(playerID, v)
-		Sleep(10)
+		MP.Sleep(10)
 	end
 end
 

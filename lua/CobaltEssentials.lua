@@ -16,7 +16,7 @@ local M = {}
 rconClients = {} --RCON clients start with an R[ID]
 --local lastContact = 0
 
-MP.CreateEventTimer("onTick", 100)
+MP.CreateEventTimer("onTick", 1000)
 ageTimer = MP.CreateTimer()
 --age = 0 --age of the server in milliseconds
 --local ticks = 0
@@ -115,7 +115,7 @@ end
 function onPlayerConnecting(ID)
 	CElog("On Player Connecting: " .. ID)
 
-	local name = GetPlayerName(ID)
+	local name = MP.GetPlayerName(ID)
 	players.bindPlayerToID(name, ID)
 	players.updateQueue()
 
@@ -127,7 +127,7 @@ function onPlayerJoining(ID)
 	CElog("On Player Joining: " .. ID)
 
 	if extensions.triggerEvent("onPlayerJoining", players[ID]) == false then
-		DropPlayer(ID,"You've been kicked from the server!")
+		MP.DropPlayer(ID,"You've been kicked from the server!")
 
 	else
 		
@@ -136,10 +136,11 @@ end
 
 function onPlayerJoin(ID)
 	players[ID].connectStage = "connected"
+
 	CElog("On Player Join: " .. ID)
-	
+
 	if extensions.triggerEvent("onPlayerJoin", players[ID]) == false then
-		DropPlayer(ID,"You've been kicked from the server!")
+		MP.DropPlayer(ID,"You've been kicked from the server!")
 	else
 		MP.SendChatMessage(-1, players[ID].name .. " joined the game")
 	end
