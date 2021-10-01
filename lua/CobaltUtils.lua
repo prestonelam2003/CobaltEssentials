@@ -8,6 +8,8 @@ _G.GetPlayerVehiclesV = _G.GetPlayerVehicles
 _G.DropPlayerV = _G.DropPlayer
 lastRandomNumber = os.time()
 
+local tomlParser = require("toml")
+
 -------------------------------------------------REPLACED-GLOBAL-FUNCTIONS-------------------------------------------------
 --Trigger the on VehicleDeleted event
 function RemoveVehicle(playerID, vehID)
@@ -233,94 +235,26 @@ local function readOldCfg(path)
 	return cfg
 end
 
---read a TOML file and return a table containing it's files
---doSubtables is a boolean that dictates if the section titles used in TOML should contribute to their own subtable or if everything should go in one table.
-	--doSubtables = false: contents of TOML catagories are not placed into their own subtable
-	--doSubtables = true: contents of TOML catagories are placed into their own subtable
---includeComments: Dictates how comments are dealt with.
-	--includeComments = -1: Comments are entirely ignored
-	--includeComments = 0: Comments not placed in the main table
-	--includeComments = 1: Comments are placed in a comments subtable.
-local function readCfg(path,doSubtables, includeComments)
-	--set default values
-	doSubtables = doSubtables or false
-	includeComments = (includeComments and includeComments >= -1 and includeComments <= 1) or 0
+--read a .cfg file and return a table containing it's files
+local function readCfg(path)
+	local tomlFile, error = io.open(path, 'r')
+	if error then return nil, error end
 
-	local cfg = {}
-	local comments = {}
-	local lineNumber = 1
-	local catagory = nil
-	local currentTable = cfg
+	local tomlText = tomlFile:read("*a")
+	tomlFile:close()
 
-	local file = io.open(path,"r")
+	local cfg = tomlParser.parse(tomlText)
 
-	--loop through all the lines
-	local line = file:read("*l") --get first value for line
-	while line ~= nil do
-		
-		--Comments
-		local c = line:find("#")
-		if c ~= nil then
-			if includeComments ~= -1 then
-				local comment = line:sub(c+1)
-				if includeComments == 1 then
-					currentTable.comments = currentTable.comments or {} --set default
-
-					currentTable.comments[lineNumber] = comment --add to comments subtable
-				end
-
-				comments[lineNumber] = comment --add to main comments table
-			end
-			line = line:sub(1,c-1)
-		end
-
-		--Catagories/Subtables
-		local tempCatagory = line:find("%[")
-		if tempCatagory ~= nil then
-			if doSubtables then
-				catagory = line:sub(tempCatagory + 1, line:len() - 1)
-
-				cfg[catagory] = cfg[catagory] or {} -- set default
-
-				currentTable = cfg[catagory]
-			end
-		end
-
-		--see if this line even contians a value
-		local equalSignIndex = line:find("=")
-		if equalSignIndex ~= nil then
-			
-			local k = line:sub(1, equalSignIndex - 1)
-			k = k:gsub(" ", "") --remove spaces in the key, they aren't required and will serve to make thigns more confusing.
-
-			local v = line:sub(equalSignIndex + 1)
-
-			v = load("return " ..  v)()
-			
-			currentTable[k] = v
-		end
-
-
-		--get next line ready
-		line = file:read("*line")
-		lineNumber = lineNumber + 1 --increment lineNumber
-	end
-
-
-	if currentTable.Name then
-		cfg.rawName = cfg.Name
-		local s,e = cfg.Name:find("%^")
+	if cfg.General and cfg.General.Name then -- remove special chars from server name
+		cfg.General.rawName = cfg.General.Name
+		local s,e = cfg.General.Name:find("%^")
 		while s ~= nil do
-
-			if s ~= nil then
-				cfg.Name = cfg.Name:sub(0,s-1) .. cfg.Name:sub(s+2)
-			end
-		
-			s,e = cfg.Name:find("%^")
+			cfg.General.Name = cfg.General.Name:sub(1,s-1) .. cfg.General.Name:sub(s+2)
+			s,e = cfg.General.Name:find("%^")
 		end
 	end
 
-	return cfg, comments
+	return cfg
 end
 
 -- PRE: number, time in seconds is passed in, followed by boolean hours, boolean minutes, boolean seconds, boolean milliseconds.
