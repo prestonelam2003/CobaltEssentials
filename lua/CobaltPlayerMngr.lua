@@ -32,7 +32,7 @@ specCount = 0
 playersMetatable = 
 {
 	__len = function(table)
-		return GetPlayerCount()
+		return MP.GetPlayerCount()
 	end
 }
 
@@ -514,7 +514,7 @@ local function tell(player, message)
 end
 
 local function kick(player, reason)
-	DropPlayer(player.playerID, reason)
+	MP.DropPlayer(player.playerID, reason)
 end
 
 local function ban(player, reason)
@@ -522,7 +522,7 @@ local function ban(player, reason)
 	player.permissions.banned = true
 	player.permissions.banReason = reason
 
-	DropPlayer(player.playerID, reason or "You are banned from this server!")
+	MP.DropPlayer(player.playerID, reason or "You are banned from this server!")
 end
 
 
