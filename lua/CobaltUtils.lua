@@ -3,22 +3,22 @@
 
 local M = {}
 _G.MP.SendChatMessageV = _G.MP.SendChatMessage
-_G.RemoveVehicleV = _G.RemoveVehicle
-_G.GetPlayerVehiclesV = _G.GetPlayerVehicles
-_G.DropPlayerV = _G.DropPlayer
+_G.RemoveVehicleV = _G.MP.RemoveVehicle
+_G.GetPlayerVehiclesV = _G.MP.GetPlayerVehicles
+_G.DropPlayerV = _G.MP.DropPlayer
 lastRandomNumber = os.time()
 
 local tomlParser = require("toml")
 
 -------------------------------------------------REPLACED-GLOBAL-FUNCTIONS-------------------------------------------------
 --Trigger the on VehicleDeleted event
-function RemoveVehicle(playerID, vehID)
+MP.RemoveVehicle = function(playerID, vehID)
 	RemoveVehicleV(playerID,vehID)
 	MP.TriggerGlobalEvent("onVehicleDeleted", playerID, vehID)
 end
 
 --Make sending multi-line chat messages with \n possible.
-function MP.SendChatMessage(playerID, message)
+MP.SendChatMessage = function(playerID, message)
 	message = split(message ,"\n")
 
 	for k,v in ipairs(message) do
@@ -28,11 +28,11 @@ function MP.SendChatMessage(playerID, message)
 end
 
 --make GetPlayerVehicles actually work.
-function GetPlayerVehicles(playerID)
+MP.GetPlayerVehicles = function(playerID)
 	return players[playerID].vehicles
 end
 
-function DropPlayer(playerID, reason)
+MP.DropPlayer = function(playerID, reason)
 	if players[playerID] ~= nil then
 		players[playerID].dropReason = reason
 	end
