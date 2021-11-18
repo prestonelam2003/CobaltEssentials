@@ -3,34 +3,36 @@
 
 local M = {}
 _G.MP.SendChatMessageV = _G.MP.SendChatMessage
-_G.RemoveVehicleV = _G.RemoveVehicle
-_G.GetPlayerVehiclesV = _G.GetPlayerVehicles
-_G.DropPlayerV = _G.DropPlayer
+_G.RemoveVehicleV = _G.MP.RemoveVehicle
+_G.GetPlayerVehiclesV = _G.MP.GetPlayerVehicles
+_G.DropPlayerV = _G.MP.DropPlayer
 lastRandomNumber = os.time()
+
+local tomlParser = require("toml")
 
 -------------------------------------------------REPLACED-GLOBAL-FUNCTIONS-------------------------------------------------
 --Trigger the on VehicleDeleted event
-function RemoveVehicle(playerID, vehID)
+MP.RemoveVehicle = function(playerID, vehID)
 	RemoveVehicleV(playerID,vehID)
 	MP.TriggerGlobalEvent("onVehicleDeleted", playerID, vehID)
 end
 
 --Make sending multi-line chat messages with \n possible.
-function MP.SendChatMessage(playerID, message)
+MP.SendChatMessage = function(playerID, message)
 	message = split(message ,"\n")
 
 	for k,v in ipairs(message) do
 		MP.SendChatMessageV(playerID, v)
-		Sleep(10)
+		MP.Sleep(10)
 	end
 end
 
 --make GetPlayerVehicles actually work.
-function GetPlayerVehicles(playerID)
+MP.GetPlayerVehicles = function(playerID)
 	return players[playerID].vehicles
 end
 
-function DropPlayer(playerID, reason)
+MP.DropPlayer = function(playerID, reason)
 	if players[playerID] ~= nil then
 		players[playerID].dropReason = reason
 	end
@@ -147,30 +149,6 @@ function output(ID, message)
 	end
 end
 
-local function exists(file)
-   local ok, err, code = os.rename(file, file)
-   if not ok then
-	  if code == 13 then
-		 -- Permission denied, but it exists
-		 return true
-	  end
-   end
-   return ok, err
-end
-
-local function createDirectory(path)
-	os.execute("mkdir " .. dbpath:gsub("/","\\"))
-end
-
-local function copyFile(path_src, path_dst)
-	local ltn12 = require("Resources/server/CobaltEssentials/socket/lua/ltn12")
-
-	ltn12.pump.all(
-		ltn12.source.file(assert(io.open(path_src, "rb"))),
-		ltn12.sink.file(assert(io.open(path_dst, "wb")))
-	)
-end
-
 local function parseVehData(data)
 	local s, e = data:find('%{')
 
@@ -257,94 +235,26 @@ local function readOldCfg(path)
 	return cfg
 end
 
---read a TOML file and return a table containing it's files
---doSubtables is a boolean that dictates if the section titles used in TOML should contribute to their own subtable or if everything should go in one table.
-	--doSubtables = false: contents of TOML catagories are not placed into their own subtable
-	--doSubtables = true: contents of TOML catagories are placed into their own subtable
---includeComments: Dictates how comments are dealt with.
-	--includeComments = -1: Comments are entirely ignored
-	--includeComments = 0: Comments not placed in the main table
-	--includeComments = 1: Comments are placed in a comments subtable.
-local function readCfg(path,doSubtables, includeComments)
-	--set default values
-	doSubtables = doSubtables or false
-	includeComments = (includeComments and includeComments >= -1 and includeComments <= 1) or 0
+--read a .cfg file and return a table containing it's files
+local function readCfg(path)
+	local tomlFile, error = io.open(path, 'r')
+	if error then return nil, error end
 
-	local cfg = {}
-	local comments = {}
-	local lineNumber = 1
-	local catagory = nil
-	local currentTable = cfg
+	local tomlText = tomlFile:read("*a")
+	tomlFile:close()
 
-	local file = io.open(path,"r")
+	local cfg = tomlParser.parse(tomlText)
 
-	--loop through all the lines
-	local line = file:read("*l") --get first value for line
-	while line ~= nil do
-		
-		--Comments
-		local c = line:find("#")
-		if c ~= nil then
-			if includeComments ~= -1 then
-				local comment = line:sub(c+1)
-				if includeComments == 1 then
-					currentTable.comments = currentTable.comments or {} --set default
-
-					currentTable.comments[lineNumber] = comment --add to comments subtable
-				end
-
-				comments[lineNumber] = comment --add to main comments table
-			end
-			line = line:sub(1,c-1)
-		end
-
-		--Catagories/Subtables
-		local tempCatagory = line:find("%[")
-		if tempCatagory ~= nil then
-			if doSubtables then
-				catagory = line:sub(tempCatagory + 1, line:len() - 1)
-
-				cfg[catagory] = cfg[catagory] or {} -- set default
-
-				currentTable = cfg[catagory]
-			end
-		end
-
-		--see if this line even contians a value
-		local equalSignIndex = line:find("=")
-		if equalSignIndex ~= nil then
-			
-			local k = line:sub(1, equalSignIndex - 1)
-			k = k:gsub(" ", "") --remove spaces in the key, they aren't required and will serve to make thigns more confusing.
-
-			local v = line:sub(equalSignIndex + 1)
-
-			v = load("return " ..  v)()
-			
-			currentTable[k] = v
-		end
-
-
-		--get next line ready
-		line = file:read("*line")
-		lineNumber = lineNumber + 1 --increment lineNumber
-	end
-
-
-	if currentTable.Name then
-		cfg.rawName = cfg.Name
-		local s,e = cfg.Name:find("%^")
+	if cfg.General and cfg.General.Name then -- remove special chars from server name
+		cfg.General.rawName = cfg.General.Name
+		local s,e = cfg.General.Name:find("%^")
 		while s ~= nil do
-
-			if s ~= nil then
-				cfg.Name = cfg.Name:sub(0,s-1) .. cfg.Name:sub(s+2)
-			end
-		
-			s,e = cfg.Name:find("%^")
+			cfg.General.Name = cfg.General.Name:sub(1,s-1) .. cfg.General.Name:sub(s+2)
+			s,e = cfg.General.Name:find("%^")
 		end
 	end
 
-	return cfg, comments
+	return cfg
 end
 
 -- PRE: number, time in seconds is passed in, followed by boolean hours, boolean minutes, boolean seconds, boolean milliseconds.
@@ -436,14 +346,67 @@ function compareCobaltVersion(ver1,ver2)
 	return ver1strength > ver2strength
 end
 
+
+-- FS related functions
+local function readJson(path)
+	if not FS.Exists(path) then
+		return nil, "File does not exist"
+	end
+
+	local jsonFile, error = io.open(path,"r")
+	if not jsonFile or error then
+		return nil, error
+	end
+
+	local jsonText = jsonFile:read("*a")
+	jsonFile:close()
+	local success, data = pcall(json.parse, jsonText)
+
+	if not success then
+		print("Error while parsing file", path, data)
+		return nil, "Error while parsing JSON"
+	end
+
+	return data, nil
+end
+
+local function writeJson(path, data)
+	local success, error = FS.CreateDirectory(FS.GetParentFolder(path))
+
+	if not success then
+		CElog('failed to create directory for file "' .. tostring(path) .. '", error: ' .. tostring(error),"WARN")
+		return false, error
+	end
+
+	local jsonFile, error = io.open(path,"w")
+	if not jsonFile or error then
+		return nil, error
+	end
+
+	jsonFile:write(json.stringify(data or {}))
+	jsonFile:close()
+
+	return true, nil
+end
+
+local function copyFile(path_src, path_dst)
+	local ltn12 = require("Resources/server/CobaltEssentials/socket/lua/ltn12")
+
+	ltn12.pump.all(
+		ltn12.source.file(assert(io.open(path_src, "rb"))),
+		ltn12.sink.file(assert(io.open(path_dst, "wb")))
+	)
+end
+-- FS related functions
+
+
+
 setLogType("WARN",31,false,31)
 setLogType("RCON",33)
 setLogType("CobaltDB",35)
 setLogType("CHAT",32)
 
 M.random = random
-M.copyFile = copyFile
-M.exists = exists
 M.parseVehData = parseVehData
 
 M.setLogType = setLogType
@@ -451,5 +414,10 @@ M.getLogTypes = getLogTypes
 
 M.readOldCfg = readOldCfg
 M.readCfg = readCfg
+
+M.readJson = readJson
+M.writeJson = writeJson
+
+M.copyFile = copyFile
 
 return M

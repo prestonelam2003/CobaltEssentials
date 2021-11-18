@@ -32,7 +32,7 @@ specCount = 0
 playersMetatable = 
 {
 	__len = function(table)
-		return GetPlayerCount()
+		return MP.GetPlayerCount()
 	end
 }
 
@@ -114,7 +114,7 @@ playerTemplate.permissions.metatable =
 			local group, groupName = table.CobaltPlayerMgnr_playerObject:getGroup()
 			return groupName
 		else
-			return (table.CobaltPlayerMgnr_database:exists() and table.CobaltPlayerMgnr_database[key]) or players.database["group:" .. table.group][key] or defaultPermissions[key]
+			return table.CobaltPlayerMgnr_database:exists() and table.CobaltPlayerMgnr_database[key] or players.database["group:" .. table.group][key] or defaultPermissions[key]
 		end
 		--if table.CobaltPlayerMgnr_playerObject and rawget(table.CobaltPlayerMgnr_playerObject, "gamemode") and table.CobaltPlayerMgnr_playerObject.gamemode.mode > 0 then
 			-- Mode-Map [-1:undefined 0:active, 1:inQueue 2:spectator]
@@ -175,9 +175,8 @@ local function new(name, role, isGuest)
 	--newPlayer.hardwareID = GetPlayerHWID(playerID)
 	newPlayer.guest = isGuest
 	newPlayer.name = name
-	newPlayer.joinTime = age
+	newPlayer.joinTime = ageTimer:GetCurrent()*1000
 	newPlayer.connectStage = 0
-
 
 	--PERMISSIONS
 	--newPlayer.permissions.playerID = newPlayer.playerID
@@ -205,6 +204,8 @@ local function new(name, role, isGuest)
 	--newPlayer.gamemode.locked =  false
 	--newPlayer.gamemode.source = "default"
 
+
+
 	--VEHICLES
 	newPlayer.vehicles = {}
 	setmetatable(newPlayer.vehicles, vehiclesTableTemplate.metatable)
@@ -212,7 +213,7 @@ local function new(name, role, isGuest)
 	for methodName, method in pairs(playerTemplate.methods) do
 		newPlayer[methodName] = method
 	end
-	
+
 	--SET METATABLES
 	setmetatable(newPlayer.permissions, playerTemplate.permissions.metatable)
 	setmetatable(newPlayer, playerTemplate.metatable)
@@ -227,7 +228,8 @@ local function new(name, role, isGuest)
 		canJoin = false
 		reason = "You are not whitelisted on this server!"
 	end
-	
+
+
 	if newPlayer.permissions.banned == true then
 		canJoin = false
 		reason = newPlayer.permissions.banReason or "You are banned from this server!"
@@ -255,7 +257,7 @@ local function bindPlayerToID(name, playerID)
 	
 	--assign some values that require a playerID
 	player.playerID = playerID
-	player.hardwareID = GetPlayerHWID(playerID)
+	player.hardwareID = nil--MP.GetPlayerHWID(playerID)
 
 
 	--GAMEMODE
@@ -512,7 +514,7 @@ local function tell(player, message)
 end
 
 local function kick(player, reason)
-	DropPlayer(player.playerID, reason)
+	MP.DropPlayer(player.playerID, reason)
 end
 
 local function ban(player, reason)
@@ -520,7 +522,7 @@ local function ban(player, reason)
 	player.permissions.banned = true
 	player.permissions.banReason = reason
 
-	DropPlayer(player.playerID, reason or "You are banned from this server!")
+	MP.DropPlayer(player.playerID, reason or "You are banned from this server!")
 end
 
 

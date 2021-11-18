@@ -28,7 +28,9 @@ function startRCON(port)
 	MP.RegisterEvent("keepAlive","keepAlive")
 	MP.RegisterEvent("RCONsend","RCONsend")
 	MP.RegisterEvent("RCONreply","RCONreply")
-	--CreateThread("listenRCON",500)
+	MP.RegisterEvent("listenRCON","listenRCON")
+
+	MP.CreateEventTimer("listenRCON", 100)
 
 	CElog("RCON open on port " .. port,"RCON")
 
@@ -36,7 +38,6 @@ end
 
 
 function listenRCON()
-
 	--if waitingForReply == false then
 
 		local message, ip, port = server:receivefrom()
@@ -54,19 +55,19 @@ function listenRCON()
 			local s, e = message:find(" ")
 			local prefix = message:sub(1,s-1)
 			message = message:sub(s+1)
-	
+
 			local s, e = message:find(" ")
 			local password = message:sub(1,s-1)
 			message = message:sub(s+1)
-	
+
 			message = message:sub(1,message:len()-1)
-			
+
 
 
 --			print("'".. prefix .. "'")
 --			print("'".. password .. "'")
 --			print("'".. message .. "'")
-			
+
 			MP.TriggerGlobalEvent("onRconCommand", ID, message, password, prefix)
 			waitingForReply = true
 		end
@@ -76,7 +77,7 @@ end
 function RCONsend(rconID, message)
 
 	local splitMes = split(message,"\n")
-	
+
 	if splitMes[2] ~= nil then
 			splitMes[1] = splitMes[1] .. "..."
 	end
@@ -134,11 +135,11 @@ function RCONreply(reply)
 		reply = ""
 	else
 		local splitReply = split(reply,"\n")
-	
+
 		if splitReply[2] ~= nil then
 			splitReply[1] = splitReply[1] .. "..."
 		end
-		
+
 		CElog("RCON REPLY: " .. splitReply[1],"RCON")
 	end
 
@@ -148,7 +149,7 @@ end
 
 function split(s, sep)
 	local fields = {}
-	
+
 	local sep = sep or " "
 	local pattern = string.format("([^%s]+)", sep)
 	string.gsub(s, pattern, function(c) fields[#fields + 1] = c end)
