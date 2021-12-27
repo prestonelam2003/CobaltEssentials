@@ -5,7 +5,8 @@ MP.RegisterEvent("onCobaltDBhandshake","onCobaltDBhandshake") --to make sure cob
 
 cobaltVersion = "1.6.0 [BETA 5]"
 
-pluginPath = "Resources/Server/CobaltEssentials"
+pluginPath = debug.getinfo(1).source:gsub("\\","/")
+pluginPath = pluginPath:sub(1,(pluginPath:find("CobaltEssentialsLoader.lua"))-2)
 
 utils = require("CobaltUtils")
 
