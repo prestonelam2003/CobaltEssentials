@@ -30,7 +30,7 @@ function startRCON(port)
 	MP.RegisterEvent("RCONreply","RCONreply")
 	MP.RegisterEvent("listenRCON","listenRCON")
 
-	MP.CreateEventTimer("listenRCON", 100)
+	MP.CreateEventTimer("listenRCON", 200)
 
 	CElog("RCON open on port " .. port,"RCON")
 
