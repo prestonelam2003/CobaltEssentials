@@ -30,19 +30,19 @@ local beamMPconfigMetatable = {
 	end,
 	__newindex = function(table, key, value)
 		if key == "Debug" then
-			Set(0, value)
+			MP.Set(0, value)
 		elseif key == "Private" then
-			Set(1, value)
+			MP.Set(1, value)
 		elseif key == "MaxCars" then
-			Set(2, value)
+			MP.Set(2, value)
 		elseif key == "MaxPlayers" then
-			Set(3, value)
+			MP.Set(3, value)
 		elseif key == "Map" then
-			Set(4, value)
+			MP.Set(4, value)
 		elseif key == "Name" then 
-			Set(5, value)
+			MP.Set(5, value)
 		elseif key == "Description" then
-			Set(6, value)
+			MP.Set(6, value)
 		else
 			return nil
 		end
