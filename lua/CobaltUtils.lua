@@ -180,7 +180,6 @@ local function parseVehData(data)
 	return data
 end
 
---DEPRECATED
 --read a .cfg file and return a table containing it's files
 local function readOldCfg(path)
 
@@ -237,6 +236,9 @@ end
 
 --read a .cfg file and return a table containing it's files
 local function readCfg(path)
+
+print('readcfg called with ' .. path)
+
 	local tomlFile, error = io.open(path, 'r')
 	if error then return nil, error end
 

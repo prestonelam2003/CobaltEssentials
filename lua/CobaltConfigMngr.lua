@@ -29,23 +29,7 @@ local beamMPconfigMetatable = {
 		return currentcfg[key] or beamMPcfg[key]
 	end,
 	__newindex = function(table, key, value)
-		if key == "Debug" then
-			MP.Set(0, value)
-		elseif key == "Private" then
-			MP.Set(1, value)
-		elseif key == "MaxCars" then
-			MP.Set(2, value)
-		elseif key == "MaxPlayers" then
-			MP.Set(3, value)
-		elseif key == "Map" then
-			MP.Set(4, value)
-		elseif key == "Name" then 
-			MP.Set(5, value)
-		elseif key == "Description" then
-			MP.Set(6, value)
-		else
-			return nil
-		end
+		MP.Set(MP.Settings[key], value)
 		currentcfg[key] = value
 	end
 }
@@ -93,6 +77,7 @@ end
 local defaultConfig = 
 {
 	commandPrefix =		{value = "/",			description = "The character placed at the beginning of a chat message when using a command"},
+	consolePrefix =		{value = "ce ",			description = "The text placed at the beginning of a console command"},
 	maxActivePlayers =	{value = 20,			description = "max amount of active/nonspectator players allowed on a server, any further players will be spectator and placed on a queue."},
 	enableWhitelist =	{value = false,			description = "weather or not the whitelist is enabled"},
 	enableDebug =		{value = false,			description = "weather or not the server will output debug messages."},
@@ -119,7 +104,7 @@ local defaultCommands =
 	--orginModule[commandName] is where the command is executed from
 	--Source-Limit-Map [0:no limit | 1:Chat Only | 2:RCON Only]
 	--A star before an argument actually means the opposite of what it would traditionally mean, a '*' means the argument is optional.
-	help =			{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Lists all commands accessible by the player"},
+	help =			{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = {"*command"},						description = "Lists all commands accessible by the player"},
 	status =		{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Lists all the players on the server with their ids and basic information on the server"},
 	statusdetail =	{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Lists all the players on the server in detail along with basic server information"},
 	connected =		{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Get the connect stage of all players on the server"},

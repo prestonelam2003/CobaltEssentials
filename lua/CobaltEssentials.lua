@@ -31,6 +31,7 @@ MP.RegisterEvent("onPlayerJoining","onPlayerJoining")
 MP.RegisterEvent("onPlayerJoin","onPlayerJoin")
 MP.RegisterEvent("onPlayerDisconnect","onPlayerDisconnect")
 	
+MP.RegisterEvent("onConsoleInput","onConsoleInput")
 MP.RegisterEvent("onChatMessage","onChatMessage")
 
 MP.RegisterEvent("onVehicleSpawn","onVehicleSpawn")
@@ -166,9 +167,40 @@ function onPlayerDisconnect(ID)
 	players.updateQueue()
 end
 
+function onConsoleInput(message)
+	if message == "help" then -- special case for help, it should show up without the prefix
+		return M.command({type="C", canExecute=function() return true end}, "help")
+	end
+
+	local commandPrefix = config.consolePrefix.value or "CE "
+	local prefixLen = commandPrefix:len()
+
+
+	if message:sub(1, prefixLen) ~= commandPrefix then
+		return nil
+	end
+
+	message = message:sub(prefixLen+1)
+
+	local command, args = message
+	local s, e = message:find(' ')
+	if s ~= nil then
+		command = message:sub(1,s-1)
+		args = message:sub(s+1)
+	end
+
+	local client = { ID=0, ip="", chat=false, type="C" }
+
+	client.canExecute = function(client, command)
+		return true
+	end
+
+	local reply = M.command(client, command, args)
+
+	return reply
+end
 
 function onChatMessage(playerID, name ,chatMessage)
-
 	if extensions.triggerEvent("onChatMessage", players[playerID], chatMessage) == false then
 		return -1
 	end
@@ -421,10 +453,10 @@ local function getArguments(sender, command, unhandledArgs)
 	if type(commandArgs) == "number" then
 		args = unhandledArgs
 		--count the arguments
-		local argCount = 0
+		local argCount = 1
 		if args ~= nil then
 			args = split(args, " ")
-		
+
 			for k,v in pairs(args) do
 				if argCount < command.arguments then
 					argCount = argCount + 1
@@ -440,12 +472,11 @@ local function getArguments(sender, command, unhandledArgs)
 		end
 	--loop through the command's requested args
 	elseif type(commandArgs) == "table" then
-		args[0] = " " .. unhandledArgs
+		args[0] = unhandledArgs and (" " .. unhandledArgs ) or ""
+
+		local argString = CC.getArgumentString(commandArgs)
 		
-		local argString = ""
-		--loop through and get all the args.
 		for index, argumentType in pairs(commandArgs) do
-			argString = argString .. "<" .. argumentType .. ">"
 			local lastArg = args[index - 1]
 			local s, e = lastArg:find(" ")
 			
@@ -471,7 +502,7 @@ local function getArguments(sender, command, unhandledArgs)
 			--see if the argument is nil
 			if args[index] == nil then
 				if required then
-					error = "Incorrect arguments," .. commandName .. " takes " .. #command.arguments .. "(" .. argString .. ")"
+					error = "Incorrect arguments, command '" .. commandName .. "' takes " .. #command.arguments .. " (" .. argString .. ")"
 				else
 					break --why keep looping through if the rest are empty.
 				end

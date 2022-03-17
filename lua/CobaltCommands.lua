@@ -19,7 +19,23 @@ end
 
 ---------------------------------------------------------ACCESSORS---------------------------------------------------------
 
+local function getArgumentString(args)
+	local output = ""
 
+	if type(args) ~= "table" or #args == 0 then
+		return ""
+	end
+
+	for index, argument in pairs(args) do
+		if argument:sub(1,1) == '*' then
+			output = output .. "[" .. argument:sub(2) .. "] "
+		else
+			output = output .. "<" .. argument .. "> "
+		end
+	end
+
+	return output:sub(1, #output-1)
+end
 
 ---------------------------------------------------------FUNCTIONS---------------------------------------------------------
 
@@ -172,12 +188,39 @@ local function connected(sender,...)
 	return playersList
 end
 
-local function help(sender, ...)
+local function help(sender, commandName, ...)
 	local commandList = ""
-	
+
+	local commandColor, argColor, noColor, indent = "", "", "", ""
+	local commandPrefix = ""
+
+	if sender.type == "C" then
+		commandColor, argColor, noColor, indent = color(94), color(31), color(0), "        "
+		commandList = "Cobalt Essentials:\n    Commands:\n"
+		commandPrefix = config.consolePrefix.value or "CE "
+	end
+
+	local padRight = function(i) local a="" for b=i,1,-1 do a=a.." " end return a end
+
+	if commandName then
+		local command = commands[commandName]
+		if command then
+			if sender:canExecute(command) then
+				return commandColor .. commandPrefix .. tostring(commandName) .. " " .. argColor .. getArgumentString(command.arguments) .. noColor .. ": " .. tostring(command.description)
+			else
+				return "You don't have permission to use this command."
+			end
+		else
+			return "The command '" .. commandName .. "' does not exist."
+		end
+	end
+
 	for commandName, command in pairs(commands) do
 		if sender:canExecute(command) then
-			commandList = commandList .. tostring(commandName) .. ": " .. tostring(command.description) .. "\n"
+			local args = getArgumentString(command.arguments)
+			if args ~= "" then args = " " .. argColor .. args end
+
+			commandList = commandList .. indent .. commandColor .. commandPrefix .. tostring(commandName) .. args .. noColor .. padRight(35-#(commandName..args)) .. tostring(command.description) .. "\n"
 		end
 	end
 
@@ -312,7 +355,7 @@ local function say(sender, message, ...)
 end
 
 local function uptime(sender, ...)
-	local clock = math.floor(os.clock())
+	local clock = math.floor(ageTimer:GetCurrent())
 	
 	local seconds = clock % 60
 	
@@ -381,6 +424,7 @@ M.onInit = onInit
 ----MUTATORS-----
 
 ----ACCESSORS----
+M.getArgumentString = getArgumentString
 
 ----COMMANDS----
 M.kick = kick
