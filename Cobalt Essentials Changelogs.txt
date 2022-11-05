@@ -64,6 +64,14 @@ OnChatMessage event now passes in the correct player object (Thanks to @Deer Boi
 Cobalt Essentials now supports the TOML config file used by BeamMP servers
 Began Vehicle Rework
 
+-------Cobalt Essentials 1.7.0 Changelog-------
+Moved to 3.x server syntax (MP.*)
+Added event based DB connector, no longer relying on luasocket (though it is still a legacy option)
+Fixed Cobalt Essentials relying on the folder name being "CobaltEssentials"
+Rework of command system
+Added support for direct console command input
+
+
 TODO:
 Vehicles are now proper objects
 
