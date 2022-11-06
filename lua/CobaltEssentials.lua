@@ -13,8 +13,6 @@
 
 local M = {}
 
-rconClients = {} --RCON clients start with an R[ID]
---local lastContact = 0
 
 MP.CreateEventTimer("onTick", 1000)
 ageTimer = MP.CreateTimer()
@@ -39,9 +37,6 @@ MP.RegisterEvent("onVehicleEdited","onVehicleEdited")
 MP.RegisterEvent("onVehicleDeleted","onVehicleDeleted")
 MP.RegisterEvent("onVehicleReset","onVehicleReset")
 
-MP.RegisterEvent("onRconCommand","onRconCommand")
-MP.RegisterEvent("onNewRconClient","onNewRconClient")
-
 MP.RegisterEvent("stop","stopServer")
 MP.RegisterEvent("Cobaltstop","stopServer")
 
@@ -63,13 +58,6 @@ function onTick()
 			delayedQueue.n = delayedQueue.n - 1
 		end
 	end
-
-	--for ID, client in pairs(rconClients) do
-		--if config.RCONkeepAliveTick.value ~= false and age > client.lastContact + config.RCONkeepAliveTick.value * 1000 then
-			--MP.TriggerGlobalEvent("keepAlive", ID)
-			--client.lastContact = age
-		--end
-	--end
 
 	if extensions then
 		if extensions.triggerEvent("onTick", age) == false then
@@ -241,16 +229,6 @@ function onChatMessage(playerID, name ,chatMessage)
 		CElog("MUTED:[".. playerID .. "]" .. name .. " : " .. chatMessage,"CHAT")
 		return 1
 	end
-
-	local formattedMessage = "[".. playerID .. "]" .. name .. " : " .. chatMessage
-
-	for rconID, rconClient in pairs(rconClients) do
-		if rconClient.chat == true then
-			MP.TriggerGlobalEvent("RCONsend", rconID, formattedMessage) 
-			rconClients[rconID].lastContact = ageTimer:GetCurrent()*1000
-		end
-	end
-
 end
 
 
@@ -329,77 +307,6 @@ end
 
 
 
-function onRconCommand(ID, message, password, prefix)
-	local reply
-
-
-	CElog(rconClients[ID].ip .. " : " ..prefix .. " " .. password .. " " .. message,"RCON")
-
-	rconClients[ID].lastContact = ageTimer:GetCurrent()*1000 
-
-
-	--correctPassword = config.RCONpassword.value
-	--print(password)
-	--print(correctPassword)
-	--if password == correctPassword then
-	if password == config.RCONpassword.value then
-		
-		if extensions.triggerEvent("onRconCommand", ID, message, password, prefix) == false then
-			return 1
-		end
-
-		local args
-		local command = split(message," ")[1]
-		local s, e = message:find(' ')
-		if s ~= nil then
-			args = message:sub(s+1)
-		end
-	
-		if CobaltDB.tableExists("commands", command) then
-			
-			local reply = M.command(rconClients[ID], command, args)
-
-			--CElog("RCON REPLIES WITH COMMAND REPLY")
-			if reply ~= nil then
-				MP.TriggerGlobalEvent("RCONsend", ID, reply)
-			end
-		else
-			--CElog("RCON REPLIES WITH BAD COMMAND")
-			MP.TriggerGlobalEvent("RCONsend", ID, "Unrecognized Command")
-		end
-	else
-		--CElog("RCON REPLIES WITH BAD PASSWORD")
-		MP.TriggerGlobalEvent("RCONsend", ID, "Bad Password")
-	end
-end
-
-function onNewRconClient(ID, ip, port)
-	local client = {}
-
-	client.ID = ID
-	client.ip = ip
-	client.port = port
-	client.chat = false
-	client.lastContact = ageTimer:GetCurrent()*1000
-	client.type = "RCON"
-
-	client.canExecute = function(client, command)
-		return command.sourceLimited ~= 1
-	end
-	
-	if extensions.triggerEvent("onNewRconClient", client) == false then
-		return 1
-	end
-
-
-
-	rconClients[ID] = client
-
-
-	MP.TriggerGlobalEvent("RCONsend", ID, "BLEAT")
-
-
-end
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 
 --Stop server safely make sure anything that needs to be is backed up.
@@ -436,10 +343,6 @@ local function delayExec(delay, func, args)
 end
 
 ---------------------------------------------------------ACCESSORS---------------------------------------------------------
-
-local function getRconClients()
-	return rconClients
-end
 
 -- PRE: the sender object, command object, the arguments after the commmand as a string are passed in.
 --POST: the unhandledArgs string is divided up into distinct arguments for the command.
@@ -585,7 +488,6 @@ M.stopServer = stopServer
 M.delayExec = delayExec
 
 ----ACCESSORS----
-M.getRconClients = getRconClients
 M.getArguments = getArguments
 
 ----FUNCTIONS----

@@ -75,6 +75,9 @@ Don't load luasocket if the DB doesn't need it
 Made sure the players table is easy to iterate over
 Added extensions.* interface as a secondary option to access extensions
 
+-------Cobalt Essentials 1.7.1 Changelog-------
+Removed Quake RCON from the base plugin (moved to an extension)
+
 
 TODO:
 Vehicles are now proper objects

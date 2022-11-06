@@ -375,10 +375,21 @@ local function copyFile(path_src, path_dst)
 end
 -- FS related functions
 
+-- blocking call for global events. nil result means timeout
+function waitForEventResult(...)
+	local future = MP.TriggerGlobalEvent(...)
+	local timeout = 0
+	-- wait until handlers finished
+	while not future:IsDone() and timeout < 5000 do
+		MP.Sleep(100) -- sleep 100 ms
+		timeout = timeout + 100
+	end
 
+	local res = future:GetResults()
+	if future:IsDone() then return res end
+end
 
 setLogType("WARN",31,false,31)
-setLogType("RCON",33)
 setLogType("CobaltDB",35)
 setLogType("CHAT",32)
 

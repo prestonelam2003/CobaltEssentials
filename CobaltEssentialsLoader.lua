@@ -3,7 +3,7 @@
 
 MP.RegisterEvent("onCobaltDBhandshake","onCobaltDBhandshake") --to make sure cobaltDB loads first
 
-cobaltVersion = "1.7.0"
+cobaltVersion = "1.7.1"
 
 pluginPath = debug.getinfo(1).source:gsub("\\","/")
 pluginPath = pluginPath:sub(1,(pluginPath:find("CobaltEssentialsLoader.lua"))-2)
@@ -59,11 +59,6 @@ function onCobaltDBhandshake(port)
 		CobaltCompat = require("CobaltCompat")
 	end
 
-	if config.RCONenabled.value == true then
-		CElog("opening RCON on port " .. config.RCONport.value)
-		MP.TriggerLocalEvent("startRCON", config.RCONport.value)
-	end
-	
 	--WARNING for not having enough players in the config.
 	if beamMPconfig.MaxPlayers > config.maxActivePlayers.value then
 		CElog("/!\\ ---THE SERVER'S MAX PLAYER COUNT IS GREATER THAN THE MAX ACTIVE PLAYERS IN THE COBALT CONFIG--- /!\\","WARN")
