@@ -571,49 +571,6 @@ local function command(sender, command, args)
 			CElog("Insufficent Perms")
 			return "You do not have permission to use this command."
 		end
-
-		
-		--if rconClients[ID] ~= nil or players[ID].permissions.level >= commands[command].reqPerm then
-
-			--local argCount = 0
-			--if args ~= nil then
-				--args = split(args, " ")
-
-				--for k,v in pairs(args) do
-					--if argCount < commands[command].argCount then
-						--argCount = argCount + 1
-					--else
-						--args[argCount] = args[argCount] .. " " .. v
-						--args[k] = nil
-					--end
-				--end
-
-			--end
-
-			--if argCount < commands[command].argCount then
-				--print("Not enough arguments")
-				--return "Not enough arguments (" .. command .. " takes " .. commands[command].argCount .. ")"
-			--end
-
-			--print(ID .. " is Executing command")
-
-			--local sender = ID
-
-			--if players[ID] ~= nil then
-				--sender = players[ID]
-			--end
-
-			--if args == nil then
-				--return commands[command].func(sender)
-			--else
-				--return commands[command].func(sender, table.unpack(args))
-			--end
-
-		--else
-			--print("Insufficent Perms")
-			--return "You do not have permission for this command"
-		--end
-
 	else
 		CElog("Command does not exist")
 		return "This command does not exist type /help for a list of commands"

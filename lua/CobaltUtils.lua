@@ -59,24 +59,6 @@ function CElog(string, heading, debug)
 
 	out = out .. string .. color(0)
 
-	--if heading == "WARN" then
-	--	out =  out .. " [" .. color(31) .. "WARN" .. color(0) .. "] " .. color(31) .. string
-	--elseif heading == "RCON" then
-	--	out = out .. " [" .. color(33) .. "RCON" .. color(0) .. "] " .. color(0) .. string
-	--elseif heading == "CobaltDB" then
-	--	out = out .. " [" .. color(35) .. "CobaltDB" .. color(0) .. "] " .. color(0) .. string
-	--elseif heading == "CHAT" then
-	--	out = out .. " [" .. color(32) .. "CHAT" .. color(0) .. "] " .. color(0) .. string
-	----elseif heading == "DEBUG" and ((config == nil or config.enableDebug.value == true) or (query and CobaltDB.query("config","enableDebug","value") == true)) or true then
-	--elseif heading == "DEBUG" then
-	--	if config == nil or config.enableDebug.value == true) or (query and CobaltDB.query("config","enableDebug","value") == true)) or true then
-	--		out = out .. " [" .. color(97) .. "DEBUG" .. color(0) .. "] " .. color(0) .. string
-	--	end
-	--else
-	--	out = out .. " [" .. color(94) .. heading .. color(0) .. "] " .. color(0) .. string
-	--end
-
-
 	print(out)
 	return out
 end
@@ -236,9 +218,6 @@ end
 
 --read a .cfg file and return a table containing it's files
 local function readCfg(path)
-
-print('readcfg called with ' .. path)
-
 	local tomlFile, error = io.open(path, 'r')
 	if error then return nil, error end
 
