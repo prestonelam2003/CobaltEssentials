@@ -72,6 +72,7 @@ Rework of command system
 Added support for direct console command input
 Now using FS.CopyFile instead of LTN12 function
 Don't load luasocket if the DB doesn't need it
+Made sure the players table is easy to iterate over
 
 
 TODO:

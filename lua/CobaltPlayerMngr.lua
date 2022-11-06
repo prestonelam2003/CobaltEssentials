@@ -33,6 +33,15 @@ playersMetatable =
 {
 	__len = function(table)
 		return MP.GetPlayerCount()
+	end,
+	__pairs = function(t)
+		return function(t,k)
+			local v
+			repeat
+				k, v = next(t, k)
+			until k == nil or (type(k) == "number" and type(v) == "table")
+			return k, v
+		end, t, nil
 	end
 }
 
