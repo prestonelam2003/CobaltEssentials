@@ -8,6 +8,7 @@
 -----------------------------------------------------------INIT------------------------------------------------------------
 
 local M = {}
+local MT = {}
 
 loaded = {}
 
@@ -33,10 +34,10 @@ end
 --POST: any file named <extension>.lua is loaded, the module is placed under a global variable named after string extension and it's init is executed, if the file exists, function returns true.
 local function load(extension, extensionPath)
 	extensionPath = extensionPath or extension
-	
+
 	if loaded[extension] == nil then
 		local module = require("extensions/" .. extensionPath)
-	
+
 		_G[extension] = module
 		loaded[extension] = module
 
@@ -47,11 +48,11 @@ local function load(extension, extensionPath)
 end
 
 
---DOES NOT WORK DOES NOT WORK DOES NOT WORK DOES NOT WORK DOES NOT WORK DOES NOT WORK DOES NOT WORK DOES NOT WORK DOES NOT WORK 
+--DOES NOT WORK DOES NOT WORK DOES NOT WORK DOES NOT WORK DOES NOT WORK DOES NOT WORK DOES NOT WORK DOES NOT WORK DOES NOT WORK
 -- PRE: the string "extension" is passed in.
 --POST: any extensions named extension will be unloaded returns true if the path exists and was unloaded.
 local function unload(extension)
-	
+
 end
 
 local function cancelEvent()
@@ -64,7 +65,7 @@ end
 -- PRE: a string 'event' is passed in, coresponding to a function in a module
 --POST: any function at index event of a module is executed with parameters parameters
 local function triggerEvent(event, ...)
-	
+
 
 	local args = {...}
 
@@ -73,12 +74,12 @@ local function triggerEvent(event, ...)
 
 	--loop through all loaded modules
 	for k,v in pairs(loaded) do
-		
+
 		--check to see if this module has the desired event
 		if v[event] ~= nil then
 			v[event](table.unpack(args))
 
-			
+
 			--if a nil parameter isn't ignored, make sure parameters isn't nil or don't use it
 			--if parameters == nil then
 				--v[event]()
@@ -105,6 +106,20 @@ end
 
 
 ------------------------------------------------------PUBLICINTERFACE------------------------------------------------------
+
+MT.__index = function(tbl, key)
+	if key == nil then return nil end
+
+	if loaded[key] ~= nil then return loaded[key] end
+
+	print(key)
+
+	return rawget(tbl, key)
+end
+
+setmetatable(M, MT)
+
+
 
 ----EVENTS-----
 
