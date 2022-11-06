@@ -39,12 +39,12 @@ MP.RegisterEvent("set","set")
 --give the CobaltDBconnector all the information it needs without having to re-calculate it all
 function initDB()
 	json = require("json")
-	socket = require("socket")
 	utils = require("CobaltUtils")
 
 	_G.dbpath = pluginPath .. "/CobaltDB/"
 
 	if not dontusesocket then
+		socket = require("socket")
 
 		local jsonFile, error = io.open(dbpath .."config.json")
 		if error == nil then
@@ -55,7 +55,9 @@ function initDB()
 	CElog("CobaltDB Initiated","CobaltDB")
 	MP.TriggerLocalEvent("onCobaltDBhandshake",CobaltDBport)
 
-	connector = socket.udp()
+	if not dontusesocket then
+		connector = socket.udp()
+	end
 end
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 
