@@ -291,15 +291,35 @@ function formatVersionAsTable(versionString)
 
 	end
 	
-	print("'".. tag .."'")
+	--print("'".. tag .."'")
 	version = split(versionString,".")
 	
 	return version, tag
 end
 
---RETURNS TRUE IF VER1 IS NEWER THAN vER2
-function compareCobaltVersion(ver1,ver2)
-	
+
+
+--RETURNS TRUE IF VER1 IS NEWER THAN VER2
+function isCobaltVersionNewer(ver1,ver2)
+	if type(ver1) == "string" then
+		ver1 = formatVersionAsTable(ver1)
+	end
+	if type(ver2) == "string" then
+		ver2 = formatVersionAsTable(ver2)
+	end
+
+
+	for i=1,3 do
+		local digit1, digit2 = tonumber(ver1[i]) or 0, tonumber(ver2[i]) or 0
+		if digit1 ~= digit2 then
+			return digit1 > digit2
+		end
+	end
+
+	return false
+end
+
+function compareCobaltVersion(ver1, ver2)
 	local ver1strength = 0
 	local ver2strength = 0
 	
@@ -324,7 +344,7 @@ function compareCobaltVersion(ver1,ver2)
 	--print("------------" .. ver2strength)
 	--print(ver1strength > ver2strength)
 	--print("------------")
-	return ver1strength > ver2strength
+	return ver1strength, ver2strength
 end
 
 
