@@ -392,12 +392,7 @@ local function writeJson(path, data)
 end
 
 local function copyFile(path_src, path_dst)
-	local ltn12 = require("Resources/server/CobaltEssentials/socket/lua/ltn12")
-
-	ltn12.pump.all(
-		ltn12.source.file(assert(io.open(path_src, "rb"))),
-		ltn12.sink.file(assert(io.open(path_dst, "wb")))
-	)
+	return FS.Copy(path_src, path_dst)
 end
 -- FS related functions
 
