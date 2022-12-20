@@ -81,6 +81,9 @@ Removed Quake RCON from the base plugin (moved to an extension)
 -------Cobalt Essentials 1.7.2 Changelog-------
 Overhauled extension system, now featuring autoload
 
+-------Cobalt Essentials 1.7.3 Changelog-------
+Fix luasocket still being a dependency
+
 TODO:
-Vehicles are now proper objects
+Make vehicles objects
 

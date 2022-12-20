@@ -12,6 +12,8 @@ local M = {}
 local loadedDatabases = {}
 --local loadedJson = {}
 
+local dbpath
+
 local cobaltSysChar = string.char(0x99, 0x99, 0x99, 0x99)
 
 local CobaltDBport = 58933
@@ -41,7 +43,7 @@ function initDB()
 	json = require("json")
 	utils = require("CobaltUtils")
 
-	_G.dbpath = pluginPath .. "/CobaltDB/"
+	dbpath = pluginPath .. "/CobaltDB/"
 
 	if not dontusesocket then
 		socket = require("socket")

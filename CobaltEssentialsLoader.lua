@@ -3,7 +3,7 @@
 
 MP.RegisterEvent("onCobaltDBhandshake","onCobaltDBhandshake") --to make sure cobaltDB loads first
 
-cobaltVersion = "1.7.2"
+cobaltVersion = "1.7.3"
 
 pluginPath = debug.getinfo(1).source:gsub("\\","/")
 pluginPath = pluginPath:sub(1,(pluginPath:find("CobaltEssentialsLoader.lua"))-2)

@@ -16,8 +16,10 @@ local cobaltSysChar = string.char(0x99, 0x99, 0x99, 0x99)
 local requestTag = "" .. color(43) .. "[Request]" .. color(0) .. ""
 local receiveTag = "" .. color(42) .. "[Receive]" .. color(0) .. "" 
 
+dontusesocket = true
+
 function init()
-	dontusesocket = true
+	--dontusesocket = true
 end
 
 
