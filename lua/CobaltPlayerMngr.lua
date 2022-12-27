@@ -174,7 +174,7 @@ playerTemplate.permissions.protectedKeys =
 }
 
 --------------------------------------------------------CONSTRUCTOR--------------------------------------------------------
-local function new(name, role, isGuest)
+local function new(name, role, isGuest, identifiers)
 	local newPlayer = {} --player object
 	local canJoin = true --if the player is allowed to join
 	local reason = nil --if the canJoin is false, why can't they join.
@@ -182,6 +182,8 @@ local function new(name, role, isGuest)
 	--BASE STUFF
 	--newPlayer.discordID = GetPlayerDiscordID(playerID)
 	--newPlayer.hardwareID = GetPlayerHWID(playerID)
+	newPlayer.beammp = identifiers.beammp
+	newPlayer.ip = identifiers.ip
 	newPlayer.guest = isGuest
 	newPlayer.name = name
 	newPlayer.joinTime = ageTimer:GetCurrent()*1000
