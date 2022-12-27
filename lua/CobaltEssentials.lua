@@ -80,9 +80,9 @@ function onPlayerFirstAuth(name)
 end
 
 --the player is authenticated by the backend
-function onPlayerAuth(name, role, isGuest)
+function onPlayerAuth(name, role, isGuest, identifiers)
 	
-	local player, canJoin, reason = players.new(name, role, isGuest)
+	local player, canJoin, reason = players.new(name, role, isGuest, identifiers)
 
 	if extensions.triggerEvent("onPlayerAuth", player) == false then
 		return players.cancelBind(name, "You were blocked from joining by an extension")
