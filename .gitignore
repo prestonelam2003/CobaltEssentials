@@ -1,8 +1,0 @@
-lua/*.old
-*.old
-CobaltDB*
-lua/CobaltConfig.lua
-extensions/CobaltMotorsports.lua
-extensions/extCommands.lua
-extensions/CobaltHandoff.lua
-extensions/CobaltInv.lua
