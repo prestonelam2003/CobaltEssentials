@@ -272,7 +272,7 @@ function onVehicleEdited(ID, vehID,  data)
 	if canSpawn then
 		CElog(players[ID].name .. " edited their '" .. data.name .. "' (".. ID .."-".. vehID ..")")
 	else
-		CElog(players[ID].name .. "tried to edit their '" .. data.name .. "' (".. ID .."-".. vehID ..") The edit has been blocked, and the vehicle deleted due to " .. reason)
+		CElog(players[ID].name .. " tried to edit their '" .. data.name .. "' (".. ID .."-".. vehID ..") The edit has been blocked, and the vehicle deleted due to " .. reason)
 		MP.TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
 	end
