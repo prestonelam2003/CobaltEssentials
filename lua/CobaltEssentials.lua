@@ -248,9 +248,9 @@ function onVehicleSpawn(ID, vehID,  data)
 	reason = reason or "Spawn blocked by extension"
 
 	if canSpawn then
-		CElog(players[ID].name .. " Spawned a '" .. data.name .. "' (".. ID .."-".. vehID ..")")
+		CElog(players[ID].name .. " spawned a '" .. data.name .. "' (".. ID .."-".. vehID ..")")
 	else
-		CElog(players[ID].name .. " Tried to spawn '" .. data.name .. "' (".. ID .."-".. vehID ..") The spawn was blocked due to '" .. reason .. "'")
+		CElog(players[ID].name .. " tried to spawn '" .. data.name .. "' (".. ID .."-".. vehID ..") The spawn was blocked due to '" .. reason .. "'")
 		players[ID]:tell("Unable to spawn vehicle: " .. reason)
 		MP.TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
