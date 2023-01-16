@@ -22,15 +22,15 @@ local function init()
 
 	ConfigMngrConfig = _G.config
 	config = nil
-	
+
 	--local CobaltConfig = require("CobaltConfig")
-	
+
 	deprecatedConfig = config
-	
+
 	_G.config = ConfigMngrConfig
-	
+
 	local existingConfigOptions = {"commandPrefix", "maxActivePlayers", "RCONport", "RCONpassword", "RCONkeepAliveTick", "enableWhitelist","RCONenabled"}
-	
+
 	for option, value in pairs(deprecatedConfig) do
 		CElog(tostring(option) .. ":" .. tostring(value))
 		for index, existingOption in pairs(existingConfigOptions) do
@@ -42,7 +42,7 @@ local function init()
 				existingConfigOptions[index] = nil
 			end
 		end
-	
+
 		--special cases for option translations
 		if optionSet == false then
 			--if option == "enableWhitelist" then
@@ -62,12 +62,12 @@ local function init()
 				--config.RCONkeepAliveTick.value = value
 			end
 		end
-	end	
+	end
 
 	CElog("")
 
 	CobaltConfig.loadConfig()
-		
+
 	CE.registerUser = nil
 	CE.setPermission = nil
 	CE.registerCommand = nil
@@ -75,7 +75,7 @@ local function init()
 	CE.addWhitelist = nil
 	CE.ban = nil
 	extensions.load = loadExtensions
-end	
+end
 
 ----------------------------------------------------------EVENTS-----------------------------------------------------------
 
@@ -97,9 +97,9 @@ end
 --POST: set the permission requirement for the "flag" optional value for things like car count
 local function setPermission(permission, reqPerm, value) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
 	--CElog("CE.setPermission() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'permissions' database to edit it directly.")
-	
+
 	permissions[permission][reqPerm] = value
-end 
+end
 
 -- PRE: a command name, function and the required permission level is passed in.
 --POST: the command is added to the commands table.
@@ -131,7 +131,7 @@ end
 local function addWhitelist(identifier, IDtype) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
 	--CElog("CE.addWhitelist() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
 	CElog("Added " .. identifier .. " as ID Type " .. IDtype .. " to the whitelist" )
-	
+
 	if IDtype == 1 then
 		players.database[identifier].whitelisted = true
 	else
@@ -142,7 +142,7 @@ end
 local function ban(identifier, IDtype) --DEPRECATED DUE TO CobaltDB, CobaltConfigMngr & CobaltPlayerMngr IMPLEMENTATION
 	--CElog("CE.ban() is deprecated as of Cobalt Essentials 1.4.0! It is not supported, and may be removed in the future. For in-code implementation, please use the CobaltDB 'playerPermissions' database to edit it directly.")
 	CElog("Banned " .. identifier .. " as ID Type " .. IDtype .. " from the server" )
-	
+
 	if IDtype == 1 then
 		players.database[identifier].banned = true
 	else

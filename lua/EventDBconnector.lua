@@ -14,7 +14,7 @@ local M = {}
 local cobaltSysChar = string.char(0x99, 0x99, 0x99, 0x99)
 
 local requestTag = "" .. color(43) .. "[Request]" .. color(0) .. ""
-local receiveTag = "" .. color(42) .. "[Receive]" .. color(0) .. "" 
+local receiveTag = "" .. color(42) .. "[Receive]" .. color(0) .. ""
 
 dontusesocket = true
 
@@ -39,26 +39,26 @@ databaseTemplate.metatable =
 	end,
 
 	__pairs = function(database)
-	
+
 		indexes = M.getTables(database.CobaltDB_databaseName)
-	
+
 		local function stateless_iter(indexTable, k)
-		
+
 				k, v = next(indexTable, k)
-	
+
 				v = database[k]
 				--CElog(k, v ,database[k])
-				
+
 				if v ~= nil then
 						return k, v
 				end
-		end	
-		
+		end
+
 		return stateless_iter, indexes, nil
 	end
 }
 
-databaseTemplate.protectedKeys = 
+databaseTemplate.protectedKeys =
 {
 	CobaltDB_databaseName = true,
 	CobaltDB_newTable = true
@@ -68,7 +68,7 @@ databaseTemplate.protectedKeys =
 --DATABASE TABLE
 local tableTemplate = {}
 
-tableTemplate.protectedKeys = 
+tableTemplate.protectedKeys =
 {
 	CobaltDB_databaseName = true,
 	CobaltDB_tableName = true,
@@ -76,14 +76,14 @@ tableTemplate.protectedKeys =
 }
 --Setup metatable for the sub-table
 --THIS IS THE SUBTABLE
-tableTemplate.metatable = 
+tableTemplate.metatable =
 {
 	__index = function(table, key)
 		return M.query(table.CobaltDB_databaseName, table.CobaltDB_tableName,key)
 	end,
 
 	__newindex = function(table, key, value)
-		
+
 		--is this a protectedKey?
 		if tableTemplate.protectedKeys[key] then
 			rawset(table,key,value)
@@ -93,9 +93,9 @@ tableTemplate.metatable =
 	end,
 
 	__pairs = function(table)
-		
+
 		local cobaltTable = M.getTable(table.CobaltDB_databaseName, table.CobaltDB_tableName)
-				
+
 		return next, cobaltTable, nil
 	end
 }
@@ -115,7 +115,7 @@ local function newDatabase(DBname)
 		else
 			CElog(DBname .. " sucessfully opened.","CobaltDB")
 
-			newDatabase = 
+			newDatabase =
 			{
 				CobaltDB_databaseName = DBname,
 				CobaltDB_newTable = M.newTable,
@@ -195,7 +195,7 @@ local function query(DBname, tableName, key)
 			end
 		end
 	end
-		
+
 	--server:close()
 	--if type(data) ~= "table" then
 	--end
@@ -225,9 +225,9 @@ end
 --returns a read-only list of all tables within the database
 local function getTables(DBname)
 	--CElog(requestTag .. " #"    .. requestID .. ": getTables - " ..DBname,"CobaltDB")
-	
+
 	local res = MP.TriggerLocalEvent("getTables", DBname, requestID)
-	
+
 	local data = res[1]
 	local error
 
@@ -263,7 +263,7 @@ local function tableExists(DBname, tableName)
 	--CElog(requestTag .. " #"    .. requestID .. ": tableExists - " ..DBname .. ">" .. tableName,"CobaltDB")
 
 	local res = MP.TriggerLocalEvent("tableExists", DBname, tableName, requestID)
-	
+
 	exists = res[1] == tableName
 
 	return exists
@@ -279,7 +279,7 @@ local function openDatabase(DBname)
 	local res = MP.TriggerLocalEvent("openDatabase", DBname)
 
 	if res[1] == DBname then
-		--CElog(DBname .. " sucessfully opened.","CobaltDB")	
+		--CElog(DBname .. " sucessfully opened.","CobaltDB")
 		return true
 	else
 		return false
@@ -289,21 +289,21 @@ end
 --repair the connection to CobaltDB in the event of a disconnect.
 --note: BeamMP functions time out after 6ish seconds, so since this is almost always a socket timeout problem, we have to factor in that there will be 2 seconds already gone to work with.
 local function repairCobaltDBconnection(reason)
-	
+
 	CElog("/!\\ --------------------------COBALT-DB-CONNECTION-REPAIR-------------------------- /!\\\n","WARN")
 	CElog("Cobalt Essentials has detected an error in your connection to CobaltDB","WARN")
 	CElog("Please stand by while CE attempts to repair the connection.","WARN")
-	
+
 	--server = socket.udp()
 	--server:settimeout(timeout)
 	server:close()
 	server:setsockname('0.0.0.0', tonumber(port))
 
 	CElog("Socket has been reset, running a connection test.\n","WARN")
-	
+
 	local startTime = os.clock() * 1000
 	MP.TriggerLocalEvent("testCobaltDBconnection")--request test
-	
+
 	local data, error = server:receive()--wait  for test
 	local recTime = os.clock() * 1000
 
@@ -322,14 +322,14 @@ local function repairCobaltDBconnection(reason)
 end
 
 local function receiveDB(expectedRequestID)
-	requestID = requestID + 1 --increment requestID because 
+	requestID = requestID + 1 --increment requestID because
 	--CElog(receiveTag .. " #" expectedRequestID ..": requested.","CobaltDB")
 	local data,error = server:receive()
 	--CElog((data or "nil") .. " was received.","CobaltDB")
 
 	local s, e = data:find("%[requestIDsplitter%]")--find the index of the splitter
 	local recRequestID
-	
+
 	if s ~= nil then
 		recRequestID = data:sub(1,s-1)
 		data = data:sub(e+1)
@@ -338,7 +338,7 @@ local function receiveDB(expectedRequestID)
 
 	if data == nil or expectedRequestID ~= tonumber(recRequestID) or s == nil then
 		if repairCobaltDBconnection(error) == true then
-			
+
 			CElog("Requesting resend of last CobaltDB request","CobaltDB")
 			MP.TriggerLocalEvent("DBresend")
 			data, error = server:receive()

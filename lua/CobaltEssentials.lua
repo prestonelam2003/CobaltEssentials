@@ -28,7 +28,7 @@ MP.RegisterEvent("onPlayerConnecting","onPlayerConnecting")
 MP.RegisterEvent("onPlayerJoining","onPlayerJoining")
 MP.RegisterEvent("onPlayerJoin","onPlayerJoin")
 MP.RegisterEvent("onPlayerDisconnect","onPlayerDisconnect")
-	
+
 MP.RegisterEvent("onConsoleInput","onConsoleInput")
 MP.RegisterEvent("onChatMessage","onChatMessage")
 
@@ -49,7 +49,7 @@ function onTick()
 
 	for k,v in pairs(delayedQueue) do
 		if k ~= "n" and v.complete == false and age >= v.execTime then
-			
+
 			v.complete = true
 
 			v.func(table.unpack(v.args))
@@ -119,7 +119,7 @@ function onPlayerJoining(ID)
 		MP.DropPlayer(ID,"You've been kicked from the server!")
 
 	else
-		
+
 	end
 end
 
@@ -137,7 +137,7 @@ function onPlayerJoin(ID)
 end
 
 function onPlayerDisconnect(ID)
-		
+
 	extensions.triggerEvent("onPlayerDisconnect", players[ID]) --allow extensions to act first.
 
 	if players[ID] then
@@ -204,25 +204,25 @@ function onChatMessage(playerID, name ,chatMessage)
 		if s ~= nil then
 			args = chatMessage:sub(s+1)
 		end
-		
+
 
 		--get the command and args from the chat message.
 		--local args = chatMessage
 		--args[0] = playerID
 
 		--run the command and react accordingly
-		
+
 		local reply = M.command(players[playerID], command, args)
 		if reply ~= nil then
 			MP.SendChatMessage(playerID, reply)
 		end
 
-		--make the chat message not appear in chat. 
+		--make the chat message not appear in chat.
 		return 1
 	else
-			
+
 	end
-	
+
 	if players[playerID].permissions.muted ~= true and players[playerID]:hasPermission("sendMessage") == true then
 		CElog("[".. playerID .. "]" .. name .. " : " .. chatMessage,"CHAT")
 	else
@@ -233,10 +233,10 @@ end
 
 
 function onVehicleSpawn(ID, vehID,  data)
-	
+
 	--local vehicle = vehicles.new(ID, vehID, data)
-	
-	
+
+
 
 	data = utils.parseVehData(data)
 
@@ -261,7 +261,6 @@ function onVehicleSpawn(ID, vehID,  data)
 end
 
 function onVehicleEdited(ID, vehID,  data)
-
 	data = utils.parseVehData(data)
 
 
@@ -329,7 +328,7 @@ local function delayExec(delay, func, args)
 
 	local delayedItem = {}
 
-	local age = ageTimer:GetCurrent()*1000 
+	local age = ageTimer:GetCurrent()*1000
 
 	delayedItem.execTime = age + delay --the time at which the func is called with args args
 	delayedItem.func = func --the function that is executed
@@ -378,11 +377,11 @@ local function getArguments(sender, command, unhandledArgs)
 		args[0] = unhandledArgs and (" " .. unhandledArgs ) or ""
 
 		local argString = CC.getArgumentString(commandArgs)
-		
+
 		for index, argumentType in pairs(commandArgs) do
 			local lastArg = args[index - 1]
 			local s, e = lastArg:find(" ")
-			
+
 			--see if there are even more spaces
 			if s == nil then
 				break
@@ -431,7 +430,7 @@ local function getArguments(sender, command, unhandledArgs)
 		end
 	end
 
-	
+
 	--clear args if it's an empty table
 	if args == {} then
 		args = nil
@@ -459,7 +458,7 @@ local function command(sender, command, args)
 		end
 
 		if sender:canExecute(command) then
-			
+
 			if sender.playerID then
 				CElog(message)
 			end

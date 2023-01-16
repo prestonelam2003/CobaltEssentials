@@ -74,7 +74,7 @@ end
 ------------------------------------------------------DEFAULT-CONFIGS------------------------------------------------------
 --THIS IS NOT THE NEW CONFIG, DO NOT CHANGE THESE FOR STARTERS, IT WONT DO ANYTHING.
 --IF YOU ARE LOOKING FOR THE CONFIG, PLEASE REFER TO: beamMPserver/Resources/Server/CobaltEssentials/CobaltDB for where the json config is now stored.
-local defaultConfig = 
+local defaultConfig =
 {
 	commandPrefix =		{value = "/",			description = "The character placed at the beginning of a chat message when using a command"},
 	consolePrefix =		{value = "ce ",			description = "The text placed at the beginning of a console command"},
@@ -91,7 +91,7 @@ local defaultConfig =
 	CobaltDBport =		{value = 10814,			description = "The port used for internal CobaltDB communications, please keep it unique to each server or there may be interference."}
 }
 
-local defaultPermissions = 
+local defaultPermissions =
 {
 	--note: the numbers are displayed as strings because they must be, when referenced, everything will be converted to numbers appropriately.
 	spawnVehicles =	{[0] = true, description = "If you may spawn vehicles or not."},
@@ -99,7 +99,7 @@ local defaultPermissions =
 	vehicleCap =	{[1] = 1, [3] = 2, [5] = 5, [10] = 10, description = "The  amount of vehicles that may be spawned based on permission level."}
 }
 
-local defaultCommands = 
+local defaultCommands =
 {
 	--orginModule[commandName] is where the command is executed from
 	--Source-Limit-Map [0:no limit | 1:Chat Only | 2:RCON Only]
@@ -126,7 +126,7 @@ local defaultCommands =
 	stop =			{orginModule = "CC",	level = 10,	sourceLimited = 0,	arguments = 0,						description = "Stops the server"}
 }
 
-local defaultVehiclePermissions = 
+local defaultVehiclePermissions =
 {
 	default =	{level = 1}
 }

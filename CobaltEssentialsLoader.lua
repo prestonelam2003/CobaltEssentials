@@ -71,7 +71,7 @@ function onCobaltDBhandshake(port)
 		highestCap = cap
 		end
 	end
-		
+
 	if tonumber(highestCap) > tonumber(beamMPconfig.MaxCars) then
 		CElog("/!\\ -------------------------------SERVERSIDE-VEHICLE-CAP-FOR-CARS-TOO-LOW------------------------------- /!\\","WARN")
 		CElog("		The serverside vehicle cap (Cars) in the config is too low.","WARN")

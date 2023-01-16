@@ -8,7 +8,7 @@ local M = {}
 
 --runs when the script is called.
 function onInit()
-    
+
 end
 
 
@@ -104,11 +104,11 @@ local function status(sender, ...)
 	for playerID, player in pairs(players) do
 		if type(playerID) == "number" then
 			playerCount = playerCount + 1
-			
+
 			currentPlayer = tostring(playerID) .. ": " .. tostring(player.name) .. "\n"
 
 
-			if player.gamemode.mode == 0 then 
+			if player.gamemode.mode == 0 then
 				playersList = playersList .. "[A] " .. currentPlayer
 			elseif player.gamemode.mode == 1 then
 				specPlayersList = specPlayersList .. "[Q] " .. currentPlayer
@@ -133,7 +133,7 @@ local function statusdetail(sender, ...)
 	for playerID, player in pairs(players) do
 		if type(playerID) == "number" then
 			playerCount = playerCount + 1
-			
+
 			currentPlayer = tostring(player)
 
 
@@ -170,13 +170,13 @@ local function connected(sender,...)
 
 			currentPlayer = tostring(playerID) .. ": " .. tostring(player.name) .. "\n"
 
-			if player.connectStage == "connected" then 
+			if player.connectStage == "connected" then
 				playersConnected = playersConnected .. "[C] " .. currentPlayer
 				connectedCount = connectedCount + 1
-			elseif player.connectStage == "loading" then 
+			elseif player.connectStage == "loading" then
 				playersLoading = playersLoading .. "[L] " .. currentPlayer
 				loadingCount = loadingCount + 1
-			elseif player.connectStage == "downloading" then 
+			elseif player.connectStage == "downloading" then
 				playersDownloading = playersDownloading .. "[D] " .. currentPlayer
 				downloadingCount = downloadingCount + 1
 			end
@@ -282,7 +282,7 @@ local function whitelist(sender, arguments)
 		action = arguments
 		argument = nil
 	end
-	
+
 	if action == "enable" then
 		config.enableWhitelist.value = true
 		returnString = "The whitelist has been enabled."
@@ -290,7 +290,7 @@ local function whitelist(sender, arguments)
 		config.enableWhitelist.value = false
 		returnString = "The whitelist has been disabled."
 	elseif action == "add" then
-		
+
 		if argument then
 			returnString = argument .. " has been whitelisted on this server."
 			players.database[argument].whitelisted = true
@@ -299,14 +299,14 @@ local function whitelist(sender, arguments)
 		end
 
 	elseif action == "remove" then
-		
+
 		if argument then
 			returnString = argument .. " has been unwhitelisted on this server."
 			players.database[argument].whitelisted = false
 		else
 			returnString = "You must specify a player"
 		end
-	
+
 	elseif action == "help" then
 		returnString = returnString .. "enable: turns on the whitelist\n"
 		returnString = returnString .. "disable: turns off the whitelist\n"
@@ -340,7 +340,7 @@ local function countdown(sender, ...)
 end
 
 local function lua(sender, toExecute, ...)
-	
+
 	CElog(sender.ID .. " executed: " .. toExecute .. "\n")
 	return load(toExecute)()
 end
@@ -356,9 +356,9 @@ end
 
 local function uptime(sender, ...)
 	local clock = math.floor(ageTimer:GetCurrent())
-	
+
 	local seconds = clock % 60
-	
+
 	local minutes = math.floor(clock/60) % 60
 
 	local hours = math.floor((math.floor(clock/60)/60))
@@ -374,7 +374,7 @@ local function uptime(sender, ...)
 		hours = "0" .. hours
 	end
 
-	
+
 	return(hours .. ":" .. minutes .. ":" .. seconds)
 
 end
@@ -403,7 +403,7 @@ end
 --You may add your credit to this command alongside mine, so long as it follows GPLv3 standards.
 --You may adjust line 1 and 2 to suit whatever Cobalt Essentials has turned into, so long as the original development credit goes to Preston Elam (Cobalt) and as per GPLv3 states, it's also gotta be under a GPLv3 license.
 --
---All in all, I've (Preston Elam) worked really hard on this beamMP plugin, i've made it open source and released it under a GPLv3 license so that if for whatever reason the direction I take the plugin doesn't satisfy you, or 
+--All in all, I've (Preston Elam) worked really hard on this beamMP plugin, i've made it open source and released it under a GPLv3 license so that if for whatever reason the direction I take the plugin doesn't satisfy you, or
 --I stop developing it, someone else can pick up where I left off, and to be honest I just want credit. I'm not a lawyer at a big buisness, if you fuck up some copyright notices or accidentally break the command im not gonna sue you,
 --I just really want to be recognized for all the time and effort I've put into Cobalt Essentials
 --																									-Preston Elam (Cobalt)

@@ -11,7 +11,7 @@ local M = {}
 local VehicleObject = {}
 
 ----------------------------------------------------------INIT-----------------------------------------------------------
-	
+
 
 
 ----------------------------------------------------------EVENTS-----------------------------------------------------------
@@ -70,7 +70,7 @@ local function parseVehData(data)
 			--TODO: BACKUP THE JSON IN A FILE. tempData is the error, data is the json.
 			return false
 		end
-		data.info = tempData 
+		data.info = tempData
 	end
 
 	return data

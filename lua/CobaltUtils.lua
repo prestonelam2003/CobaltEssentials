@@ -67,7 +67,7 @@ local function setLogType(heading, headingColor, conditonFunc, stringColor)
 	headingColor = headingColor or 94
 	stringColor = stringColor or 0
 	logTypes[heading] = {}
-	
+
 	logTypes[heading].headingColor = color(headingColor)
 	logTypes[heading].stringColor = color(stringColor)
 
@@ -113,7 +113,7 @@ function output(ID, message)
 		error("ID is nil")
 	end
 	if message == nil then
-		error("message is nil")	
+		error("message is nil")
 	end
 
 	if type(ID) == "string" then
@@ -123,7 +123,7 @@ function output(ID, message)
 		elseif ID:sub(1,1) == "R" then
 			MP.TriggerGlobalEvent("RCONsend", ID, message)
 		end
-	
+
 	elseif type(ID) == "number" then
 		MP.SendChatMessage(ID, message)
 	else
@@ -156,7 +156,7 @@ local function parseVehData(data)
 			--TODO: BACKUP THE JSON IN A FILE. tempData is the error, data is the json.
 			return false
 		end
-		data.info = tempData 
+		data.info = tempData
 	end
 
 	return data
@@ -166,7 +166,7 @@ end
 local function readOldCfg(path)
 
 	local cfg = {}
-	
+
 	local n = 1
 
 	local file = io.open(path,"r")
@@ -184,14 +184,14 @@ local function readOldCfg(path)
 		--see if this line even contians a value
 		local equalSignIndex = line:find("=")
 		if equalSignIndex ~= nil then
-			
+
 			local k = line:sub(1, equalSignIndex - 1)
 			k = k:gsub(" ", "") --remove spaces in the key, they aren't required and will serve to make thigns more confusing.
 
 			local v = line:sub(equalSignIndex + 1)
 
 			v = load("return " ..  v)()
-			
+
 			cfg[k] = v
 		end
 
@@ -208,7 +208,7 @@ local function readOldCfg(path)
 			if s ~= nil then
 				cfg.Name = cfg.Name:sub(0,s-1) .. cfg.Name:sub(s+2)
 			end
-		
+
 			s,e = cfg.Name:find("%^")
 		end
 	end
@@ -290,10 +290,10 @@ function formatVersionAsTable(versionString)
 		tag = tag:sub(1,s)
 
 	end
-	
+
 	--print("'".. tag .."'")
 	version = split(versionString,".")
-	
+
 	return version, tag
 end
 
@@ -322,7 +322,7 @@ end
 function compareCobaltVersion(ver1, ver2)
 	local ver1strength = 0
 	local ver2strength = 0
-	
+
 	if type(ver1) == "string" then
 		ver1 = formatVersionAsTable(ver1)
 	end

@@ -29,7 +29,7 @@ specCount = 0
 
 
 -----------------------------------------------------(META)-TABLES-INIT-----------------------------------------------------
-playersMetatable = 
+playersMetatable =
 {
 	__len = function(table)
 		return MP.GetPlayerCount()
@@ -53,7 +53,7 @@ vehiclesTableTemplate.metatable =
 	__len = function(table)
 		local count	= 0
 		for k,v in pairs(table) do
-			if type(v) == "table" then	
+			if type(v) == "table" then
 				count = count + 1
 			end
 		end
@@ -263,7 +263,7 @@ end
 
 local function bindPlayerToID(name, playerID)
 	local player = unboundAuthenticated[name]
-	
+
 	--assign some values that require a playerID
 	player.playerID = playerID
 	player.hardwareID = nil--MP.GetPlayerHWID(playerID)
@@ -273,7 +273,7 @@ local function bindPlayerToID(name, playerID)
 	-- Mode-Map [-1:undefined 0:active, 1:inQueue 2:spectator]
 	player.gamemode = {}
 	player.gamemode.queue = activeCount + 1 - config.maxActivePlayers.value
-	
+
 	if player.gamemode.queue > 0 then
 		player.gamemode.mode = 1
 	else
@@ -293,7 +293,7 @@ local function bindPlayerToID(name, playerID)
 	unboundAuthenticated[name] = nil
 
 	CElog(tostring(player))
-	
+
 end
 
 local function cancelBind(name, reason)
@@ -329,7 +329,7 @@ local function updateQueue()
 	end
 
 	openSlots = config.maxActivePlayers.value - activeCount
-	
+
 	if openSlots >= 1 then
 		for i = 1, openSlots do
 			local toPromote
@@ -366,7 +366,7 @@ end
 local function setGamemode(player, mode, locked, source)
 	
 	local changeAllowed = true
-	
+
 	--figure out if change is allowed
 	if player.gamemode.locked == true then
 		for _,weakSource in pairs(weakSources) do
@@ -381,7 +381,7 @@ local function setGamemode(player, mode, locked, source)
 		player.gamemode.mode = mode
 		player.gamemode.locked = locked
 		player.gamemode.source = source
-		
+
 		return mode
 	end
 end
@@ -392,7 +392,7 @@ end
 local function hasPermission(player, permission) 
 	
 	local highestLevel
-	
+
 	if permissions[permission]:exists() then
 		--CElog(permission)
 
@@ -401,7 +401,7 @@ local function hasPermission(player, permission)
 				highestLevel = level
 			end
 		end
-		
+
 		return highestLevel and permissions[permission][highestLevel]
 	end
 end
@@ -410,8 +410,8 @@ local function canSpawn(player, vehID,  data)
 
 	if data then --make sure the car's data exists in the first place.
 		if player:hasPermission("spawnVehicles") == true then
-				
-			
+
+
 			local vehicleDBobject --database object of the vehicle
 			local defaultVehiclePermissions --a boolean refering to if vehicleDBobject is of the "default" slot
 			if vehiclePermissions[data.name]:exists() then
@@ -427,21 +427,21 @@ local function canSpawn(player, vehID,  data)
 				for key, value in pairs(vehicleDBobject) do
 					if key:sub(1,10) == "partlevel:" then
 						local part = key:sub(11)
-	
+
 						for slot, part2 in pairs(data.vcf.parts) do
 							if part == part2 then
 								if value > player.permissions.level then
 									CElog('Insufficent Permissions for the part: "' .. part .. "' Spawn Blocked" )
 									return false, "Insufficent permissions for the part " .. part
-								
+
 								end
 								break
 							end
 						end
-	
+
 					end
 				end
-				
+
 				if #player.vehicles - ((player.vehicles[vehID] == nil and 0) or 1) >= player:hasPermission("vehicleCap") then
 						CElog("Vehicle Cap Reached, Spawn Blocked")
 						return false, "Vehicle Cap Reached"
@@ -454,7 +454,7 @@ local function canSpawn(player, vehID,  data)
 			CElog("Insufficent Permissions, Spawn Blocked")
 			return false, "Insufficent Spawn Permissions"
 		end
-	
+
 		return true
 	else
 		CElog("Vehicle JSON could not be read for some reason, Try again.")
