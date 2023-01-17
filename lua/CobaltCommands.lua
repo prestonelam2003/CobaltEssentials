@@ -98,14 +98,13 @@ local function status(sender, ...)
 	local playersList = ""
 	local playersInQueue = ""
 	local specPlayersList = ""
-	local currentPlayer
-	playerCount = 0
+	local playerCount = 0
 
 	for playerID, player in pairs(players) do
 		if type(playerID) == "number" then
 			playerCount = playerCount + 1
 
-			currentPlayer = tostring(playerID) .. ": " .. tostring(player.name) .. "\n"
+			local currentPlayer = tostring(playerID) .. ": " .. tostring(player.name) .. "\n"
 
 
 			if player.gamemode.mode == 0 then
@@ -118,23 +117,20 @@ local function status(sender, ...)
 		end
 	end
 
-	playersList = "CE " .. cobaltVersion .. " | " .. playerCount .. "/" .. beamMPconfig.MaxPlayers .. " Player(s) | " .. beamMPconfig.Name .. " \n" .. playersList .. specPlayersList
-
-	return playersList
+	return string.format("CE %s | %d/%s Players | %s^r\n%s%s", cobaltVersion, playerCount, beamMPconfig.MaxPlayers, beamMPconfig.Name, playersList, specPlayersList)
 end
 
 local function statusdetail(sender, ...)
 	local playersList = ""
 	local playersInQueue = ""
 	local specPlayersList = ""
-	local currentPlayer
-	playerCount = 0
+	local playerCount = 0
 
 	for playerID, player in pairs(players) do
 		if type(playerID) == "number" then
 			playerCount = playerCount + 1
 
-			currentPlayer = tostring(player)
+			local currentPlayer = tostring(player)
 
 
 			if player.gamemode.mode == 0 then
@@ -147,28 +143,25 @@ local function statusdetail(sender, ...)
 		end
 	end
 
-	playersList = "CE " .. cobaltVersion .. " | " .. playerCount .. "/" .. beamMPconfig.MaxPlayers .. " Player(s) | " .. beamMPconfig.Name .. " \n" .. playersList .. specPlayersList
-
-	return playersList
+	return string.format("CE %s | %d/%s Players | %s\n%s%s", cobaltVersion, playerCount, beamMPconfig.MaxPlayers, beamMPconfig.Name, playersList, specPlayersList)
 end
 
 local function connected(sender,...)
 	local playersConnected = ""
 	local playersLoading = ""
 	local playersDownloading = ""
-	local currentPlayer
-	playerCount = 0
+	local playerCount = 0
 
 
-	connectedCount = 0
-	loadingCount = 0
-	downloadingCount = 0
+	local connectedCount = 0
+	local loadingCount = 0
+	local downloadingCount = 0
 
 	for playerID, player in pairs(players) do
 		if type(playerID) == "number" then
 			playerCount = playerCount + 1
 
-			currentPlayer = tostring(playerID) .. ": " .. tostring(player.name) .. "\n"
+			local currentPlayer = tostring(playerID) .. ": " .. tostring(player.name) .. "\n"
 
 			if player.connectStage == "connected" then
 				playersConnected = playersConnected .. "[C] " .. currentPlayer
@@ -183,9 +176,7 @@ local function connected(sender,...)
 		end
 	end
 
-	playersList = "Connected: " .. connectedCount .. " | Loading: " .. loadingCount .. " | Downloading: " .. downloadingCount .. " \n" .. playersConnected .. playersLoading .. playersDownloading
-
-	return playersList
+	return string.format("Connected: %d | Loading: %d | Downloading: %d\n%s%s%s", connectedCount, loadingCount, downloadingCount, playersConnected, playersLoading, playersDownloading)
 end
 
 local function help(sender, commandName, ...)

@@ -40,10 +40,10 @@ databaseTemplate.metatable =
 
 	__pairs = function(database)
 
-		indexes = M.getTables(database.CobaltDB_databaseName)
+		local indexes = M.getTables(database.CobaltDB_databaseName)
 
 		local function stateless_iter(indexTable, k)
-
+				local v
 				k, v = next(indexTable, k)
 
 				v = database[k]
@@ -264,7 +264,7 @@ local function tableExists(DBname, tableName)
 
 	local res = MP.TriggerLocalEvent("tableExists", DBname, tableName, requestID)
 
-	exists = res[1] == tableName
+	local exists = res[1] == tableName
 
 	return exists
 end

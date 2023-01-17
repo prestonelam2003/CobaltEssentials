@@ -21,15 +21,14 @@ local activePlayers = {}
 local playerQueue = {}
 local spectators = {}
 
-playerCount = 0
-activeCount = 0
-queueCount = 0
-specCount = 0
+local activeCount = 0
+local queueCount = 0
+local specCount = 0
 
 
 
 -----------------------------------------------------(META)-TABLES-INIT-----------------------------------------------------
-playersMetatable =
+local playersMetatable =
 {
 	__len = function(table)
 		return MP.GetPlayerCount()

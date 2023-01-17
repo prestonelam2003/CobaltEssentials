@@ -10,7 +10,7 @@
 local M = {}
 local MT = {}
 
-loaded = {}
+local loaded = {}
 
 local eventAllowed = true
 

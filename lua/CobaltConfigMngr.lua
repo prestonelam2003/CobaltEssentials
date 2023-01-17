@@ -14,9 +14,9 @@ commands = CobaltDB.new("commands")
 vehiclePermissions = CobaltDB.new("vehicles")
 config = CobaltDB.new("config")
 
-beamMPconfig = {}
-currentcfg = {}
-beamMPcfg = utils.readCfg("ServerConfig.toml").General
+beamMPconfig = {} -- proxy table
+local currentcfg = {} -- live config
+local beamMPcfg = utils.readCfg("ServerConfig.toml").General -- starting config
 
 
 
