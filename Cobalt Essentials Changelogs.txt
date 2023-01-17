@@ -83,6 +83,8 @@ Overhauled extension system, now featuring autoload
 
 -------Cobalt Essentials 1.7.3 Changelog-------
 Fix luasocket still being a dependency
+Add warning for extensions without version numbers
+Cleaned up some logs (thanks 02bensch)
 
 TODO:
 Make vehicles objects
