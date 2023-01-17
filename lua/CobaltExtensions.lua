@@ -84,6 +84,8 @@ local function load(extensionName, extensionPath)
 			elseif cobaltVer < extensionVer then
 				CElog(string.format("Extension '%s' is newer (%s) than Cobalt Essentials, it might not work as intended." ,extensionName, module.COBALT_VERSION), "WARN")
 			end
+		else
+			CElog(string.format("Extension '%s' does not specify a version, it might be outdated.", extensionName, module.COBALT_VERSION), "WARN")
 		end
 
 		_G[extensionName] = module
