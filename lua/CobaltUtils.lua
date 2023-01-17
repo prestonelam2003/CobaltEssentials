@@ -50,7 +50,7 @@ function CElog(string, heading, debug)
 	local out = ""
 
 	if logTypes[heading] then
-		if logTypes[heading].conditonFunc == nil or logTypes[heading].conditonFunc() then
+		if logTypes[heading].conditionFunc == nil or logTypes[heading].conditionFunc() then
 			out = out .. "[" .. logTypes[heading].headingColor .. heading .. color(0) .. "] " .. logTypes[heading].stringColor
 		end
 	else
@@ -63,7 +63,7 @@ function CElog(string, heading, debug)
 	return out
 end
 
-local function setLogType(heading, headingColor, conditonFunc, stringColor)
+local function setLogType(heading, headingColor, conditionFunc, stringColor)
 	headingColor = headingColor or 94
 	stringColor = stringColor or 0
 	logTypes[heading] = {}
@@ -71,8 +71,8 @@ local function setLogType(heading, headingColor, conditonFunc, stringColor)
 	logTypes[heading].headingColor = color(headingColor)
 	logTypes[heading].stringColor = color(stringColor)
 
-	if conditonFunc then
-		logTypes[heading].conditonFunc = conditonFunc
+	if conditionFunc then
+		logTypes[heading].conditionFunc = conditionFunc
 	end
 end
 
