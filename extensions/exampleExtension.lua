@@ -1,5 +1,5 @@
 local M = {}
-M.COBALT_VERSION = "1.7.3"
+M.COBALT_VERSION = "1.7.4"
 
 
 local lastAnnounce = 0

@@ -85,6 +85,8 @@ Overhauled extension system, now featuring autoload
 Fixed luasocket still being a dependency
 Added warning for extensions without version numbers
 Cleaned up some logs (thanks 02bensch)
+
+-------Cobalt Essentials 1.7.4 Changelog-------
 Added extension reload mechanism
 
 TODO:
