@@ -1,5 +1,5 @@
 local M = {}
-M.COBALT_VERSION = "1.7.2"
+M.COBALT_VERSION = "1.7.3"
 
 
 local lastAnnounce = 0
@@ -7,8 +7,14 @@ local announceStep = 300000
 
 
 --called whenever the extension is loaded
-local function onInit()
+local function onInit(stateData)
+	if stateData then
+		CElog('extension reloaded with state data: ' .. tostring(stateData))
+	end
+end
 
+local function onUnload()
+	return 'state data for this extension'
 end
 
 --called once every tick
@@ -97,6 +103,7 @@ end
 
 
 M.onInit = onInit
+M.onUnload = onUnload
 M.onTick = onTick
 
 M.onPlayerFirstAuth = onPlayerFirstAuth

@@ -64,12 +64,12 @@ end
 
 -- PRE: the string "extensionName" is passed in.
 --POST: any file named <extensionName>.lua is loaded, the module is placed under a global variable named after string extensionName and it's init is executed, if the file exists, function returns true.
-local function load(extensionName, extensionPath)
+local function load(extensionName, extensionPath, extensionData)
 	extensionPath = extensionPath or extensionName
 
 	if loaded[extensionName] == nil then
 		local path = "extensions/" .. extensionPath
-		if not isAvailable(path) then
+		if not isAvailable(path) then -- catches syntax errors
 			CElog("Extension unavailable: " .. tostring(extensionName) .. " at location: " .. tostring(path), "WARN")
 			return false
 		end
@@ -88,11 +88,14 @@ local function load(extensionName, extensionPath)
 			CElog(string.format("Extension '%s' does not specify a version, it might be outdated.", extensionName, module.COBALT_VERSION), "WARN")
 		end
 
+		module.__relativePath = extensionPath
+		module.__absolutePath = pluginPath .. '/' .. path .. '.lua'
+
 		_G[extensionName] = module
 		loaded[extensionName] = module
 
 		if type(module.onInit) == "function"  then
-			local success, error = pcall(module.onInit)
+			local success, error = pcall(module.onInit, extensionData)
 			if not success then
 				_G[extensionName] = nil
 				loaded[extensionName] = nil
@@ -114,19 +117,38 @@ local function unload(extensionName)
 	if not loaded[extensionName] then return false end
 	local module = loaded[extensionName]
 
-	if type(module.onUnload) == "function" then module.onUnload() end
+	local extensionData
+
+	if type(module.onUnload) == "function" then
+		extensionData = module.onUnload()
+	end
 
 	_G[extensionName] = nil
 	loaded[extensionName] = nil
 	package.loaded[extensionName] = nil
 
-	return true
+	return true, extensionData
 end
 
 local function cancelEvent()
 	eventAllowed = false
 end
 
+
+local function reload(extensionName)
+	CElog("Reloading Extension " .. color(32)..extensionName..color(0))
+
+	local extensionPath = (loaded[extensionName] or {}).__relativePath
+
+	local unloaded, extensionData = M.unload(extensionName)
+
+	if not unloaded then
+		CElog("Could not find extension to reload called " .. tostring(extensionName), "WARN")
+		return
+	end
+
+	M.load(extensionName, extensionPath, extensionData)
+end
 
 ---------------------------------------------------------ACCESSORS---------------------------------------------------------
 
@@ -166,6 +188,17 @@ end
 
 ------------------------------------------------------PUBLICINTERFACE------------------------------------------------------
 
+local function onFileChanged(path)
+	for moduleName, m in pairs(loaded) do
+		if m.__absolutePath == path then
+			reload(moduleName)
+			return true
+		end
+	end
+
+	return false
+end
+
 MT.__index = function(tbl, key)
 	if key == nil then return nil end
 
@@ -186,6 +219,7 @@ setmetatable(M, MT)
 M.load = load
 M.unload = unload
 M.cancelEvent = cancelEvent
+M.reload = reload
 
 ----ACCESSORS----
 M.triggerEvent = triggerEvent
@@ -193,6 +227,7 @@ M.getLoaded = getLoaded
 
 
 ----FUNCTIONS----
+M.onFileChanged = onFileChanged
 
 init()
 return M

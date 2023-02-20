@@ -32,6 +32,8 @@ MP.RegisterEvent("onPlayerDisconnect","onPlayerDisconnect")
 MP.RegisterEvent("onConsoleInput","onConsoleInput")
 MP.RegisterEvent("onChatMessage","onChatMessage")
 
+MP.RegisterEvent("onFileChanged","onFileChanged")
+
 MP.RegisterEvent("onVehicleSpawn","onVehicleSpawn")
 MP.RegisterEvent("onVehicleEdited","onVehicleEdited")
 MP.RegisterEvent("onVehicleDeleted","onVehicleDeleted")
@@ -304,7 +306,9 @@ function onVehicleDeleted(ID, vehID)
 	end
 end
 
-
+function onFileChanged(path)
+	if extensions.onFileChanged(path) then return end -- it was a CE extension, nothing else to do
+end
 
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 

@@ -122,6 +122,7 @@ local defaultCommands =
 	setperm =		{orginModule = "CC",	level = 10,	sourceLimited = 0,	arguments = {"player","value"},		description = "Change a player's permission level"},
 	setgroup =		{orginModule = "CC",	level = 10,	sourceLimited = 0,	arguments = {"player","value"},		description = "Set a player's permission group"},
 	lua =			{orginModule = "CC",	level = 10,	sourceLimited = 2,	arguments = {"command"},			description = "Execute Lua, return the desired reply."},
+	reload =		{orginModule = "CC",	level = 10,	sourceLimited = 0,	arguments = {"extension"},			description = "Reloads the given Cobalt Extenion"},
 	togglechat =	{orginModule = "CC",	level =	10,	sourceLimited = 2,	arguments = 0,						description = "Toggles viewing chat in the RCON client"},
 	stop =			{orginModule = "CC",	level = 10,	sourceLimited = 0,	arguments = 0,						description = "Stops the server"}
 }

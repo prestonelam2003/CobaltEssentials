@@ -387,6 +387,10 @@ local function stop(sender, ...)
 	CE.stopServer()
 end
 
+local function reload(sender, extensionName)
+	extensions.reload(extensionName)
+end
+
 --This is part of the copyright notice, if you edit Cobalt Essentials, you may not remove the copyright notice here.
 --The /about command, which points back to this function, must also stay enabled for all permissions.
 --The command must output the text as seen below, the function can be updated/modernized however, it must ultimately get this copyright notice back to the user in clear text.
@@ -437,6 +441,7 @@ M.lua = lua
 M.uptime = uptime
 M.togglechat = togglechat
 M.stop = stop
+M.reload = reload
 M.about = about
 
 M.testCommand = testCommand
