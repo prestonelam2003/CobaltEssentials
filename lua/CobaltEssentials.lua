@@ -162,7 +162,7 @@ function onConsoleInput(message)
 		return M.command({type="C", canExecute=function() return true end}, "help")
 	end
 
-	local commandPrefix = config.consolePrefix.value or "CE "
+	local commandPrefix = config.consolePrefix.value or "ce "
 	local prefixLen = commandPrefix:len()
 
 

@@ -182,13 +182,13 @@ end
 local function help(sender, commandName, ...)
 	local commandList = ""
 
-	local commandColor, argColor, noColor, indent = "", "", "", ""
-	local commandPrefix = ""
+	local commandColor, argColor, noColor, indent = "^b", "^c", "^r", ""
+	local commandPrefix = config.commandPrefix.value or "/"
 
 	if sender.type == "C" then
 		commandColor, argColor, noColor, indent = color(94), color(31), color(0), "        "
 		commandList = "Cobalt Essentials:\n    Commands:\n"
-		commandPrefix = config.consolePrefix.value or "CE "
+		commandPrefix = config.consolePrefix.value or "ce "
 	end
 
 	local padRight = function(i) local a="" for b=i,1,-1 do a=a.." " end return a end

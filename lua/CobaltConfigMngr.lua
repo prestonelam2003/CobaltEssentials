@@ -104,7 +104,7 @@ local defaultCommands =
 	--orginModule[commandName] is where the command is executed from
 	--Source-Limit-Map [0:no limit | 1:Chat Only | 2:RCON Only]
 	--A star before an argument actually means the opposite of what it would traditionally mean, a '*' means the argument is optional.
-	help =			{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = {"*command"},						description = "Lists all commands accessible by the player"},
+	help =			{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = {"*command"},			description = "Lists all commands accessible by the player"},
 	status =		{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Lists all the players on the server with their ids and basic information on the server"},
 	statusdetail =	{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Lists all the players on the server in detail along with basic server information"},
 	connected =		{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Get the connect stage of all players on the server"},
