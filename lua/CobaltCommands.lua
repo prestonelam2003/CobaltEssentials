@@ -338,7 +338,7 @@ end
 
 local function testCommand(sender, ...)
 	CElog("Test Command Executed")
-	return "Test Sucessful"
+	return "Test successful"
 end
 
 local function say(sender, message, ...)

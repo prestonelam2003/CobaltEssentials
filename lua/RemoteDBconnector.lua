@@ -168,7 +168,7 @@ local function newDatabase(dbName, targetID)
 			CElog(dbName .. " could not be opened, Remote DB returned an invalid response: " .. dbResponseString, "WARN")
 			return nil, "Invalid response from CobaltDB"
 		else
-			CElog(dbName .. " sucessfully opened, target is: " .. parsedResposnse.targetID, "CobaltDB")
+			CElog(dbName .. " successfully opened, target is: " .. parsedResposnse.targetID, "CobaltDB")
 
 			local dbHandle =
 			{

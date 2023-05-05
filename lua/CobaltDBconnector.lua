@@ -117,9 +117,9 @@ local function newDatabase(DBname)
 	if databaseLoaderInfo ~= nil then
 		if databaseLoaderInfo:sub(1,2) == "E:" then
 			CElog(DBname .. " could not be opened after 5 tries due to: " .. databaseLoaderInfo:sub(3),"CobaltDB")
-			return nil, "CobaltDB failed to load " .. DBname .. "after 5 tries due to : " .. databaseLoaderInfo:sub(3)
+			return nil, "CobaltDB failed to load " .. DBname .. "after 5 tries due to: " .. databaseLoaderInfo:sub(3)
 		else
-			CElog(DBname .. " sucessfully opened.","CobaltDB")
+			CElog(DBname .. " successfully opened.","CobaltDB")
 
 			newDatabase =
 			{
@@ -299,7 +299,7 @@ local function openDatabase(DBname)
 
 	MP.TriggerLocalEvent("openDatabase", DBname)
 	if M.receiveDB(requestID) == DBname then
-		--CElog(DBname .. " sucessfully opened.","CobaltDB")
+		--CElog(DBname .. " successfully opened.","CobaltDB")
 
 		--server:close()
 		return true
@@ -332,13 +332,13 @@ local function repairCobaltDBconnection(reason)
 	local recTime = os.clock() * 1000
 
 	if data == port then
-		CElog(color(32) .. "CobaltDB Connection sucessfully repaired with a propagation delay of " .. math.floor(recTime - startTime) .. "ms","WARN")
-		--CElog(color(32) .. "CobaltDB Connection sucessfully repaired with a propagation delay of " .. (startTime - recTime) .. "ms","CobaltDB")
+		CElog(color(32) .. "CobaltDB Connection successfully repaired with a propagation delay of " .. math.floor(recTime - startTime) .. "ms","WARN")
+		--CElog(color(32) .. "CobaltDB Connection successfully repaired with a propagation delay of " .. (startTime - recTime) .. "ms","CobaltDB")
 		CElog("/!\\ --------------------------COBALT-DB-CONNECTION-REPAIR-------------------------- /!\\","WARN")
 		return true
 	else
-		CElog("CobaltDB Connection repair was unsucessful, please try restarting your server.","WARN")
-		CElog("If you are running multiple servers, make sure each server has a unique CobaltDBport","WARN")
+		CElog("CobaltDB Connection repair was unsuccessful, please try restarting your server.","WARN")
+		CElog("If you are running multiple servers, make sure each server has a unique CobaltDBport.","WARN")
 		CElog("If the problem persists, please reach out to Cobalt Essentials support in our discord.","WARN")
 		CElog("/!\\ --------------------------COBALT-DB-CONNECTION-REPAIR-------------------------- /!\\","WARN")
 		return false

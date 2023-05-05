@@ -347,7 +347,7 @@ end
 
 ---------------------------------------------------------ACCESSORS---------------------------------------------------------
 
--- PRE: the sender object, command object, the arguments after the commmand as a string are passed in.
+-- PRE: the sender object, command object, the arguments after the command as a string are passed in.
 --POST: the unhandledArgs string is divided up into distinct arguments for the command.
 local function getArguments(sender, command, unhandledArgs)
 	local args = {}
@@ -474,7 +474,7 @@ local function command(sender, command, args)
 			end
 
 		else
-			CElog("Insufficent Perms")
+			CElog("Insufficient Perms")
 			return "You do not have permission to use this command."
 		end
 	else
