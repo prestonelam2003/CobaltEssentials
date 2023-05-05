@@ -1,4 +1,4 @@
---Copyright (C) 2021, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
+--Copyright (C) 2023, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
 --THIS SCRIPT IS PROTECTED UNDER AN GPLv3 LICENSE
 
 --    PRE: Precondition
