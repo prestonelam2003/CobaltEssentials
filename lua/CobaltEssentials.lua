@@ -468,9 +468,9 @@ local function command(sender, command, args)
 			end
 
 			if args == nil then
-				return _G[command.orginModule][commandName](sender)
+				return _G[command.originModule][commandName](sender)
 			else
-				return _G[command.orginModule][commandName](sender, table.unpack(args))
+				return _G[command.originModule][commandName](sender, table.unpack(args))
 			end
 
 		else
