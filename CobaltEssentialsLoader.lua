@@ -3,7 +3,7 @@
 
 MP.RegisterEvent("onCobaltDBhandshake","onCobaltDBhandshake") --to make sure cobaltDB loads first
 
-cobaltVersion = "1.7.4"
+cobaltVersion = "1.7.5"
 
 pluginPath = debug.getinfo(1).source:gsub("\\","/")
 pluginPath = pluginPath:sub(1,(pluginPath:find("CobaltEssentialsLoader.lua"))-2)
@@ -78,7 +78,7 @@ function onCobaltDBhandshake(port)
 		CElog("		If you do not turn it up, dynamic vehicle caps based on permission level will not work!","WARN")
 		CElog("		Please adjust the serverside vehicle cap to " .. highestCap .. " or greater to avoid any problems.","WARN")
 		CElog("/!\\ -------------------------------SERVERSIDE-VEHICLE-CAP-FOR-CARS-TOO-LOW------------------------------- /!\\","WARN")
-		beamMPcfg.MaxCars = highestCap
+		beamMPconfig.MaxCars = highestCap
 		--Sleep(5000)
 	end
 
@@ -88,7 +88,6 @@ function onCobaltDBhandshake(port)
 		CElog("		This will lead to duplicate chat messages in the console and log, as Cobalt logs messages as well.","WARN")
 		CElog("		Please set the option 'LogChat' to false to avoid this.","WARN")
 		CElog("/!\\ -------------------------------CHAT-LOGGING-ENABLED------------------------------- /!\\","WARN")
-		beamMPcfg.MaxCars = highestCap
 		--Sleep(5000)
 	end
 
