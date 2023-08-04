@@ -1,4 +1,4 @@
---Copyright (C) 2020, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
+--Copyright (C) 2023, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 --    PRE: Precondition
@@ -28,9 +28,11 @@ MP.RegisterEvent("onPlayerConnecting","onPlayerConnecting")
 MP.RegisterEvent("onPlayerJoining","onPlayerJoining")
 MP.RegisterEvent("onPlayerJoin","onPlayerJoin")
 MP.RegisterEvent("onPlayerDisconnect","onPlayerDisconnect")
-	
+
 MP.RegisterEvent("onConsoleInput","onConsoleInput")
 MP.RegisterEvent("onChatMessage","onChatMessage")
+
+MP.RegisterEvent("onFileChanged","onFileChanged")
 
 MP.RegisterEvent("onVehicleSpawn","onVehicleSpawn")
 MP.RegisterEvent("onVehicleEdited","onVehicleEdited")
@@ -49,7 +51,7 @@ function onTick()
 
 	for k,v in pairs(delayedQueue) do
 		if k ~= "n" and v.complete == false and age >= v.execTime then
-			
+
 			v.complete = true
 
 			v.func(table.unpack(v.args))
@@ -119,7 +121,7 @@ function onPlayerJoining(ID)
 		MP.DropPlayer(ID,"You've been kicked from the server!")
 
 	else
-		
+
 	end
 end
 
@@ -137,7 +139,7 @@ function onPlayerJoin(ID)
 end
 
 function onPlayerDisconnect(ID)
-		
+
 	extensions.triggerEvent("onPlayerDisconnect", players[ID]) --allow extensions to act first.
 
 	if players[ID] then
@@ -160,7 +162,7 @@ function onConsoleInput(message)
 		return M.command({type="C", canExecute=function() return true end}, "help")
 	end
 
-	local commandPrefix = config.consolePrefix.value or "CE "
+	local commandPrefix = config.consolePrefix.value or "ce "
 	local prefixLen = commandPrefix:len()
 
 
@@ -204,25 +206,25 @@ function onChatMessage(playerID, name ,chatMessage)
 		if s ~= nil then
 			args = chatMessage:sub(s+1)
 		end
-		
+
 
 		--get the command and args from the chat message.
 		--local args = chatMessage
 		--args[0] = playerID
 
 		--run the command and react accordingly
-		
+
 		local reply = M.command(players[playerID], command, args)
 		if reply ~= nil then
 			MP.SendChatMessage(playerID, reply)
 		end
 
-		--make the chat message not appear in chat. 
+		--make the chat message not appear in chat.
 		return 1
 	else
-			
+
 	end
-	
+
 	if players[playerID].permissions.muted ~= true and players[playerID]:hasPermission("sendMessage") == true then
 		CElog("[".. playerID .. "]" .. name .. " : " .. chatMessage,"CHAT")
 	else
@@ -233,10 +235,10 @@ end
 
 
 function onVehicleSpawn(ID, vehID,  data)
-	
+
 	--local vehicle = vehicles.new(ID, vehID, data)
-	
-	
+
+
 
 	data = utils.parseVehData(data)
 
@@ -248,9 +250,9 @@ function onVehicleSpawn(ID, vehID,  data)
 	reason = reason or "Spawn blocked by extension"
 
 	if canSpawn then
-		CElog(players[ID].name .. " Spawned a '" .. data.name .. "' (".. ID .."-".. vehID ..")")
+		CElog(players[ID].name .. " spawned a '" .. data.name .. "' (".. ID .."-".. vehID ..")")
 	else
-		CElog(players[ID].name .. " Tried to spawn '" .. data.name .. "' (".. ID .."-".. vehID ..") The spawn was blocked due to '" .. reason .. "'")
+		CElog(players[ID].name .. " tried to spawn '" .. data.name .. "' (".. ID .."-".. vehID ..") The spawn was blocked due to '" .. reason .. "'")
 		players[ID]:tell("Unable to spawn vehicle: " .. reason)
 		MP.TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
@@ -261,7 +263,6 @@ function onVehicleSpawn(ID, vehID,  data)
 end
 
 function onVehicleEdited(ID, vehID,  data)
-
 	data = utils.parseVehData(data)
 
 
@@ -272,7 +273,7 @@ function onVehicleEdited(ID, vehID,  data)
 	if canSpawn then
 		CElog(players[ID].name .. " edited their '" .. data.name .. "' (".. ID .."-".. vehID ..")")
 	else
-		CElog(players[ID].name .. "tried to edit their '" .. data.name .. "' (".. ID .."-".. vehID ..") The edit has been blocked, and the vehicle deleted due to " .. reason)
+		CElog(players[ID].name .. " tried to edit their '" .. data.name .. "' (".. ID .."-".. vehID ..") The edit has been blocked, and the vehicle deleted due to " .. reason)
 		MP.TriggerGlobalEvent("onVehicleDeleted", ID, vehID)
 		return 1
 	end
@@ -305,7 +306,9 @@ function onVehicleDeleted(ID, vehID)
 	end
 end
 
-
+function onFileChanged(path)
+	if extensions.onFileChanged(path) then return end -- it was a CE extension, nothing else to do
+end
 
 ----------------------------------------------------------MUTATORS---------------------------------------------------------
 
@@ -329,7 +332,7 @@ local function delayExec(delay, func, args)
 
 	local delayedItem = {}
 
-	local age = ageTimer:GetCurrent()*1000 
+	local age = ageTimer:GetCurrent()*1000
 
 	delayedItem.execTime = age + delay --the time at which the func is called with args args
 	delayedItem.func = func --the function that is executed
@@ -344,7 +347,7 @@ end
 
 ---------------------------------------------------------ACCESSORS---------------------------------------------------------
 
--- PRE: the sender object, command object, the arguments after the commmand as a string are passed in.
+-- PRE: the sender object, command object, the arguments after the command as a string are passed in.
 --POST: the unhandledArgs string is divided up into distinct arguments for the command.
 local function getArguments(sender, command, unhandledArgs)
 	local args = {}
@@ -378,11 +381,11 @@ local function getArguments(sender, command, unhandledArgs)
 		args[0] = unhandledArgs and (" " .. unhandledArgs ) or ""
 
 		local argString = CC.getArgumentString(commandArgs)
-		
+
 		for index, argumentType in pairs(commandArgs) do
 			local lastArg = args[index - 1]
 			local s, e = lastArg:find(" ")
-			
+
 			--see if there are even more spaces
 			if s == nil then
 				break
@@ -431,7 +434,7 @@ local function getArguments(sender, command, unhandledArgs)
 		end
 	end
 
-	
+
 	--clear args if it's an empty table
 	if args == {} then
 		args = nil
@@ -459,19 +462,19 @@ local function command(sender, command, args)
 		end
 
 		if sender:canExecute(command) then
-			
+
 			if sender.playerID then
 				CElog(message)
 			end
 
 			if args == nil then
-				return _G[command.orginModule][commandName](sender)
+				return _G[command.originModule][commandName](sender)
 			else
-				return _G[command.orginModule][commandName](sender, table.unpack(args))
+				return _G[command.originModule][commandName](sender, table.unpack(args))
 			end
 
 		else
-			CElog("Insufficent Perms")
+			CElog("Insufficient Perms")
 			return "You do not have permission to use this command."
 		end
 	else

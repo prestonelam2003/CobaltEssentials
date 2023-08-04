@@ -1,4 +1,5 @@
 # CobaltEssentials
+
 CobaltEssentials for BeamMP Servers
 
 ## Basic Owner Setup of CobaltEssentials

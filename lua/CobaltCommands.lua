@@ -1,4 +1,4 @@
---Copyright (C) 2020, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
+--Copyright (C) 2023, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 local M = {}
@@ -8,7 +8,7 @@ local M = {}
 
 --runs when the script is called.
 function onInit()
-    
+
 end
 
 
@@ -98,17 +98,16 @@ local function status(sender, ...)
 	local playersList = ""
 	local playersInQueue = ""
 	local specPlayersList = ""
-	local currentPlayer
-	playerCount = 0
+	local playerCount = 0
 
 	for playerID, player in pairs(players) do
 		if type(playerID) == "number" then
 			playerCount = playerCount + 1
-			
-			currentPlayer = tostring(playerID) .. ": " .. tostring(player.name) .. "\n"
+
+			local currentPlayer = tostring(playerID) .. ": " .. tostring(player.name) .. "\n"
 
 
-			if player.gamemode.mode == 0 then 
+			if player.gamemode.mode == 0 then
 				playersList = playersList .. "[A] " .. currentPlayer
 			elseif player.gamemode.mode == 1 then
 				specPlayersList = specPlayersList .. "[Q] " .. currentPlayer
@@ -118,23 +117,20 @@ local function status(sender, ...)
 		end
 	end
 
-	playersList = "CE " .. cobaltVersion .. " | " .. playerCount .. "/" .. beamMPconfig.MaxPlayers .. " Player(s) | " .. beamMPconfig.Name .. " \n" .. playersList .. specPlayersList
-
-	return playersList
+	return string.format("CE %s | %d/%s Players | %s^r\n%s%s", cobaltVersion, playerCount, beamMPconfig.MaxPlayers, beamMPconfig.Name, playersList, specPlayersList)
 end
 
 local function statusdetail(sender, ...)
 	local playersList = ""
 	local playersInQueue = ""
 	local specPlayersList = ""
-	local currentPlayer
-	playerCount = 0
+	local playerCount = 0
 
 	for playerID, player in pairs(players) do
 		if type(playerID) == "number" then
 			playerCount = playerCount + 1
-			
-			currentPlayer = tostring(player)
+
+			local currentPlayer = tostring(player)
 
 
 			if player.gamemode.mode == 0 then
@@ -147,57 +143,52 @@ local function statusdetail(sender, ...)
 		end
 	end
 
-	playersList = "CE " .. cobaltVersion .. " | " .. playerCount .. "/" .. beamMPconfig.MaxPlayers .. " Player(s) | " .. beamMPconfig.Name .. " \n" .. playersList .. specPlayersList
-
-	return playersList
+	return string.format("CE %s | %d/%s Players | %s\n%s%s", cobaltVersion, playerCount, beamMPconfig.MaxPlayers, beamMPconfig.Name, playersList, specPlayersList)
 end
 
 local function connected(sender,...)
 	local playersConnected = ""
 	local playersLoading = ""
 	local playersDownloading = ""
-	local currentPlayer
-	playerCount = 0
+	local playerCount = 0
 
 
-	connectedCount = 0
-	loadingCount = 0
-	downloadingCount = 0
+	local connectedCount = 0
+	local loadingCount = 0
+	local downloadingCount = 0
 
 	for playerID, player in pairs(players) do
 		if type(playerID) == "number" then
 			playerCount = playerCount + 1
 
-			currentPlayer = tostring(playerID) .. ": " .. tostring(player.name) .. "\n"
+			local currentPlayer = tostring(playerID) .. ": " .. tostring(player.name) .. "\n"
 
-			if player.connectStage == "connected" then 
+			if player.connectStage == "connected" then
 				playersConnected = playersConnected .. "[C] " .. currentPlayer
 				connectedCount = connectedCount + 1
-			elseif player.connectStage == "loading" then 
+			elseif player.connectStage == "loading" then
 				playersLoading = playersLoading .. "[L] " .. currentPlayer
 				loadingCount = loadingCount + 1
-			elseif player.connectStage == "downloading" then 
+			elseif player.connectStage == "downloading" then
 				playersDownloading = playersDownloading .. "[D] " .. currentPlayer
 				downloadingCount = downloadingCount + 1
 			end
 		end
 	end
 
-	playersList = "Connected: " .. connectedCount .. " | Loading: " .. loadingCount .. " | Downloading: " .. downloadingCount .. " \n" .. playersConnected .. playersLoading .. playersDownloading
-
-	return playersList
+	return string.format("Connected: %d | Loading: %d | Downloading: %d\n%s%s%s", connectedCount, loadingCount, downloadingCount, playersConnected, playersLoading, playersDownloading)
 end
 
 local function help(sender, commandName, ...)
 	local commandList = ""
 
-	local commandColor, argColor, noColor, indent = "", "", "", ""
-	local commandPrefix = ""
+	local commandColor, argColor, noColor, indent = "^b", "^c", "^r", ""
+	local commandPrefix = config.commandPrefix.value or "/"
 
 	if sender.type == "C" then
 		commandColor, argColor, noColor, indent = color(94), color(31), color(0), "        "
 		commandList = "Cobalt Essentials:\n    Commands:\n"
-		commandPrefix = config.consolePrefix.value or "CE "
+		commandPrefix = config.consolePrefix.value or "ce "
 	end
 
 	local padRight = function(i) local a="" for b=i,1,-1 do a=a.." " end return a end
@@ -282,7 +273,7 @@ local function whitelist(sender, arguments)
 		action = arguments
 		argument = nil
 	end
-	
+
 	if action == "enable" then
 		config.enableWhitelist.value = true
 		returnString = "The whitelist has been enabled."
@@ -290,7 +281,7 @@ local function whitelist(sender, arguments)
 		config.enableWhitelist.value = false
 		returnString = "The whitelist has been disabled."
 	elseif action == "add" then
-		
+
 		if argument then
 			returnString = argument .. " has been whitelisted on this server."
 			players.database[argument].whitelisted = true
@@ -299,14 +290,14 @@ local function whitelist(sender, arguments)
 		end
 
 	elseif action == "remove" then
-		
+
 		if argument then
 			returnString = argument .. " has been unwhitelisted on this server."
 			players.database[argument].whitelisted = false
 		else
 			returnString = "You must specify a player"
 		end
-	
+
 	elseif action == "help" then
 		returnString = returnString .. "enable: turns on the whitelist\n"
 		returnString = returnString .. "disable: turns off the whitelist\n"
@@ -340,14 +331,14 @@ local function countdown(sender, ...)
 end
 
 local function lua(sender, toExecute, ...)
-	
+
 	CElog(sender.ID .. " executed: " .. toExecute .. "\n")
 	return load(toExecute)()
 end
 
 local function testCommand(sender, ...)
 	CElog("Test Command Executed")
-	return "Test Sucessful"
+	return "Test successful"
 end
 
 local function say(sender, message, ...)
@@ -356,9 +347,9 @@ end
 
 local function uptime(sender, ...)
 	local clock = math.floor(ageTimer:GetCurrent())
-	
+
 	local seconds = clock % 60
-	
+
 	local minutes = math.floor(clock/60) % 60
 
 	local hours = math.floor((math.floor(clock/60)/60))
@@ -374,7 +365,7 @@ local function uptime(sender, ...)
 		hours = "0" .. hours
 	end
 
-	
+
 	return(hours .. ":" .. minutes .. ":" .. seconds)
 
 end
@@ -396,6 +387,10 @@ local function stop(sender, ...)
 	CE.stopServer()
 end
 
+local function reload(sender, extensionName)
+	extensions.reload(extensionName)
+end
+
 --This is part of the copyright notice, if you edit Cobalt Essentials, you may not remove the copyright notice here.
 --The /about command, which points back to this function, must also stay enabled for all permissions.
 --The command must output the text as seen below, the function can be updated/modernized however, it must ultimately get this copyright notice back to the user in clear text.
@@ -403,7 +398,7 @@ end
 --You may add your credit to this command alongside mine, so long as it follows GPLv3 standards.
 --You may adjust line 1 and 2 to suit whatever Cobalt Essentials has turned into, so long as the original development credit goes to Preston Elam (Cobalt) and as per GPLv3 states, it's also gotta be under a GPLv3 license.
 --
---All in all, I've (Preston Elam) worked really hard on this beamMP plugin, i've made it open source and released it under a GPLv3 license so that if for whatever reason the direction I take the plugin doesn't satisfy you, or 
+--All in all, I've (Preston Elam) worked really hard on this beamMP plugin, i've made it open source and released it under a GPLv3 license so that if for whatever reason the direction I take the plugin doesn't satisfy you, or
 --I stop developing it, someone else can pick up where I left off, and to be honest I just want credit. I'm not a lawyer at a big buisness, if you fuck up some copyright notices or accidentally break the command im not gonna sue you,
 --I just really want to be recognized for all the time and effort I've put into Cobalt Essentials
 --																									-Preston Elam (Cobalt)
@@ -446,6 +441,7 @@ M.lua = lua
 M.uptime = uptime
 M.togglechat = togglechat
 M.stop = stop
+M.reload = reload
 M.about = about
 
 M.testCommand = testCommand
