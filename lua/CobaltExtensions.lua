@@ -1,4 +1,4 @@
---Copyright (C) 2020, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
+--Copyright (C) 2023, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 -- PRE: Precondition
@@ -152,8 +152,8 @@ end
 
 ---------------------------------------------------------ACCESSORS---------------------------------------------------------
 
--- PRE: a string 'event' is passed in, coresponding to a function in a module
---POST: any function at index event of a module is executed with parameters parameters
+-- PRE: a string 'event' is passed in, corresponding to a function in a module
+--POST: any function at index event of a module is executed with parameters
 local function triggerEvent(event, ...)
 	local args = {...}
 

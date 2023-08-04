@@ -1,4 +1,4 @@
---Copyright (C) 2020, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
+--Copyright (C) 2023, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 -- PRE: Precondition
@@ -412,7 +412,7 @@ local function canSpawn(player, vehID,  data)
 
 
 			local vehicleDBobject --database object of the vehicle
-			local defaultVehiclePermissions --a boolean refering to if vehicleDBobject is of the "default" slot
+			local defaultVehiclePermissions --a boolean referring to if vehicleDBobject is of the "default" slot
 			if vehiclePermissions[data.name]:exists() then
 				vehicleDBobject = vehiclePermissions[data.name]
 				defaultVehiclePermissions = false
@@ -430,8 +430,8 @@ local function canSpawn(player, vehID,  data)
 						for slot, part2 in pairs(data.vcf.parts) do
 							if part == part2 then
 								if value > player.permissions.level then
-									CElog('Insufficent Permissions for the part: "' .. part .. "' Spawn Blocked" )
-									return false, "Insufficent permissions for the part " .. part
+									CElog('Insufficient Permissions for the part: "' .. part .. "' Spawn Blocked" )
+									return false, "Insufficient permissions for the part: " .. part
 
 								end
 								break
@@ -446,12 +446,12 @@ local function canSpawn(player, vehID,  data)
 						return false, "Vehicle Cap Reached"
 				end
 			else
-				CElog("Insufficent Permissions for this Vehicle, Spawn Blocked")
-				return false, "Insufficent permissions to spawn '" .. data.name .. "'"
+				CElog("Insufficient Permissions for this Vehicle, Spawn Blocked")
+				return false, "Insufficient permissions to spawn '" .. data.name .. "'"
 			end
 		else
-			CElog("Insufficent Permissions, Spawn Blocked")
-			return false, "Insufficent Spawn Permissions"
+			CElog("Insufficient Permissions, Spawn Blocked")
+			return false, "Insufficient Spawn Permissions"
 		end
 
 		return true

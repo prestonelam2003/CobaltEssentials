@@ -1,4 +1,4 @@
---Copyright (C) 2021, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
+--Copyright (C) 2023, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
 --THIS SCRIPT IS PROTECTED UNDER AN GPLv3 LICENSE
 
 --    PRE: Precondition
@@ -44,8 +44,8 @@ local function parseVehData(data)
 
 	data = data:sub(s)
 
-	local sucessful, tempData = pcall(json.parse, data)
-	if not sucessful then
+	local successful, tempData = pcall(json.parse, data)
+	if not successful then
 		--TODO: BACKUP THE JSON IN A FILE. tempData is the error, data is the json.
 		return false
 	end
@@ -65,8 +65,8 @@ local function parseVehData(data)
 
 
 	if data[4] ~= nil then
-		local sucessful, tempData = pcall(json.parse, data[4])
-		if not sucessful then
+		local successful, tempData = pcall(json.parse, data[4])
+		if not successful then
 			--TODO: BACKUP THE JSON IN A FILE. tempData is the error, data is the json.
 			return false
 		end

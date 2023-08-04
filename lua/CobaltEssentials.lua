@@ -1,4 +1,4 @@
---Copyright (C) 2020, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
+--Copyright (C) 2023, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 --    PRE: Precondition
@@ -347,7 +347,7 @@ end
 
 ---------------------------------------------------------ACCESSORS---------------------------------------------------------
 
--- PRE: the sender object, command object, the arguments after the commmand as a string are passed in.
+-- PRE: the sender object, command object, the arguments after the command as a string are passed in.
 --POST: the unhandledArgs string is divided up into distinct arguments for the command.
 local function getArguments(sender, command, unhandledArgs)
 	local args = {}
@@ -468,13 +468,13 @@ local function command(sender, command, args)
 			end
 
 			if args == nil then
-				return _G[command.orginModule][commandName](sender)
+				return _G[command.originModule][commandName](sender)
 			else
-				return _G[command.orginModule][commandName](sender, table.unpack(args))
+				return _G[command.originModule][commandName](sender, table.unpack(args))
 			end
 
 		else
-			CElog("Insufficent Perms")
+			CElog("Insufficient Perms")
 			return "You do not have permission to use this command."
 		end
 	else

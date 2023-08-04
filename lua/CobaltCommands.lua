@@ -1,4 +1,4 @@
---Copyright (C) 2020, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
+--Copyright (C) 2023, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 local M = {}
@@ -338,7 +338,7 @@ end
 
 local function testCommand(sender, ...)
 	CElog("Test Command Executed")
-	return "Test Sucessful"
+	return "Test successful"
 end
 
 local function say(sender, message, ...)

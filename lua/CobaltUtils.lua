@@ -1,4 +1,4 @@
---Copyright (C) 2020, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
+--Copyright (C) 2023, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 local M = {}
@@ -105,7 +105,7 @@ function split(s, sep)
 end
 
 --PRE: ID is passed in, representing a player ID, an RCON ID, or C to print into console with message, a valid string.
---POST: message is output to the desired destination, if sent to players \n is seperated.
+--POST: message is output to the desired destination, if sent to players \n is separated.
 
 --IDs | "C" = console | "R<N>" = RCON | "<number>" = player
 function output(ID, message)
@@ -136,8 +136,8 @@ local function parseVehData(data)
 
 	data = data:sub(s)
 
-	local sucessful, tempData = pcall(json.parse, data)
-	if not sucessful then
+	local successful, tempData = pcall(json.parse, data)
+	if not successful then
 		--TODO: BACKUP THE JSON IN A FILE. tempData is the error, data is the json.
 		return false
 	end
@@ -151,8 +151,8 @@ local function parseVehData(data)
 
 
 	if data[4] ~= nil then
-		local sucessful, tempData = pcall(json.parse, data[4])
-		if not sucessful then
+		local successful, tempData = pcall(json.parse, data[4])
+		if not successful then
 			--TODO: BACKUP THE JSON IN A FILE. tempData is the error, data is the json.
 			return false
 		end
@@ -181,12 +181,12 @@ local function readOldCfg(path)
 			line = line:sub(1,c-1)
 		end
 
-		--see if this line even contians a value
+		--see if this line even contains a value
 		local equalSignIndex = line:find("=")
 		if equalSignIndex ~= nil then
 
 			local k = line:sub(1, equalSignIndex - 1)
-			k = k:gsub(" ", "") --remove spaces in the key, they aren't required and will serve to make thigns more confusing.
+			k = k:gsub(" ", "") --remove spaces in the key, they aren't required and will serve to make things more confusing.
 
 			local v = line:sub(equalSignIndex + 1)
 

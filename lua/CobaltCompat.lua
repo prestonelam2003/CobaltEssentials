@@ -1,4 +1,4 @@
---Copyright (C) 2020, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
+--Copyright (C) 2023, Preston Elam (CobaltTetra) ALL RIGHTS RESERVED
 --COBALTESSENTIALS IS PROTECTED UNDER AN GPLv3 LICENSE
 
 --    PRE: Precondition
@@ -111,7 +111,7 @@ local function registerCommand(command, func, reqPerm, desc, argCount, RCONonly)
 	commands[command].arguments = argCount
 	commands[command].description = desc
 
-	commands[command].orginModule = "CC"
+	commands[command].originModule = "CC"
 
 	if RCONonly == 1 then
 		commands[command].sourceLimited = 2
