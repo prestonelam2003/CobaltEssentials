@@ -111,6 +111,13 @@ function onPlayerConnecting(ID)
 	players.updateQueue()
 
 	players[ID].connectStage = "downloading"
+
+	if extensions.triggerEvent("onPlayerConnecting", players[ID]) == false then
+		MP.DropPlayer(ID,"You've been kicked from the server!")
+
+	else
+
+	end
 end
 
 function onPlayerJoining(ID)
