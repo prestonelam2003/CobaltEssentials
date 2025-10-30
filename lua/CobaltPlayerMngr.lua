@@ -237,7 +237,7 @@ local function new(name, role, isGuest, identifiers)
 	--CAN THE PLAYER JOIN?
 	if newPlayer.permissions.whitelisted == false and config.enableWhitelist.value == true then
 		canJoin = false
-		reason = "You are not whitelisted on this server!"
+		reason = query("config", "whitelistKickReason", "value"):sub(2, -2) or "You are not whitelisted on this server!"
 	end
 
 

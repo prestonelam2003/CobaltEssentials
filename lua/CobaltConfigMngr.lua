@@ -76,19 +76,21 @@ end
 --IF YOU ARE LOOKING FOR THE CONFIG, PLEASE REFER TO: beamMPserver/Resources/Server/CobaltEssentials/CobaltDB for where the json config is now stored.
 local defaultConfig =
 {
-	commandPrefix =		{value = "/",			description = "The character placed at the beginning of a chat message when using a command"},
-	consolePrefix =		{value = "ce ",			description = "The text placed at the beginning of a console command"},
-	maxActivePlayers =	{value = 20,			description = "max amount of active/nonspectator players allowed on a server, any further players will be spectator and placed in a queue"},
-	enableWhitelist =	{value = false,			description = "whether or not the whitelist is enabled"},
-	enableDebug =		{value = false,			description = "whether or not the server will output debug messages"},
-	enableColors =		{value = true,			description = "whether or not console outputs can utilize colors. Causes problems with environments missing ANSI escape sequence support. Requires restart"},
+	commandPrefix =		  {value = "/",										description = "The character placed at the beginning of a chat message when using a command"},
+	consolePrefix =		  {value = "ce ",										description = "The text placed at the beginning of a console command"},
+	maxActivePlayers =	  {value = 20,										description = "max amount of active/nonspectator players allowed on a server, any further players will be spectator and placed in a queue"},
+	enableWhitelist =	  {value = false,										description = "whether or not the whitelist is enabled"},
+	enableDebug =		  {value = false,										description = "whether or not the server will output debug messages"},
+	enableColors =		  {value = true,										description = "whether or not console outputs can utilize colors. Causes problems with environments missing ANSI escape sequence support. Requires restart"},
 
-	RCONenabled =		{value = true,			description = "whether or not the server runs a q3 compliant rcon server for remote access to the server. Requires restart"},
-	RCONport =			{value = 20814,			description = "The port used to host the server. Since CE is external to beamMP make sure to not place this on the same port as the server."},
-	RCONpassword =		{value = "password",	description = "The password required to connect to the RCON"},
-	RCONkeepAliveTick = {value = false,			description = "The amount of seconds between ticks sent to RCONclients to keep the connections alive, false to disable, This may not work?"},
+	RCONenabled =		  {value = true,										description = "whether or not the server runs a q3 compliant rcon server for remote access to the server. Requires restart"},
+	RCONport =			  {value = 20814,										description = "The port used to host the server. Since CE is external to beamMP make sure to not place this on the same port as the server."},
+	RCONpassword =	      {value = "password",								description = "The password required to connect to the RCON"},
+	RCONkeepAliveTick =   {value = false,										description = "The amount of seconds between ticks sent to RCONclients to keep the connections alive, false to disable, This may not work?"},
 
-	CobaltDBport =		{value = 10814,			description = "The port used for internal CobaltDB communications, please keep it unique to each server or there may be interference."}
+	CobaltDBport =		  {value = 10814,										description = "The port used for internal CobaltDB communications, please keep it unique to each server or there may be interference."},
+
+	whitelistKickReason = {value = "You are not whitelisted on this server!", description = "The message displayed to the user when they are kicked due to not being whitelisted"}
 }
 
 local defaultPermissions =
