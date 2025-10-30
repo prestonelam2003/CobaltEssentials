@@ -6,7 +6,7 @@ CobaltEssentials for BeamMP Servers
 
 This guide will walk through the most basic process of installing **CobaltEssentials** onto a **BeamMP Server** and setting yourself as the **owner**.
 
-This assumes you have successfully set up your own **BeamMP Server**, there is a guide **[here](https://wiki.beammp.com/en/home/server-installation)**.
+This assumes you have successfully set up your own **BeamMP Server**, there is a guide **[here](https://docs.beammp.com/server/create-a-server/)**.
 
 ### Installation and setting yourself as owner:
 1. Get the latest **CobaltEssentials** from the **[CobaltEssentials GitHub](https://github.com/prestonelam2003/CobaltEssentials)**

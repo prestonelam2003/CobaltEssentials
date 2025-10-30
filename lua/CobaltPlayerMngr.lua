@@ -183,6 +183,7 @@ local function new(name, role, isGuest, identifiers)
 	--newPlayer.hardwareID = GetPlayerHWID(playerID)
 	newPlayer.beammp = identifiers.beammp
 	newPlayer.ip = identifiers.ip
+	newPlayer.role = role
 	newPlayer.guest = isGuest
 	newPlayer.name = name
 	newPlayer.joinTime = ageTimer:GetCurrent()*1000
