@@ -111,7 +111,7 @@ local function registerCommand(command, func, reqPerm, desc, argCount, RCONonly)
 	commands[command].arguments = argCount
 	commands[command].description = desc
 
-	commands[command].orginModule = "CC"
+	commands[command].originModule = "CC"
 
 	if RCONonly == 1 then
 		commands[command].sourceLimited = 2

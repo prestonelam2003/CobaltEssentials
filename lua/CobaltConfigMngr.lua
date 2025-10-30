@@ -101,30 +101,30 @@ local defaultPermissions =
 
 local defaultCommands =
 {
-	--orginModule[commandName] is where the command is executed from
+	--originModule[commandName] is where the command is executed from
 	--Source-Limit-Map [0:no limit | 1:Chat Only | 2:RCON Only]
 	--A star before an argument actually means the opposite of what it would traditionally mean, a '*' means the argument is optional.
-	help =			{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = {"*command"},			description = "Lists all commands accessible by the player"},
-	status =		{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Lists all the players on the server with their ids and basic information on the server"},
-	statusdetail =	{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Lists all the players on the server in detail along with basic server information"},
-	connected =		{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Get the connection state of all players on the server"},
-	about =			{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Displays the license, version, and copyright notice associated with Cobalt Essentials"},
-	uptime =		{orginModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Get the uptime of the server"},
-	countdown =		{orginModule = "CC",	level = 1,	sourceLimited = 0,	arguments = 0,						description = "Start a countdown in chat"},
-	whitelist =		{orginModule = "CC",	level = 5,	sourceLimited = 0,	arguments = {"subcommand"},			description = "Control the server's whitelist"},
-	say =			{orginModule = "CC",	level = 5,	sourceLimited = 0,	arguments = {"message"},			description = "Say a message as the server"},
-	mute =			{orginModule = "CC",	level = 5,	sourceLimited = 0,	arguments = {"player","*reason"},	description = "Disallow a player from talking"},
-	unmute =		{orginModule = "CC",	level = 5,	sourceLimited = 0,	arguments = {"player"},				description = "Allow a muted player to talk again"},
-	kick =			{orginModule = "CC",	level = 5,	sourceLimited = 0,	arguments = {"player","*reason"},	description = "Kick a player from the session"},
-	setcfg =		{orginModule = "CC",	level = 5,	sourceLimited = 0,	arguments = {"option","value"},		description = "Set a vanilla beamMP server config option"},
-	ban =			{orginModule = "CC",	level = 10,	sourceLimited = 0,	arguments = {"player","*reason"},	description = "Ban a player from the server"},
-	unban =			{orginModule = "CC",	level = 10,	sourceLimited = 0,	arguments = {"player"},				description = "Unban a player from the server"},
-	setperm =		{orginModule = "CC",	level = 10,	sourceLimited = 0,	arguments = {"player","value"},		description = "Set a player's permission level"},
-	setgroup =		{orginModule = "CC",	level = 10,	sourceLimited = 0,	arguments = {"player","value"},		description = "Set a player's permission group"},
-	lua =			{orginModule = "CC",	level = 10,	sourceLimited = 2,	arguments = {"command"},			description = "Execute Lua, return the desired reply"},
-	reload =		{orginModule = "CC",	level = 10,	sourceLimited = 0,	arguments = {"extension"},			description = "Reload the given Cobalt Extension"},
-	togglechat =	{orginModule = "CC",	level =	10,	sourceLimited = 2,	arguments = 0,						description = "Toggles viewing chat in the RCON client"},
-	stop =			{orginModule = "CC",	level = 10,	sourceLimited = 0,	arguments = 0,						description = "Stops the server"}
+	help =			{originModule = "CC",	level = 0,	sourceLimited = 0,	arguments = {"*command"},			description = "Lists all commands accessible by the player"},
+	status =		{originModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Lists all the players on the server with their ids and basic information on the server"},
+	statusdetail =	{originModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Lists all the players on the server in detail along with basic server information"},
+	connected =		{originModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Get the connection state of all players on the server"},
+	about =			{originModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Displays the license, version, and copyright notice associated with Cobalt Essentials"},
+	uptime =		{originModule = "CC",	level = 0,	sourceLimited = 0,	arguments = 0,						description = "Get the uptime of the server"},
+	countdown =		{originModule = "CC",	level = 1,	sourceLimited = 0,	arguments = 0,						description = "Start a countdown in chat"},
+	whitelist =		{originModule = "CC",	level = 5,	sourceLimited = 0,	arguments = {"subcommand"},			description = "Control the server's whitelist"},
+	say =			{originModule = "CC",	level = 5,	sourceLimited = 0,	arguments = {"message"},			description = "Say a message as the server"},
+	mute =			{originModule = "CC",	level = 5,	sourceLimited = 0,	arguments = {"player","*reason"},	description = "Disallow a player from talking"},
+	unmute =		{originModule = "CC",	level = 5,	sourceLimited = 0,	arguments = {"player"},				description = "Allow a muted player to talk again"},
+	kick =			{originModule = "CC",	level = 5,	sourceLimited = 0,	arguments = {"player","*reason"},	description = "Kick a player from the session"},
+	setcfg =		{originModule = "CC",	level = 5,	sourceLimited = 0,	arguments = {"option","value"},		description = "Set a vanilla beamMP server config option"},
+	ban =			{originModule = "CC",	level = 10,	sourceLimited = 0,	arguments = {"player","*reason"},	description = "Ban a player from the server"},
+	unban =			{originModule = "CC",	level = 10,	sourceLimited = 0,	arguments = {"player"},				description = "Unban a player from the server"},
+	setperm =		{originModule = "CC",	level = 10,	sourceLimited = 0,	arguments = {"player","value"},		description = "Set a player's permission level"},
+	setgroup =		{originModule = "CC",	level = 10,	sourceLimited = 0,	arguments = {"player","value"},		description = "Set a player's permission group"},
+	lua =			{originModule = "CC",	level = 10,	sourceLimited = 2,	arguments = {"command"},			description = "Execute Lua, return the desired reply"},
+	reload =		{originModule = "CC",	level = 10,	sourceLimited = 0,	arguments = {"extension"},			description = "Reload the given Cobalt Extension"},
+	togglechat =	{originModule = "CC",	level =	10,	sourceLimited = 2,	arguments = 0,						description = "Toggles viewing chat in the RCON client"},
+	stop =			{originModule = "CC",	level = 10,	sourceLimited = 0,	arguments = 0,						description = "Stops the server"}
 }
 
 local defaultVehiclePermissions =
